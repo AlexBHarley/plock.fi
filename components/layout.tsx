@@ -183,7 +183,7 @@ const tabs = [
     disabled: true,
   },
   {
-    name: 'Audit Log',
+    name: 'History',
     icon: (
       <svg
         className="h-4"
