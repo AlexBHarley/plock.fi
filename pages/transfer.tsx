@@ -1,5 +1,5 @@
 import { gql, useLazyQuery } from '@apollo/client';
-import { Panel, Table } from 'components';
+import { Panel, Table, toast } from 'components';
 import { Toggle } from 'components/toggle';
 import { useCallback, useEffect, useState } from 'react';
 import { IoMdRefresh } from 'react-icons/io';
@@ -71,6 +71,32 @@ export default function Transfer() {
       ceur: '0.00',
     });
   }, [address]);
+
+  const transfer = useCallback(async () => {
+    if (!kit.defaultAccount) {
+      openModal();
+      return;
+    }
+
+    let contract;
+    if (currency === Currencies.CELO) {
+      contract = await kit.contracts.getGoldToken();
+    } else if (currency === Currencies.cUSD) {
+      contract = await kit.contracts.getStableToken();
+    } else {
+      throw new Error('Unsupported currency');
+    }
+
+    await contract
+      .transfer(toAddress, Web3.utils.toWei(amount, 'ether'))
+      .sendAndWaitForReceipt();
+    toast.success(`${amount} ${currency} sent`);
+    fetchBalances();
+  }, [amount, currency, kit, fetchBalances]);
+
+  useEffect(() => {
+    fetchBalances();
+  }, [fetchBalances]);
 
   useEffect(() => {
     loadTransfers({ variables: { address: kit.defaultAccount } });
@@ -186,7 +212,7 @@ export default function Transfer() {
         </div>
 
         <button
-          onClick={openModal}
+          onClick={transfer}
           className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
         >
           Send
