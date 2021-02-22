@@ -345,7 +345,7 @@ export function WithAppLayout({ children }) {
                   <a className="inline-flex">
                     <Image src="/logo.png" height={'24px'} width={'24px'} />
                     <span className="hidden md:block text-gray-300 ml-4">
-                      Celo Home
+                      CeloTools
                     </span>
                   </a>
                 </Link>
@@ -432,7 +432,7 @@ export function WithAppLayout({ children }) {
             <div className="flex items-center">
               <Image src="/logo.png" height="24px" width="24px" />
               <p className="text-center text-base font-medium text-gray-300 ml-2">
-                Celo Home
+                CeloTools
               </p>
             </div>
           </div>

@@ -45,7 +45,7 @@ export function Ledger({ onSubmit }: { onSubmit: () => Promise<void> }) {
               Ledger Connect
             </div>
             <p className="text-gray-400 leading-tight text-sm">
-              Securely connect Celo Manager to your ledger device. Before
+              Securely connect CeloTools to your ledger device. Before
               proceeding, please ensure you have:
               <ul className="list-disc list-inside">
                 <li className="mt-2">Connected your Ledger (via USB)</li>
@@ -119,12 +119,21 @@ function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <title>Celo Home</title>
+        <title>CeloTools</title>
         <link rel="icon" href="/favicon.ico" />
+
+        {process.browser && (
+          <script
+            async
+            defer
+            data-domain="celotools.com"
+            src="https://stats.celotools.com/js/index.js"
+          />
+        )}
       </Head>
 
       <ContractKitProvider
-        dappName="Celo Home"
+        dappName="CeloTools"
         reactModalProps={{
           style: {
             overlay: {
