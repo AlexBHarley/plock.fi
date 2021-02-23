@@ -24,7 +24,7 @@ export function Sidebar({
   const router = useRouter();
 
   return (
-    <aside className="sm:px-6 lg:py-0 lg:px-0 lg:col-span-3">
+    <aside className="sm:px-6 md:pb-4 lg:px-0 lg:col-span-3">
       <nav className="hidden md:block space-y-1">
         {items.map((item, i) => (
           <Link href={item.disabled ? router.asPath : item.link}>
@@ -273,7 +273,7 @@ export function WithAppLayout({ children }) {
       />
 
       <div className="md:hidden rounded-full fixed right-6 bottom-6 z-50 overflow-hidden">
-        <button className="md:hidden primary-button">Connect</button>
+        <button className="primary-button">Connect</button>
       </div>
 
       <header className="">

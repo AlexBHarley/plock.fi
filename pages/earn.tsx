@@ -44,8 +44,8 @@ export default function Earn() {
     pendingWithdrawals: [],
   });
   const [groupVotes, setGroupVotes] = useState<GroupVote[]>([]);
+  const [hasVotesToActive, setHasVotesToActivate] = useState(false);
 
-  const [viewing, setViewing] = useState('');
   const [groups, setGroups] = useState<
     (ValidatorGroup & {
       score: BigNumber;
@@ -105,12 +105,19 @@ export default function Earn() {
 
   const lock = useCallback(async () => {
     const lockedCelo = await kit.contracts.getLockedGold();
-    await lockedCelo.lock().sendAndWaitForReceipt({ value: lockAmount });
+    try {
+      await lockedCelo
+        .lock()
+        .sendAndWaitForReceipt({ value: toWei(lockAmount) });
+      toast.success('CELO locked');
+    } catch (e) {
+      toast.error(e.message);
+    }
   }, [kit, lockAmount]);
 
   const unlock = useCallback(async () => {
     const lockedCelo = await kit.contracts.getLockedGold();
-    await lockedCelo.unlock(lockAmount).sendAndWaitForReceipt();
+    await lockedCelo.unlock(toWei(lockAmount)).sendAndWaitForReceipt();
   }, [kit, lockAmount]);
 
   const withdraw = useCallback(
@@ -232,7 +239,7 @@ export default function Earn() {
   const nonvotingPctStr = nonvotingPct.isNaN() ? '0' : nonvotingPct.toFixed(0);
   const notLockedPctStr = notLockedPct.isNaN() ? '0' : notLockedPct.toFixed(0);
 
-  console.log('>>>', groups);
+  console.log(groupVotes);
 
   return (
     <>
