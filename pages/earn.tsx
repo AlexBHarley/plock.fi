@@ -241,7 +241,7 @@ export default function Earn() {
           <div className="text-gray-200 text-xl font-medium">
             Earn with CELO
           </div>
-          <p className="text-gray-400 text-xs md:text-sm  mt-2">
+          <p className="text-gray-400 text-xs md:text-sm mt-2">
             Staking your CELO is a great way to earn passive rewards. To begin
             staking you first need to lock your CELO, then you're free to vote
             for validator groups of your choosing.
@@ -249,7 +249,7 @@ export default function Earn() {
         </div>
 
         <div className="space-y-3">
-          <div className="flex flex-col md:flex-row space-y-1 md:space-y-0 md:space-x-3 items-end md:items-center justify-end">
+          <div className="flex flex-col sm:flex-row space-y-1 md:space-y-0 md:space-x-3 items-end justify-end">
             <span
               style={{ width: 'fit-content' }}
               className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 whitespace-no-wrap"
@@ -326,36 +326,39 @@ export default function Earn() {
                 locked for voting. Lock or unlock more for access to more
                 rewards.{' '}
               </div>
-              <div className="mx-auto">
-                <span className="hidden md:flex flex-row items-center space-x-3">
-                  <button className="secondary-button" onClick={unlock}>
-                    Unlock
-                  </button>
-                  <div className="mt-1 relative rounded-md shadow-sm">
-                    <input
-                      type="text"
-                      value={lockAmount}
-                      onChange={(e) => setLockAmount(e.target.value)}
-                      className="appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-full md:w-64"
-                      placeholder={'0'}
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center">
-                      <div className="flex items-center justify-center focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-4 border-transparent bg-transparent text-gray-300 sm:text-sm rounded-md">
-                        CELO
+              <div>
+                <div className="flex">
+                  <span className="hidden sm:inline-flex mx-auto flex-row items-center space-x-3 min-w-0">
+                    <button className="secondary-button" onClick={unlock}>
+                      Unlock
+                    </button>
+                    <div className="mt-1 relative rounded-md shadow-sm">
+                      <input
+                        type="text"
+                        value={lockAmount}
+                        onChange={(e) => setLockAmount(e.target.value)}
+                        className="appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-80"
+                        placeholder={'0'}
+                      />
+                      <div className="absolute inset-y-0 right-0 flex items-center">
+                        <div className="flex items-center justify-center focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-4 border-transparent bg-transparent text-gray-300 sm:text-sm rounded-md">
+                          CELO
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <button className="secondary-button" onClick={lock}>
-                    Lock
-                  </button>
-                </span>
-                <span className="flex md:hidden flex-col">
-                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <button className="secondary-button" onClick={lock}>
+                      Lock
+                    </button>
+                  </span>
+                </div>
+
+                <span className="flex sm:hidden flex-col">
+                  <div className="mt-1 relative rounded-md shadow-sm w-full">
                     <input
                       type="text"
                       value={lockAmount}
                       onChange={(e) => setLockAmount(e.target.value)}
-                      className="appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-full md:w-64"
+                      className="appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-full"
                       placeholder={'0'}
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center">
