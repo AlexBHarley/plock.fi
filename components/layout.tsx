@@ -214,7 +214,7 @@ const tabs = [
 export function WithAppLayout({ children }) {
   const menuRef = useRef(null);
   const { network, summary } = Base.useContainer();
-  const { kit, updateNetwork, fornoUrl, openModal } = useContractKit();
+  const { kit, updateNetwork, fornoUrl, openModal, address } = useContractKit();
   const [healthy, setHealthy] = useState(true);
   const [menu, setMenu] = useState(false);
   const router = useRouter();
@@ -272,9 +272,11 @@ export function WithAppLayout({ children }) {
         }}
       />
 
-      <div className="md:hidden rounded-full fixed right-6 bottom-6 z-50 overflow-hidden">
-        <button className="primary-button">Connect</button>
-      </div>
+      {!address && (
+        <div className="md:hidden rounded-full fixed right-6 bottom-6 z-50 overflow-hidden">
+          <button className="primary-button">Connect</button>
+        </div>
+      )}
 
       <header className="">
         {menu && (
@@ -290,7 +292,7 @@ export function WithAppLayout({ children }) {
                   <button
                     type="button"
                     onClick={() => setMenu(false)}
-                    className="rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                    className="rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
                   >
                     <span className="sr-only">Close menu</span>
                     {/* Heroicon name: outline/x */}
@@ -353,7 +355,7 @@ export function WithAppLayout({ children }) {
             </div>
             <div className="relative flex items-center md:space-x-6">
               {kit.defaultAccount ? (
-                <div>
+                <div className="hidden md:flex flex-col">
                   <span className="text-gray-200 text-xs">
                     {summary.name || 'Unknown'}
                   </span>
@@ -373,7 +375,7 @@ export function WithAppLayout({ children }) {
                 </button>
               )}
 
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 ">
                 <select
                   name=""
                   id=""
@@ -412,11 +414,11 @@ export function WithAppLayout({ children }) {
                 </button>
               </div>
 
-              <div className="hidden md:block">
+              {/* <div className="hidden md:block">
                 <div className={healthy ? 'text-green-600' : 'text-red-600'}>
                   <PulsatingDot />
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -427,7 +429,7 @@ export function WithAppLayout({ children }) {
       </div>
 
       <footer className="bg-gray-850 pb-12 md:pb-0">
-        <div className="max-w-screen-lg mx-auto py-12 px-4 sm:px-6 md:flex md:items-center md:justify-between lg:px-8">
+        <div className="max-w-screen-lg mx-auto py-8 px-4 space-y-8 md:space-y-0 sm:px-6 md:flex md:items-center md:justify-between lg:px-8">
           <div className="mt-8 md:mt-0">
             <div className="flex items-center">
               <Image src="/logo.png" height="24px" width="24px" />

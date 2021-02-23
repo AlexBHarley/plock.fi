@@ -5769,9 +5769,9 @@ url@^0.11.0:
     querystring "0.2.0"
 
 use-contractkit@*:
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/use-contractkit/-/use-contractkit-0.0.10.tgz#77109393bf614c47a78f59c5220ad01491d6a855"
-  integrity sha512-1NdHr3KAD+2RfifhbYl7ACH8sw3EtGZg7trps8dQLy9/K3lXx8Y6DF1QITyMuiKpXshdKABfTclNZqil3QxNKw==
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/use-contractkit/-/use-contractkit-0.0.11.tgz#30bac9454d48174aa3a00d07f9371470a1cb48ed"
+  integrity sha512-7i1i4ImnVp2GZqUUA42i5fISUxVl/V23wy+iS0bPjarB5wyhH7T7zMyx8mhsO89UbxesdhzStCFjy2UttVYUAg==
   dependencies:
     "@celo/contractkit" "^1.0.2"
     "@celo/wallet-ledger" "^1.0.2"

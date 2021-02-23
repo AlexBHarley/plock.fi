@@ -3,7 +3,6 @@ import { PendingWithdrawal } from '@celo/contractkit/lib/wrappers/LockedGold';
 import { ValidatorGroup } from '@celo/contractkit/lib/wrappers/Validators';
 import { BigNumber } from 'bignumber.js';
 import { CopyText, CustomSelectSearch, Panel, Table, toast } from 'components';
-import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import Loader from 'react-loader-spinner';
 import { useContractKit } from 'use-contractkit';
@@ -25,14 +24,17 @@ interface AccountSummary {
   pendingWithdrawals: PendingWithdrawal[];
 }
 
-enum Status {
-  Active = 'Active',
-  Pending = 'Pending',
-  Revoking = 'Revoking',
+enum States {
+  None,
+  Activating,
+  Revoking,
+  Locking,
+  Unlocking,
+  Voting,
 }
 
 export default function Earn() {
-  const { kit } = useContractKit();
+  const { kit, send } = useContractKit();
 
   const [celo, setCelo] = useState(new BigNumber(0));
   const [accountSummary, setAccountSummary] = useState<AccountSummary>({
@@ -44,7 +46,8 @@ export default function Earn() {
     pendingWithdrawals: [],
   });
   const [groupVotes, setGroupVotes] = useState<GroupVote[]>([]);
-  const [hasVotesToActive, setHasVotesToActivate] = useState(false);
+  const [inactiveVotes, setInactiveVotes] = useState(new BigNumber(0));
+  const [state, setState] = useState(States.None);
 
   const [groups, setGroups] = useState<
     (ValidatorGroup & {
@@ -53,10 +56,8 @@ export default function Earn() {
       electedCount: number;
     })[]
   >([]);
-  const [lockAmount, setLockAmount] = useState('0');
-
-  const [savingVote, setSavingVote] = useState(false);
-  const [voteAmount, setVoteAmount] = useState('0');
+  const [lockAmount, setLockAmount] = useState('');
+  const [voteAmount, setVoteAmount] = useState('');
   const [votingAddress, setVotingAddress] = useState('');
 
   const [totalVotes, setTotalVotes] = useState(new BigNumber(0));
@@ -87,13 +88,19 @@ export default function Earn() {
     const votedForGroups = await election.getGroupsVotedForByAccount(
       kit.defaultAccount
     );
-    setGroupVotes(
-      await Promise.all(
-        votedForGroups.map((groupAddress) =>
-          election.getVotesForGroupByAccount(kit.defaultAccount, groupAddress)
-        )
+
+    const groupVotes = await Promise.all(
+      votedForGroups.map((groupAddress) =>
+        election.getVotesForGroupByAccount(kit.defaultAccount, groupAddress)
       )
     );
+    setInactiveVotes(
+      groupVotes.reduce(
+        (total, gv) => gv.pending.plus(total),
+        new BigNumber('0')
+      )
+    );
+    setGroupVotes(groupVotes);
 
     const [locked, goldToken] = await Promise.all([
       kit.contracts.getLockedGold(),
@@ -104,92 +111,93 @@ export default function Earn() {
   }, [kit.defaultAccount]);
 
   const lock = useCallback(async () => {
-    const lockedCelo = await kit.contracts.getLockedGold();
+    setState(States.Locking);
     try {
-      await lockedCelo
-        .lock()
-        .sendAndWaitForReceipt({ value: toWei(lockAmount) });
+      const lockedCelo = await kit.contracts.getLockedGold();
+      await send(lockedCelo.lock(), { value: toWei(lockAmount) });
       toast.success('CELO locked');
+      setLockAmount('0');
     } catch (e) {
       toast.error(e.message);
     }
-  }, [kit, lockAmount]);
+    setState(States.None);
+  }, [kit, send, lockAmount]);
 
   const unlock = useCallback(async () => {
-    const lockedCelo = await kit.contracts.getLockedGold();
-    await lockedCelo.unlock(toWei(lockAmount)).sendAndWaitForReceipt();
-  }, [kit, lockAmount]);
+    setState(States.Unlocking);
+    try {
+      const lockedCelo = await kit.contracts.getLockedGold();
+      await send(lockedCelo.unlock(toWei(lockAmount)));
+      toast.success('CELO unlocked');
+      setLockAmount('');
+    } catch (e) {
+      toast.error(e.message);
+    }
+    setState(States.None);
+  }, [kit, send, lockAmount]);
 
   const withdraw = useCallback(
     async (value: number) => {
       const lockedCelo = await kit.contracts.getLockedGold();
-      await lockedCelo.withdraw(value).sendAndWaitForReceipt();
+      await send(lockedCelo.withdraw(value));
     },
-    [kit, fetchAccountSummary]
+    [kit, send, fetchAccountSummary]
   );
 
   const activate = useCallback(async () => {
+    setState(States.Activating);
     try {
       const election = await kit.contracts.getElection();
-      await Promise.all(
-        (await election.activate(kit.defaultAccount)).map((tx) =>
-          tx.sendAndWaitForReceipt()
-        )
-      );
+      await send(await election.activate(kit.defaultAccount));
       toast.success('Votes activated');
     } catch (e) {
       toast.error(`Unable to activate votes ${e.message}`);
-    } finally {
-      fetchAccountSummary();
     }
-  }, [kit, fetchAccountSummary]);
+    fetchAccountSummary();
+    setState(States.None);
+  }, [kit, send, fetchAccountSummary]);
 
   const vote = useCallback(
     async (address: string, value: string) => {
-      setSavingVote(true);
+      setState(States.Voting);
       try {
         const election = await kit.contracts.getElection();
-        await (
-          await election.vote(address, new BigNumber(value))
-        ).sendAndWaitForReceipt();
+        await send(await election.vote(address, new BigNumber(value)));
         toast.success('Vote cast');
-        return true;
+
+        setVoteAmount('');
+        setVotingAddress('');
       } catch (e) {
         toast.error(`Unable to vote ${e.message}`);
-        return false;
       } finally {
-        setSavingVote(false);
+        setState(States.Voting);
         fetchAccountSummary();
       }
     },
-    [kit, fetchAccountSummary]
+    [kit, send, fetchAccountSummary]
   );
 
   const revoke = useCallback(
     async (address: string, value: string) => {
-      setSavingVote(true);
+      setState(States.Revoking);
       try {
         const election = await kit.contracts.getElection();
-        await Promise.all(
-          (
-            await election.revoke(
-              kit.defaultAccount,
-              address,
-              new BigNumber(value)
-            )
-          ).map((tx) => tx.sendAndWaitForReceipt())
+        await send(
+          await election.revoke(
+            kit.defaultAccount,
+            address,
+            new BigNumber(value)
+          )
         );
         toast.success('Vote cast');
-        return true;
       } catch (e) {
         toast.error(`Unable to vote ${e.message}`);
-        return false;
       } finally {
-        setSavingVote(false);
+        setState(States.None);
         fetchAccountSummary();
       }
     },
-    [kit, fetchAccountSummary]
+    [kit, send, fetchAccountSummary]
   );
 
   const fetchValidators = useCallback(async () => {
@@ -238,8 +246,6 @@ export default function Earn() {
   const votingPctStr = votingPct.isNaN() ? '0' : votingPct.toFixed(0);
   const nonvotingPctStr = nonvotingPct.isNaN() ? '0' : nonvotingPct.toFixed(0);
   const notLockedPctStr = notLockedPct.isNaN() ? '0' : notLockedPct.toFixed(0);
-
-  console.log(groupVotes);
 
   return (
     <>
@@ -334,17 +340,14 @@ export default function Earn() {
                 rewards.{' '}
               </div>
               <div>
-                <div className="flex">
-                  <span className="hidden sm:inline-flex mx-auto flex-row items-center space-x-3 min-w-0">
-                    <button className="secondary-button" onClick={unlock}>
-                      Unlock
-                    </button>
+                <span className="flex flex-col">
+                  <div className="w-full md:w-96 md:mx-auto">
                     <div className="mt-1 relative rounded-md shadow-sm">
                       <input
                         type="text"
                         value={lockAmount}
                         onChange={(e) => setLockAmount(e.target.value)}
-                        className="appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-80"
+                        className="appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-full"
                         placeholder={'0'}
                       />
                       <div className="absolute inset-y-0 right-0 flex items-center">
@@ -353,39 +356,32 @@ export default function Earn() {
                         </div>
                       </div>
                     </div>
-                    <button className="secondary-button" onClick={lock}>
-                      Lock
-                    </button>
-                  </span>
-                </div>
-
-                <span className="flex sm:hidden flex-col">
-                  <div className="mt-1 relative rounded-md shadow-sm w-full">
-                    <input
-                      type="text"
-                      value={lockAmount}
-                      onChange={(e) => setLockAmount(e.target.value)}
-                      className="appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-full"
-                      placeholder={'0'}
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center">
-                      <div className="flex items-center justify-center focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-4 border-transparent bg-transparent text-gray-300 sm:text-sm rounded-md">
-                        CELO
-                      </div>
+                    <div className="flex text-gray-400 text-xs mt-2">
+                      {toWei(lockAmount || '0')} CELO (Wei)
                     </div>
                   </div>
-                  <div className="flex space-x-4 justify-center items-center">
-                    <button className="secondary-button" onClick={unlock}>
-                      Unlock
-                    </button>
-                    <button className="secondary-button" onClick={lock}>
-                      Lock
-                    </button>
-                  </div>
+                  {state === States.Locking || state === States.Unlocking ? (
+                    <div className="flex items-center justify-center mt-3">
+                      <Loader
+                        type="TailSpin"
+                        color="white"
+                        height="24px"
+                        width="24px"
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex space-x-4 justify-center items-center">
+                        <button className="secondary-button" onClick={unlock}>
+                          Unlock
+                        </button>
+                        <button className="secondary-button" onClick={lock}>
+                          Lock
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </span>
-                <div className="flex text-gray-400 text-xs justify-center mt-2">
-                  {toWei(lockAmount)} CELO (Wei)
-                </div>
               </div>
             </div>
           </div>
@@ -413,6 +409,14 @@ export default function Earn() {
                 ({nonvotingPctStr}%) of that CELO is free for voting.
               </div>
 
+              {inactiveVotes.gt(new BigNumber('0.01', 10)) && (
+                <div className="flex">
+                  <button onClick={activate} className="ml-auto primary-button">
+                    Activate Pending
+                  </button>
+                </div>
+              )}
+
               <div>
                 <ul className="list-decimal list-inside">
                   {groupVotes.map((gv) => {
@@ -421,40 +425,57 @@ export default function Earn() {
                       return null;
                     }
                     return (
-                      <li className="flex items-center mb-3">
-                        <div className="flex items-center space-x-4">
-                          <div>
-                            <span className="text-gray-300 text-sm">
-                              {truncate(group.name, 30)}
-                            </span>
-                            <span className="text-gray-400 text-sm flex space-x-2">
-                              <span>({truncateAddress(group.address)})</span>
-                              <CopyText text={group.address} />
-                            </span>
-                          </div>
-                          {gv.active && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium text-green-600">
-                              {formatAmount(gv.active, 2)} (
-                              {gv.active
-                                .dividedBy(accountSummary.lockedGold.total)
-                                .times(100)
-                                .toFixed(0)}
-                              )%
-                            </span>
-                          )}
+                      <li className="flex flex-col mb-3">
+                        <div className="line-clamp-1">
+                          <span className="text-gray-300 text-sm">
+                            {truncate(group.name, 30)}
+                          </span>
+                          <span className="text-gray-400 text-sm flex space-x-2 mt-1">
+                            <span>({truncateAddress(group.address)})</span>
+                            <CopyText text={group.address} />
+                          </span>
                         </div>
 
-                        <div className="ml-auto">
-                          {gv.active && (
-                            <button
-                              className="text-gray-300 text-sm hover:text-gray-400"
-                              onClick={() =>
-                                revoke(gv.group, gv.active.toString())
-                              }
-                            >
-                              Revoke
-                            </button>
-                          )}
+                        <div className="relative flex flex-col mt-2">
+                          <span className="inline-flex items-center rounded-md text-xs font-medium text-indigo-600">
+                            {formatAmount(gv.active, 2)} ACTIVE (
+                            {gv.active
+                              .dividedBy(accountSummary.lockedGold.total)
+                              .times(100)
+                              .toFixed(0)}
+                            )%
+                          </span>
+                          <span className="inline-flex items-center rounded-md text-xs font-medium text-blue-600 mt-1">
+                            {formatAmount(gv.pending, 2)} PENDING (
+                            {gv.pending
+                              .dividedBy(accountSummary.lockedGold.total)
+                              .times(100)
+                              .toFixed(0)}
+                            )%
+                          </span>
+                          <div className="absolute right-0 top-0">
+                            {gv.active && (
+                              <>
+                                {state === States.Revoking ? (
+                                  <Loader
+                                    type="TailSpin"
+                                    color="white"
+                                    height={'12px'}
+                                    width="12px"
+                                  />
+                                ) : (
+                                  <button
+                                    className="text-gray-300 text-sm hover:text-gray-400"
+                                    onClick={() =>
+                                      revoke(gv.group, gv.active.toString())
+                                    }
+                                  >
+                                    Revoke
+                                  </button>
+                                )}
+                              </>
+                            )}
+                          </div>
                         </div>
                       </li>
                     );
@@ -495,20 +516,14 @@ export default function Earn() {
                         </div>
                       </div>
 
-                      {savingVote ? (
+                      {state === States.Voting ? (
                         <span className="px-6 py-2">
                           <Loader type="TailSpin" height={20} width={20} />
                         </span>
                       ) : (
                         <button
                           className="secondary-button"
-                          onClick={async () => {
-                            if (await vote(votingAddress, voteAmount)) {
-                              setVotingAddress('');
-                              setVoteAmount('0');
-                              setAdding(false);
-                            }
-                          }}
+                          onClick={async () => vote(votingAddress, voteAmount)}
                         >
                           Vote
                         </button>
