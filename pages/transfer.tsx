@@ -33,9 +33,9 @@ const transferQuery = gql`
 `;
 
 export default function Transfer() {
-  const { address, kit, openModal, network } = useContractKit();
+  const { address, kit, network, send } = useContractKit();
   const [showTiny, setShowTiny] = useState(false);
-  const [loadTransfers, { called, loading, data, refetch }] = useLazyQuery(
+  const [loadTransfers, { loading, data, refetch }] = useLazyQuery(
     transferQuery,
     {
       variables: {
@@ -76,11 +76,6 @@ export default function Transfer() {
   }, [address]);
 
   const transfer = useCallback(async () => {
-    if (!kit.defaultAccount) {
-      openModal();
-      return;
-    }
-
     let contract;
     if (currency === Currencies.CELO) {
       contract = await kit.contracts.getGoldToken();
@@ -90,12 +85,10 @@ export default function Transfer() {
       throw new Error('Unsupported currency');
     }
 
-    await contract
-      .transfer(toAddress, Web3.utils.toWei(amount, 'ether'))
-      .sendAndWaitForReceipt();
+    await send(contract.transfer(toAddress, Web3.utils.toWei(amount, 'ether')));
     toast.success(`${amount} ${currency} sent`);
     fetchBalances();
-  }, [amount, currency, kit, fetchBalances]);
+  }, [amount, currency, kit, fetchBalances, send]);
 
   useEffect(() => {
     fetchBalances();
@@ -116,8 +109,6 @@ export default function Transfer() {
             return parseFloat(Web3.utils.fromWei(n.value, 'ether')) > 0.01;
           })
       : [];
-
-  console.log(transfers);
 
   return (
     <>
@@ -178,7 +169,7 @@ export default function Transfer() {
                 onChange={(e) => setAmount(e.target.value)}
                 // className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
                 className="w-full appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20 w-64"
-                placeholder={'0.0'}
+                placeholder={'0'}
               />
               <div className="absolute inset-y-0 right-0 flex items-center">
                 <label htmlFor="currency" className="sr-only">

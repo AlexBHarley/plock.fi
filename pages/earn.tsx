@@ -34,7 +34,7 @@ enum States {
 }
 
 export default function Earn() {
-  const { kit, send } = useContractKit();
+  const { kit, send, address } = useContractKit();
 
   const [celo, setCelo] = useState(new BigNumber(0));
   const [accountSummary, setAccountSummary] = useState<AccountSummary>({
@@ -46,7 +46,9 @@ export default function Earn() {
     pendingWithdrawals: [],
   });
   const [groupVotes, setGroupVotes] = useState<GroupVote[]>([]);
-  const [inactiveVotes, setInactiveVotes] = useState(new BigNumber(0));
+  const [hasActivatablePendingVotes, setHasActivatablePendingVotes] = useState(
+    false
+  );
   const [state, setState] = useState(States.None);
 
   const [groups, setGroups] = useState<
@@ -80,25 +82,21 @@ export default function Earn() {
   );
 
   const fetchAccountSummary = useCallback(async () => {
-    if (!kit.defaultAccount) {
+    if (!address) {
       return;
     }
 
     const election = await kit.contracts.getElection();
-    const votedForGroups = await election.getGroupsVotedForByAccount(
-      kit.defaultAccount
-    );
+    const votedForGroups = await election.getGroupsVotedForByAccount(address);
 
     const groupVotes = await Promise.all(
       votedForGroups.map((groupAddress) =>
-        election.getVotesForGroupByAccount(kit.defaultAccount, groupAddress)
+        election.getVotesForGroupByAccount(address, groupAddress)
       )
     );
-    setInactiveVotes(
-      groupVotes.reduce(
-        (total, gv) => gv.pending.plus(total),
-        new BigNumber('0')
-      )
+
+    setHasActivatablePendingVotes(
+      await election.hasActivatablePendingVotes(address)
     );
     setGroupVotes(groupVotes);
 
@@ -106,9 +104,9 @@ export default function Earn() {
       kit.contracts.getLockedGold(),
       kit.contracts.getGoldToken(),
     ]);
-    setAccountSummary(await locked.getAccountSummary(kit.defaultAccount));
-    setCelo(await goldToken.balanceOf(kit.defaultAccount));
-  }, [kit.defaultAccount]);
+    setAccountSummary(await locked.getAccountSummary(address));
+    setCelo(await goldToken.balanceOf(address));
+  }, [kit, address]);
 
   const lock = useCallback(async () => {
     setState(States.Locking);
@@ -148,21 +146,23 @@ export default function Earn() {
     setState(States.Activating);
     try {
       const election = await kit.contracts.getElection();
-      await send(await election.activate(kit.defaultAccount));
+      await send(await election.activate(address));
       toast.success('Votes activated');
     } catch (e) {
       toast.error(`Unable to activate votes ${e.message}`);
     }
     fetchAccountSummary();
     setState(States.None);
-  }, [kit, send, fetchAccountSummary]);
+  }, [kit, send, fetchAccountSummary, address]);
 
   const vote = useCallback(
     async (address: string, value: string) => {
       setState(States.Voting);
       try {
         const election = await kit.contracts.getElection();
-        await send(await election.vote(address, new BigNumber(value)));
+        await send(
+          await election.vote(address, new BigNumber(Web3.utils.toWei(value)))
+        );
         toast.success('Vote cast');
 
         setVoteAmount('');
@@ -170,7 +170,7 @@ export default function Earn() {
       } catch (e) {
         toast.error(`Unable to vote ${e.message}`);
       } finally {
-        setState(States.Voting);
+        setState(States.None);
         fetchAccountSummary();
       }
     },
@@ -329,7 +329,7 @@ export default function Earn() {
           <div className="mt-2 md:mt-0 md:col-span-3">
             <div className="flex flex-col space-y-4">
               <div className="text-gray-400 text-sm">
-                {truncateAddress(kit.defaultAccount || '0x')} currently has{' '}
+                {truncateAddress(address || '0x')} currently has{' '}
                 <span className="font-medium text-gray-200">
                   {formatAmount(accountSummary.lockedGold.total, 2)}
                 </span>{' '}
@@ -396,8 +396,8 @@ export default function Earn() {
           </div>
           <div className="mt-2 md:mt-0 md:col-span-3">
             <div className="space-y-6">
-              <div className="text-gray-400 mb-2 text-sm">
-                {truncateAddress(kit.defaultAccount || '0x')} currently has{' '}
+              <div className="text-gray-400 text-sm">
+                {truncateAddress(address || '0x')} currently has{' '}
                 <span className="font-medium text-gray-200">
                   {formatAmount(accountSummary.lockedGold.total, 2)} CELO
                 </span>{' '}
@@ -406,10 +406,17 @@ export default function Earn() {
                 <span className="font-medium text-gray-200">
                   {formatAmount(accountSummary.lockedGold.nonvoting, 2)}
                 </span>{' '}
-                ({nonvotingPctStr}%) of that CELO is free for voting.
+                ({nonvotingPctStr}%) of that CELO is free to vote with.
               </div>
 
-              {inactiveVotes.gt(new BigNumber('0.01', 10)) && (
+              <div className="text-gray-400 text-sm">
+                After voting for any group there is a{' '}
+                <span className="text-gray-200">24</span> hour waiting period
+                you must observe before activating your votes. Please ensure you
+                check back here to activate any votes and start earning rewards.
+              </div>
+
+              {hasActivatablePendingVotes && (
                 <div className="flex">
                   <button onClick={activate} className="ml-auto primary-button">
                     Activate Pending
@@ -529,7 +536,7 @@ export default function Earn() {
                         </button>
                       )}
                     </div>
-                    <div className="text-xs text-right text-gray-400 mt-1">
+                    <div className="text-xs text-right text-gray-400 mt-2">
                       Staking{' '}
                       <span className="text-gray-200">
                         {toWei(voteAmount)} CELO (Wei)
