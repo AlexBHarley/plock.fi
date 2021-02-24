@@ -92,74 +92,76 @@ export default function Vote() {
             .
           </p>
         </div>
-        <Table
-          headers={['', 'ID', 'Status', 'Description']}
-          loading={loading}
-          noDataMessage="No proposals found"
-          rows={proposals.map((p) => {
-            let upvoteClass = '';
-            let downVoteClass = '';
-            if (p.vote === 'None' || p.vote === 'Abstain') {
-              upvoteClass = 'text-gray-500';
-              downVoteClass = 'text-gray-500';
-            }
-            if (p.vote === 'No') {
-              upvoteClass = 'text-gray-500';
-              downVoteClass = 'text-red-500';
-            }
-            if (p.vote === 'Yes') {
-              upvoteClass = 'text-green-500';
-              downVoteClass = 'text-gray-500';
-            }
-            return [
-              // {/* upvoted / downvoted */}
-              <span
-                className="inline-flex text-gray-500 space-x-3"
-                style={{ width: 'fit-content' }}
-              >
-                <button className={upvoteClass} onClick={() => upvote(p.id)}>
-                  <ImArrowUp />
-                </button>
-                <button
-                  className={downVoteClass}
-                  onClick={() => downvote(p.id)}
+        <div className="-mx-5">
+          <Table
+            headers={['', 'ID', 'Status', 'Description']}
+            loading={loading}
+            noDataMessage="No proposals found"
+            rows={proposals.map((p) => {
+              let upvoteClass = '';
+              let downVoteClass = '';
+              if (p.vote === 'None' || p.vote === 'Abstain') {
+                upvoteClass = 'text-gray-500';
+                downVoteClass = 'text-gray-500';
+              }
+              if (p.vote === 'No') {
+                upvoteClass = 'text-gray-500';
+                downVoteClass = 'text-red-500';
+              }
+              if (p.vote === 'Yes') {
+                upvoteClass = 'text-green-500';
+                downVoteClass = 'text-gray-500';
+              }
+              return [
+                // {/* upvoted / downvoted */}
+                <span
+                  className="inline-flex text-gray-500 space-x-3"
+                  style={{ width: 'fit-content' }}
                 >
-                  <ImArrowDown />
-                </button>
-              </span>,
+                  <button className={upvoteClass} onClick={() => upvote(p.id)}>
+                    <ImArrowUp />
+                  </button>
+                  <button
+                    className={downVoteClass}
+                    onClick={() => downvote(p.id)}
+                  >
+                    <ImArrowDown />
+                  </button>
+                </span>,
 
-              <div className="flex items-center">
-                <div className="">
-                  <div className="text-sm font-medium text-gray-200">
-                    {p.id.toString()}
+                <div className="flex items-center">
+                  <div className="">
+                    <div className="text-sm font-medium text-gray-200">
+                      {p.id.toString()}
+                    </div>
                   </div>
-                </div>
-              </div>,
-              p.isApproved ? (
-                <span className="border rounded border-green-500 text-green-500 px-2 py-1">
-                  Approved
-                </span>
-              ) : p.isExpired ? (
-                <span className="border rounded border-gray-500 text-gray-500 px-2 py-1">
-                  Expired
-                </span>
-              ) : p.isPassing ? (
-                'Passing'
-              ) : (
-                'Not passing'
-              ),
-              <div>
-                <a
-                  href={p.metadata?.descriptionURL}
-                  className="flex items-center text-gray-300 hover:text-gray-400 cursor-pointer space-x-2"
-                >
-                  <span>Link</span>
-                  <FiExternalLink />
-                </a>
-              </div>,
-            ];
-          })}
-        />
+                </div>,
+                p.isApproved ? (
+                  <span className="border rounded border-green-500 text-green-500 px-2 py-1">
+                    Approved
+                  </span>
+                ) : p.isExpired ? (
+                  <span className="border rounded border-gray-500 text-gray-500 px-2 py-1">
+                    Expired
+                  </span>
+                ) : p.isPassing ? (
+                  'Passing'
+                ) : (
+                  'Not passing'
+                ),
+                <div>
+                  <a
+                    href={p.metadata?.descriptionURL}
+                    className="flex items-center text-gray-300 hover:text-gray-400 cursor-pointer space-x-2"
+                  >
+                    <span>Link</span>
+                    <FiExternalLink />
+                  </a>
+                </div>,
+              ];
+            })}
+          />
+        </div>
       </Panel>
     </>
   );

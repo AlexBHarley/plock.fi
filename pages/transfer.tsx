@@ -1,8 +1,10 @@
 import { gql, useLazyQuery } from '@apollo/client';
-import { Panel, Table, toast } from 'components';
+import { CopyText, Panel, Table, toast } from 'components';
 import { Toggle } from 'components/toggle';
+import { getGraphQlUrl } from '../constants';
 import { useCallback, useEffect, useState } from 'react';
 import { IoMdRefresh } from 'react-icons/io';
+import { HiOutlineExternalLink } from 'react-icons/hi';
 import { useContractKit } from 'use-contractkit';
 import { formatAmount, toWei, truncateAddress } from 'utils';
 import Web3 from 'web3';
@@ -23,6 +25,7 @@ const transferQuery = gql`
           token
           toAddressHash
           fromAddressHash
+          transactionHash
         }
       }
     }
@@ -30,7 +33,7 @@ const transferQuery = gql`
 `;
 
 export default function Transfer() {
-  const { address, kit, openModal } = useContractKit();
+  const { address, kit, openModal, network } = useContractKit();
   const [showTiny, setShowTiny] = useState(false);
   const [loadTransfers, { called, loading, data, refetch }] = useLazyQuery(
     transferQuery,
@@ -113,6 +116,8 @@ export default function Transfer() {
             return parseFloat(Web3.utils.fromWei(n.value, 'ether')) > 0.01;
           })
       : [];
+
+  console.log(transfers);
 
   return (
     <>
@@ -241,50 +246,52 @@ export default function Transfer() {
           </div>
         </div>
 
-        <Table
-          headers={['Name', 'Comment', 'Amount', 'Link']}
-          loading={loading}
-          noDataMessage={
-            kit.defaultAccount
-              ? 'No transfers found'
-              : 'Need to connect an account before viewing transfers'
-          }
-          rows={transfers.map((node) => {
-            const toMe = node.toAddressHash === kit.defaultAccount;
-            const displayAddress = toMe
-              ? node.fromAddressHash
-              : node.toAddressHash;
+        <div className="-mx-5">
+          <Table
+            headers={['Name', 'Amount', 'Comment', 'Link']}
+            loading={loading}
+            noDataMessage={
+              kit.defaultAccount
+                ? 'No transfers found'
+                : 'Need to connect an account before viewing transfers'
+            }
+            rows={transfers.map((node) => {
+              const toMe = node.toAddressHash === kit.defaultAccount;
+              const displayAddress = toMe
+                ? node.fromAddressHash
+                : node.toAddressHash;
 
-            return [
-              <div className="flex items-center">
-                <div className="">
-                  <div className="text-sm font-medium text-gray-900">
-                    Unknown
+              return [
+                <div className="flex items-center">
+                  <div className="">
+                    <div className="text-sm font-medium text-gray-300">
+                      Unknown
+                    </div>
+                    <div className="text-sm text-gray-400 flex-items-center space-x-2">
+                      <span>{truncateAddress(displayAddress)}</span>
+                      <CopyText text={displayAddress} />
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-500">
-                    {truncateAddress(displayAddress)}
-                  </div>
-                </div>
-              </div>,
-              <div>
-                <div className="text-sm text-gray-900">
-                  Regional Paradigm Technician
-                </div>
-                <div className="text-sm text-gray-500">Optimization</div>
-              </div>,
-              <span className={toMe ? 'text-green-500' : 'text-red-400'}>
-                {formatAmount(node.value, 2)} {node.token}
-              </span>,
-              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                <a
-                  href={`https://explorer.celo.org/txs/${node.transactionHash}`}
-                >
-                  {'0x12345678'.slice(0, 8)}...
-                </a>
-              </span>,
-            ];
-          })}
-        />
+                </div>,
+                <span className={toMe ? 'text-green-500' : 'text-red-400'}>
+                  {formatAmount(node.value, 2)} {node.token}
+                </span>,
+                <div className="text-sm text-gray-900">{node.comment}</div>,
+                <span className="px-2 inline-flex text-xs leading-5 font-semibold text-gray-400">
+                  <a
+                    className="flex space-x-2 items-center"
+                    href={`${getGraphQlUrl(network)}/txs/${
+                      node.transactionHash
+                    }`}
+                  >
+                    <span>{node.transactionHash.slice(0, 8)}...</span>
+                    <HiOutlineExternalLink />
+                  </a>
+                </span>,
+              ];
+            })}
+          />
+        </div>
       </Panel>
     </>
   );
