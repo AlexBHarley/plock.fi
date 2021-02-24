@@ -104,7 +104,10 @@ export default function Earn() {
       kit.contracts.getLockedGold(),
       kit.contracts.getGoldToken(),
     ]);
-    setAccountSummary(await locked.getAccountSummary(address));
+
+    try {
+      setAccountSummary(await locked.getAccountSummary(address));
+    } catch (_) {}
     setCelo(await goldToken.balanceOf(address));
   }, [kit, address]);
 

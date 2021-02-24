@@ -414,11 +414,11 @@ export function WithAppLayout({ children }) {
                 </button>
               </div>
 
-              {/* <div className="hidden md:block">
+              <div className="hidden md:block">
                 <div className={healthy ? 'text-green-600' : 'text-red-600'}>
                   <PulsatingDot />
                 </div>
-              </div> */}
+              </div>
             </div>
           </div>
         </div>
