@@ -215,10 +215,12 @@ export default function Transfer() {
         </button>
       </Panel>
       <Panel>
-        <div className="flex items-center">
-          <h3 className="text-gray-300">Past transfers</h3>
+        <div className="flex flex-col md:flex-row md:items-center">
+          <h3 className="text-gray-300 whitespace-nowrap mb-3 md:mb-0">
+            Past transfers
+          </h3>
 
-          <div className="flex items-center space-x-8 ml-auto">
+          <div className="flex items-center justify-between space-x-8 md:ml-auto">
             <div className="flex items-center space-x-3">
               <div className="text-xs text-gray-300">Show tiny transfers</div>
               <Toggle

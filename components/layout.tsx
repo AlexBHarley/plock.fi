@@ -346,19 +346,19 @@ export function WithAppLayout({ children }) {
                 <Link href="/">
                   <a className="inline-flex">
                     <Image src="/logo.png" height={'24px'} width={'24px'} />
-                    <span className="hidden md:block text-gray-300 ml-4">
+                    <span className="hidden md:flex text-gray-300 ml-4">
                       CeloTools
                     </span>
                   </a>
                 </Link>
               </div>
             </div>
-            <div className="relative flex items-center md:space-x-6">
+            <div className="flex items-center md:space-x-6">
               {kit.defaultAccount ? (
-                <div className="hidden md:flex flex-col">
-                  <span className="text-gray-200 text-xs">
+                <div className="hidden md:flex md:flex-col">
+                  <div className="flex text-gray-200 text-xs">
                     {summary.name || 'Unknown'}
-                  </span>
+                  </div>
                   <div className="flex items-center">
                     <span className="text-xs text-gray-400 mr-2">
                       {truncateAddress(kit.defaultAccount)}
@@ -375,7 +375,7 @@ export function WithAppLayout({ children }) {
                 </button>
               )}
 
-              <div className="flex items-center space-x-4 ">
+              <div className="flex items-center space-x-4">
                 <select
                   name=""
                   id=""
@@ -414,7 +414,7 @@ export function WithAppLayout({ children }) {
                 </button>
               </div>
 
-              <div className="hidden md:block">
+              <div className="hidden md:flex">
                 <div className={healthy ? 'text-green-600' : 'text-red-600'}>
                   <PulsatingDot />
                 </div>
