@@ -142,3 +142,96 @@ export function Dropdown({
     </div>
   );
 }
+
+export function DropButton({
+  groups,
+  display,
+  disabled,
+  className,
+}: {
+  display: any;
+  groups?: { text: any; onClick: () => Promise<void> | void }[][];
+  disabled?: boolean;
+  className?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const dropRef = useRef(null);
+
+  useEffect(() => {
+    /**
+     * Alert if clicked on outside of element
+     */
+    function handleClickOutside(event: any) {
+      // @ts-ignore
+      if (dropRef.current && !dropRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  });
+
+  return (
+    <div ref={dropRef} className={`inline-block ${className}`}>
+      <div>
+        <button
+          type="button"
+          className={`flex justify-between rounded-md px-2 py-2 text-sm text-gray-300 border border-gray-500 px-4 py-2 focus:ring-0 focus:outline-none ${
+            !disabled && 'hover:bg-gray-800'
+          } whitespace-nowrap transition`}
+          id="options-menu"
+          aria-haspopup="true"
+          aria-expanded="true"
+          onClick={disabled ? undefined : () => setOpen((o) => !o)}
+        >
+          {display}
+          <svg
+            className="-mr-1 ml-2 h-5 w-5"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <div className="relative">
+        {open && (
+          <div
+            className="z-50 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-gray-700 ring-1 ring-black ring-opacity-5 divide-y divide-gray-100"
+            role="menu"
+            aria-orientation="vertical"
+            aria-labelledby="options-menu"
+          >
+            {groups!.map((group) => (
+              <div className="py-1">
+                {group.map(({ onClick, text }) => (
+                  <button
+                    className="block px-4 py-2 text-sm transition text-gray-300 hover:bg-gray-825 w-full text-left"
+                    role="menuitem"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.nativeEvent.stopImmediatePropagation();
+                      onClick();
+                      setOpen(false);
+                    }}
+                  >
+                    {text}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

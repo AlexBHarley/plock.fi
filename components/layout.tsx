@@ -4,10 +4,11 @@ import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Base } from 'state';
-import { Networks, useContractKit } from 'use-contractkit';
+import { Networks, useContractKit } from '@celo-tools/use-contractkit';
 import { truncateAddress } from 'utils';
 import { CopyText } from './copy-text';
 import { PulsatingDot } from './pulsating-dot';
+import { DropButton, Dropdown } from './dropdown';
 
 export function Sidebar({
   items,
@@ -214,7 +215,14 @@ const tabs = [
 export function WithAppLayout({ children }) {
   const menuRef = useRef(null);
   const { network, summary } = Base.useContainer();
-  const { kit, updateNetwork, fornoUrl, openModal, address } = useContractKit();
+  const {
+    kit,
+    updateNetwork,
+    fornoUrl,
+    openModal,
+    address,
+    destroy,
+  } = useContractKit();
   const [healthy, setHealthy] = useState(true);
   const [menu, setMenu] = useState(false);
   const router = useRouter();
@@ -346,27 +354,12 @@ export function WithAppLayout({ children }) {
                 <Link href="/">
                   <a className="inline-flex">
                     <Image src="/logo.png" height={'24px'} width={'24px'} />
-                    <span className="hidden md:flex text-gray-300 ml-4">
-                      CeloTools
-                    </span>
                   </a>
                 </Link>
               </div>
             </div>
             <div className="flex items-center md:space-x-6">
-              {kit.defaultAccount ? (
-                <div className="hidden md:flex md:flex-col">
-                  <div className="flex text-gray-200 text-xs">
-                    {summary.name || 'Unknown'}
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-xs text-gray-400 mr-2">
-                      {truncateAddress(kit.defaultAccount)}
-                    </span>
-                    <CopyText text={kit.defaultAccount} />
-                  </div>
-                </div>
-              ) : (
+              {!address && (
                 <button
                   onClick={openModal}
                   className="hidden md:inline-block primary-button"
@@ -419,6 +412,18 @@ export function WithAppLayout({ children }) {
                   <PulsatingDot />
                 </div>
               </div>
+
+              {address && (
+                <DropButton
+                  display={truncateAddress(address)}
+                  groups={[
+                    [
+                      { text: 'Settings', onClick: () => router.push('/') },
+                      { text: 'Logout', onClick: destroy },
+                    ],
+                  ]}
+                />
+              )}
             </div>
           </div>
         </div>

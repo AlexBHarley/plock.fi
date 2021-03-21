@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { useCallback, useEffect, useState } from 'react';
 import { createContainer } from 'unstated-next';
 import { getGraphQlUrl } from '../constants';
-import { Networks, useContractKit } from 'use-contractkit';
+import { Networks, useContractKit } from '@celo-tools/use-contractkit';
 import { Address } from '@celo/contractkit';
 import { Accounts } from '@celo/contractkit/lib/generated/Accounts';
 
@@ -27,7 +27,7 @@ interface AccountSummary {
 }
 
 function State() {
-  const { network, kit } = useContractKit();
+  const { network, kit, address } = useContractKit();
   const [graphql, setGraphql] = useState(getApolloClient(network));
 
   const [summary, setAccountSummary] = useState<AccountSummary>({
@@ -52,19 +52,22 @@ function State() {
     );
   }, [network]);
 
-  useEffect(() => {
-    if (!kit.defaultAccount) {
+  const fetchSummary = useCallback(async () => {
+    if (!address) {
       return;
     }
 
-    async function f() {
-      const accounts = await kit.contracts.getAccounts();
-      setAccountSummary(await accounts.getAccountSummary(kit.defaultAccount));
-    }
-    f();
-  }, [kit]);
+    const accounts = await kit.contracts.getAccounts();
+    try {
+      setAccountSummary(await accounts.getAccountSummary(address));
+    } catch (e) {}
+  }, [kit, address]);
 
-  return { network, graphql, summary };
+  useEffect(() => {
+    fetchSummary();
+  }, [fetchSummary]);
+
+  return { network, graphql, summary, fetchSummary };
 }
 
 export const Base = createContainer(State);

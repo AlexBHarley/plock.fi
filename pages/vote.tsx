@@ -1,12 +1,14 @@
-import { useContractKit } from 'use-contractkit';
+import { useContractKit } from '@celo-tools/use-contractkit';
 import { Panel, Table } from 'components';
 import { useCallback, useEffect, useState } from 'react';
 import { ImArrowDown, ImArrowUp } from 'react-icons/im';
 import { FiExternalLink } from 'react-icons/fi';
 import { VoteValue } from '@celo/contractkit/lib/wrappers/Governance';
 
+import Countdown from 'react-countdown';
+
 export default function Vote() {
-  const { kit } = useContractKit();
+  const { kit, openModal, send } = useContractKit();
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -14,39 +16,56 @@ export default function Vote() {
     setLoading(true);
     const governance = await kit.contracts.getGovernance();
     const dequeue = await governance.getDequeue();
+    const queue = await governance.getQueue();
 
-    setProposals(
-      await Promise.all(
-        dequeue.map(async (p) => {
-          const isExpired = await governance.isDequeuedProposalExpired(p);
-          // const stage = await governance.getProposalStage(p);
-          // const proposal = await governance.getProposal(p);
-          const record = await governance.getProposalRecord(p);
-          // const constitution = await governance.getConstitution(proposal);
+    const records = await Promise.all(
+      dequeue.map(async (id) => {
+        const isExpired = await governance.isDequeuedProposalExpired(id);
+        const support = await governance.getSupport(id);
+        const percentage = support.required.div(support.total).toFixed(0);
 
-          const voteRecord = await governance.getVoteRecord(
-            kit.defaultAccount,
-            p
-          );
-          //
-          // console.log(await proposalToJSON(kit, proposal));
-          const isPassing = await governance.isProposalPassing(p);
-          const isApproved = await governance.isApproved(p);
-          const timeUntilStages = await governance.humanReadableTimeUntilStages(
-            p
-          );
+        const record = await governance.getProposalRecord(id);
+        const {
+          Referendum,
+          Execution,
+          Approval,
+        } = await governance.proposalSchedule(id);
 
-          return {
-            id: p,
-            isExpired,
-            isPassing,
-            isApproved,
-            timeUntilStages,
-            vote: voteRecord ? voteRecord.value : 'None',
-          };
-        })
-      )
+        const nextStageTime = [Referendum, Execution, Approval].reduce(
+          (accum, bn) => {
+            if (bn.toNumber() < 0) {
+              return accum;
+            }
+
+            if (bn.toNumber() < accum) {
+              return bn.toNumber();
+            }
+
+            return accum;
+          },
+          Date.now()
+        );
+        const voteRecord = await governance.getVoteRecord(
+          kit.defaultAccount,
+          id
+        );
+
+        const isPassing = await governance.isProposalPassing(id);
+        const isApproved = await governance.isApproved(id);
+
+        return {
+          id: id,
+          isExpired,
+          isPassing,
+          isApproved,
+          proposal: record,
+          vote: voteRecord ? voteRecord.value : 'None',
+          nextStageTime: Date.now() + nextStageTime,
+          percentage,
+        };
+      })
     );
+    setProposals(records.sort((a, b) => b.id.minus(a.id).toNumber()));
     setLoading(false);
   }, [kit]);
 
@@ -54,17 +73,35 @@ export default function Vote() {
     fetchProposals();
   }, [fetchProposals]);
 
-  const upvote = async (id: string) => {
-    // requireInitialised
+  const approve = async (id: string) => {
+    if (!kit.defaultAccount) {
+      openModal();
+      return;
+    }
+
     const governance = await kit.contracts.getGovernance();
-    await (
-      await governance.upvote(id, kit.defaultAccount)
-    ).sendAndWaitForReceipt();
+
+    await send(governance.upvote(id, kit.defaultAccount));
+    fetchProposals();
+  };
+
+  const upvote = async (id: string) => {
+    if (!kit.defaultAccount) {
+      openModal();
+      return;
+    }
+
+    const governance = await kit.contracts.getGovernance();
+    await (await governance.vote(id, VoteValue.Yes)).sendAndWaitForReceipt();
     fetchProposals();
   };
 
   const downvote = async (id: string) => {
-    // requireInitialised
+    if (!kit.defaultAccount) {
+      openModal();
+      return;
+    }
+
     const governance = await kit.contracts.getGovernance();
     await (await governance.vote(id, VoteValue.No)).sendAndWaitForReceipt();
     fetchProposals();
@@ -79,9 +116,14 @@ export default function Vote() {
           </h3>
           <p className="text-gray-400 mt-2 text-sm">
             Celo uses a formal on-chain governance mechanism to manage and
-            upgrade the protocol. You can have your say in this by voting on
-            proposals and being active in the community. More information around
-            this can be found in the{' '}
+            upgrade the protocol. You can have your say in this by{' '}
+            <a
+              className="text-blue-500"
+              target="_blank"
+              href="https://docs.celo.org/celo-owner-guide/voting-governance"
+            ></a>
+            voting on proposals and being active in the community. More
+            information around this can be found in the{' '}
             <a
               className="text-blue-500"
               target="_blank"
@@ -94,7 +136,7 @@ export default function Vote() {
         </div>
         <div className="-mx-5">
           <Table
-            headers={['', 'ID', 'Status', 'Description']}
+            headers={['', 'ID', 'Stage', 'Status', 'Description']}
             loading={loading}
             noDataMessage="No proposals found"
             rows={proposals.map((p) => {
@@ -112,21 +154,53 @@ export default function Vote() {
                 upvoteClass = 'text-green-500';
                 downVoteClass = 'text-gray-500';
               }
+
+              let status;
+              let statusClassName;
+              if (p.proposal.stage === 'Proposal') {
+                status = '';
+              } else if (p.proposal.stage === 'Approval') {
+                status = p.isApproved ? 'Approved' : 'Not approved';
+                statusClassName = p.isApproved
+                  ? 'border rounded px-2 py-1 border-green-500 text-green-500'
+                  : 'border rounded px-2 py-1 border-red-500 text-red-500';
+              } else if (p.proposal.stage === 'Referendum') {
+                status = p.isPassing ? 'Passing' : 'Not passing';
+                statusClassName = p.isPassing
+                  ? 'border rounded px-2 py-1 border-green-500 text-green-500'
+                  : 'border rounded px-2 py-1 border-red-500 text-red-500';
+              } else if (p.proposal.stage === 'Execution') {
+              }
+
               return [
-                // {/* upvoted / downvoted */}
                 <span
                   className="inline-flex text-gray-500 space-x-3"
                   style={{ width: 'fit-content' }}
                 >
-                  <button className={upvoteClass} onClick={() => upvote(p.id)}>
-                    <ImArrowUp />
-                  </button>
-                  <button
-                    className={downVoteClass}
-                    onClick={() => downvote(p.id)}
-                  >
-                    <ImArrowDown />
-                  </button>
+                  {p.proposal.stage === 'Proposal' && (
+                    <button
+                      className={upvoteClass}
+                      onClick={() => approve(p.id)}
+                    >
+                      <ImArrowUp />
+                    </button>
+                  )}
+                  {p.proposal.stage === 'Referendum' && (
+                    <>
+                      <button
+                        className={upvoteClass}
+                        onClick={() => upvote(p.id)}
+                      >
+                        <ImArrowUp />
+                      </button>
+                      <button
+                        className={downVoteClass}
+                        onClick={() => downvote(p.id)}
+                      >
+                        <ImArrowDown />
+                      </button>
+                    </>
+                  )}
                 </span>,
 
                 <div className="flex items-center">
@@ -136,22 +210,17 @@ export default function Vote() {
                     </div>
                   </div>
                 </div>,
-                p.isApproved ? (
-                  <span className="border rounded border-green-500 text-green-500 px-2 py-1">
-                    Approved
-                  </span>
-                ) : p.isExpired ? (
-                  <span className="border rounded border-gray-500 text-gray-500 px-2 py-1">
-                    Expired
-                  </span>
-                ) : p.isPassing ? (
-                  'Passing'
-                ) : (
-                  'Not passing'
-                ),
+                <div>
+                  {p.proposal.stage} (
+                  <Countdown date={new Date(p.nextStageTime)} />)
+                </div>,
+                <span className={statusClassName}>
+                  {status} ({p.percentage}%)
+                </span>,
                 <div>
                   <a
-                    href={p.metadata?.descriptionURL}
+                    href={p.proposal.metadata?.descriptionURL}
+                    target="_blank"
                     className="flex items-center text-gray-300 hover:text-gray-400 cursor-pointer space-x-2"
                   >
                     <span>Link</span>

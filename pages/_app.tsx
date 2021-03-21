@@ -2,8 +2,8 @@ import { ApolloProvider } from '@apollo/client';
 import { WithAppLayout, WithSidebar } from 'components';
 import Head from 'next/head';
 import { Base } from 'state';
-import { ContractKitProvider } from 'use-contractkit';
-import 'use-contractkit/lib/styles.css';
+import { ContractKitProvider } from '@celo-tools/use-contractkit';
+import '@celo-tools/use-contractkit/lib/styles.css';
 import '../styles/globals.css';
 
 function BaseComponent({ children }: any) {

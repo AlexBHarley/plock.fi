@@ -1,4 +1,4 @@
-import { useContractKit } from 'use-contractkit';
+import { useContractKit } from '@celo-tools/use-contractkit';
 import { CopyText, Panel, PanelWithButton, toast } from 'components';
 import { setPriority } from 'os';
 import { useCallback, useEffect, useState } from 'react';
@@ -7,27 +7,22 @@ import { Base } from 'state';
 
 export default function General() {
   const { kit } = useContractKit();
-  const { summary } = Base.useContainer();
+  const { summary, fetchSummary } = Base.useContainer();
 
   const [state, setState] = useState({
     name: '',
     metadataURL: '',
   });
-  const [fetching, setFetching] = useState(true);
   const [saving, setSaving] = useState(false);
-
-  const fetchData = useCallback(async () => {
-    changeProperty('name', summary.name);
-    changeProperty('metadataURL', summary.metadataURL);
-  }, [summary]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
 
   function changeProperty(property: string, value: any) {
     return setState((s) => ({ ...s, [property]: value }));
   }
+
+  useEffect(() => {
+    changeProperty('name', summary.name);
+    changeProperty('metadataURL', summary.metadataURL);
+  }, [summary]);
 
   async function save() {
     if (
@@ -52,7 +47,7 @@ export default function General() {
       toast.error('Unable to update data');
     }
 
-    fetchData();
+    fetchSummary();
     setSaving(false);
   }
 
@@ -117,10 +112,11 @@ export default function General() {
 
         <button
           onClick={save}
+          disabled={saving}
           className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
         >
           {saving ? (
-            <Loader type="RevolvingDot" height={12} width={12} color="" />
+            <Loader type="TailSpin" height={24} width={24} color="white" />
           ) : (
             'Submit'
           )}
@@ -133,12 +129,31 @@ export default function General() {
             <h3 className="text-lg font-medium leading-6 text-gray-200">
               Account data
             </h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-400">
               Addresses and signing keys associated with your account
             </p>
           </div>
           <div className="mt-5 md:mt-0 md:col-span-2">
             <div className="space-y-6">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-300"
+                >
+                  Address
+                </label>
+                <div className="mt-1 flex items-center space-x-3">
+                  <input
+                    id="name"
+                    name="name"
+                    className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20"
+                    readOnly
+                    value={summary.address}
+                  />
+                  <CopyText text={summary.address} />
+                </div>
+              </div>
+
               <div>
                 <label
                   htmlFor="name"

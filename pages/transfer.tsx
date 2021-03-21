@@ -5,7 +5,7 @@ import { getGraphQlUrl } from '../constants';
 import { useCallback, useEffect, useState } from 'react';
 import { IoMdRefresh } from 'react-icons/io';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import { useContractKit } from 'use-contractkit';
+import { useContractKit } from '@celo-tools/use-contractkit';
 import { formatAmount, toWei, truncateAddress } from 'utils';
 import Web3 from 'web3';
 

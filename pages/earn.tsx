@@ -5,7 +5,7 @@ import { BigNumber } from 'bignumber.js';
 import { CopyText, CustomSelectSearch, Panel, Table, toast } from 'components';
 import { useCallback, useEffect, useState } from 'react';
 import Loader from 'react-loader-spinner';
-import { useContractKit } from 'use-contractkit';
+import { useContractKit } from '@celo-tools/use-contractkit';
 import {
   formatAmount,
   getValidatorGroupScore,

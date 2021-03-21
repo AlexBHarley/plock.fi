@@ -1,4 +1,4 @@
-import { Networks } from 'use-contractkit';
+import { Networks } from '@celo-tools/use-contractkit';
 
 const apiUrls = {
   [Networks.Alfajores]:
