@@ -1,5 +1,5 @@
 import { useContractKit } from '@celo-tools/use-contractkit';
-import { Panel, Table } from 'components';
+import { LockCelo, Panel, Table, toast } from 'components';
 import { useCallback, useEffect, useState } from 'react';
 import { ImArrowDown, ImArrowUp } from 'react-icons/im';
 import { FiExternalLink } from 'react-icons/fi';
@@ -80,30 +80,27 @@ export default function Vote() {
     }
 
     const governance = await kit.contracts.getGovernance();
-
     await send(governance.upvote(id, kit.defaultAccount));
     fetchProposals();
   };
 
-  const upvote = async (id: string) => {
+  const vote = async (id: string, value: VoteValue) => {
     if (!kit.defaultAccount) {
       openModal();
       return;
     }
 
     const governance = await kit.contracts.getGovernance();
-    await (await governance.vote(id, VoteValue.Yes)).sendAndWaitForReceipt();
-    fetchProposals();
-  };
+    const voteRecord = await governance.getVoteRecord(kit.defaultAccount, id);
 
-  const downvote = async (id: string) => {
-    if (!kit.defaultAccount) {
-      openModal();
-      return;
+    let safeValue = value;
+    if (voteRecord.value === value) {
+      safeValue = VoteValue.Abstain;
     }
 
-    const governance = await kit.contracts.getGovernance();
-    await (await governance.vote(id, VoteValue.No)).sendAndWaitForReceipt();
+    // @ts-ignore
+    await (await governance.vote(id, safeValue)).sendAndWaitForReceipt();
+    toast.success('Vote cast');
     fetchProposals();
   };
 
@@ -112,7 +109,7 @@ export default function Vote() {
       <Panel>
         <div>
           <h3 className="text-lg font-medium leading-6 text-gray-200">
-            Proposals
+            Governance
           </h3>
           <p className="text-gray-400 mt-2 text-sm">
             Celo uses a formal on-chain governance mechanism to manage and
@@ -133,7 +130,20 @@ export default function Vote() {
             </a>
             .
           </p>
+
+          <p className="text-gray-400 mt-2 text-sm">
+            As with voting for validator groups (or staking), you need to lock
+            Celo before voting on active proposals.
+          </p>
         </div>
+      </Panel>
+
+      <LockCelo />
+
+      <Panel>
+        <h3 className="text-lg font-medium leading-6 text-gray-200">
+          Proposals
+        </h3>
         <div className="-mx-5">
           <Table
             headers={['', 'ID', 'Stage', 'Status', 'Description']}
@@ -189,13 +199,13 @@ export default function Vote() {
                     <>
                       <button
                         className={upvoteClass}
-                        onClick={() => upvote(p.id)}
+                        onClick={() => vote(p.id, VoteValue.Yes)}
                       >
                         <ImArrowUp />
                       </button>
                       <button
                         className={downVoteClass}
-                        onClick={() => downvote(p.id)}
+                        onClick={() => vote(p.id, VoteValue.No)}
                       >
                         <ImArrowDown />
                       </button>

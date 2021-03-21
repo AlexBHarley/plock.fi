@@ -8,6 +8,7 @@ import { HiOutlineExternalLink } from 'react-icons/hi';
 import { useContractKit } from '@celo-tools/use-contractkit';
 import { formatAmount, toWei, truncateAddress } from 'utils';
 import Web3 from 'web3';
+import { Base } from 'state';
 
 enum Currencies {
   CELO = 'CELO',
@@ -34,6 +35,7 @@ const transferQuery = gql`
 
 export default function Transfer() {
   const { address, kit, network, send } = useContractKit();
+  const { balances, fetchBalances } = Base.useContainer();
   const [showTiny, setShowTiny] = useState(false);
   const [loadTransfers, { loading, data, refetch }] = useLazyQuery(
     transferQuery,
@@ -46,34 +48,6 @@ export default function Transfer() {
   const [amount, setAmount] = useState('0');
   const [currency, setCurrency] = useState(Currencies.CELO);
   const [toAddress, setToAddress] = useState('');
-  const [balances, setBalances] = useState({
-    celo: '0',
-    cusd: '0',
-    ceur: '0',
-  });
-
-  const fetchBalances = useCallback(async () => {
-    if (!address) {
-      return;
-    }
-
-    const [celoContract, cusdContract] = await Promise.all([
-      kit.contracts.getGoldToken(),
-      kit.contracts.getStableToken(),
-    ]);
-
-    const [celo, cusd] = (
-      await Promise.all([
-        celoContract.balanceOf(address),
-        cusdContract.balanceOf(address),
-      ])
-    ).map((bn) => formatAmount(bn, 2));
-    setBalances({
-      celo,
-      cusd,
-      ceur: '0.00',
-    });
-  }, [address]);
 
   const transfer = useCallback(async () => {
     let contract;
@@ -125,7 +99,7 @@ export default function Transfer() {
                 <div className="px-4 py-5 sm:p-6">
                   <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
                     <div className="flex items-baseline text-2xl font-semibold text-indigo-300">
-                      {balances.celo}{' '}
+                      {formatAmount(balances.celo, 2)}{' '}
                       <span className="text-sm text-gray-400 ml-2">CELO</span>
                     </div>
                   </dd>
@@ -135,7 +109,7 @@ export default function Transfer() {
                 <div className="px-4 py-5 sm:p-6">
                   <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
                     <div className="flex items-baseline text-2xl font-semibold text-indigo-300">
-                      {balances.cusd}
+                      {formatAmount(balances.cusd, 2)}
                       <span className="text-sm text-gray-400 ml-2">cUSD</span>
                     </div>
                   </dd>
@@ -145,7 +119,7 @@ export default function Transfer() {
                 <div className="px-4 py-5 sm:p-6">
                   <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
                     <div className="flex items-baseline text-2xl font-semibold text-indigo-300">
-                      {balances.ceur}
+                      {formatAmount(balances.ceur, 2)}
                       <span className="text-sm text-gray-400 ml-2">cEUR</span>
                     </div>
                   </dd>
@@ -159,7 +133,7 @@ export default function Transfer() {
       <Panel>
         <h3 className="text-gray-200">New Transfer</h3>
         <div>
-          <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row items-center space-x-2">
+          <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row items-center md:space-x-2">
             <div className="mt-1 relative rounded-md shadow-sm w-full">
               <input
                 type="text"

@@ -7,7 +7,7 @@ import { Base } from 'state';
 
 export default function General() {
   const { kit } = useContractKit();
-  const { summary, fetchSummary } = Base.useContainer();
+  const { accountSummary, fetchAccountSummary } = Base.useContainer();
 
   const [state, setState] = useState({
     name: '',
@@ -20,14 +20,14 @@ export default function General() {
   }
 
   useEffect(() => {
-    changeProperty('name', summary.name);
-    changeProperty('metadataURL', summary.metadataURL);
-  }, [summary]);
+    changeProperty('name', accountSummary.name);
+    changeProperty('metadataURL', accountSummary.metadataURL);
+  }, [accountSummary]);
 
   async function save() {
     if (
-      summary.name === state.name &&
-      summary.metadataURL === state.metadataURL
+      accountSummary.name === state.name &&
+      accountSummary.metadataURL === state.metadataURL
     ) {
       return;
     }
@@ -35,10 +35,10 @@ export default function General() {
     setSaving(true);
     try {
       const accounts = await kit.contracts.getAccounts();
-      if (summary.name !== state.name) {
+      if (accountSummary.name !== state.name) {
         await accounts.setName(state.name).sendAndWaitForReceipt();
       }
-      if (summary.metadataURL !== state.metadataURL) {
+      if (accountSummary.metadataURL !== state.metadataURL) {
         await accounts.setMetadataURL(state.metadataURL);
       }
 
@@ -47,7 +47,7 @@ export default function General() {
       toast.error('Unable to update data');
     }
 
-    fetchSummary();
+    fetchAccountSummary();
     setSaving(false);
   }
 
@@ -148,9 +148,9 @@ export default function General() {
                     name="name"
                     className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20"
                     readOnly
-                    value={summary.address}
+                    value={accountSummary?.address}
                   />
-                  <CopyText text={summary.address} />
+                  <CopyText text={accountSummary?.address} />
                 </div>
               </div>
 
@@ -168,9 +168,9 @@ export default function General() {
                     className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20"
                     placeholder="No wallet address set"
                     readOnly
-                    value={summary.wallet}
+                    value={accountSummary.wallet}
                   />
-                  <CopyText text={summary.wallet} />
+                  <CopyText text={accountSummary.wallet} />
                 </div>
               </div>
 
@@ -188,9 +188,11 @@ export default function General() {
                     className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20"
                     placeholder="No vote signing key set"
                     readOnly
-                    value={summary.authorizedSigners.attestation}
+                    value={accountSummary.authorizedSigners.attestation}
                   />
-                  <CopyText text={summary.authorizedSigners.attestation} />
+                  <CopyText
+                    text={accountSummary.authorizedSigners.attestation}
+                  />
                 </div>
               </div>
 
@@ -208,9 +210,11 @@ export default function General() {
                     className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20"
                     placeholder="No attestation signing key set"
                     readOnly
-                    value={summary.authorizedSigners.attestation}
+                    value={accountSummary.authorizedSigners.attestation}
                   />
-                  <CopyText text={summary.authorizedSigners.attestation} />
+                  <CopyText
+                    text={accountSummary.authorizedSigners.attestation}
+                  />
                 </div>
               </div>
 
@@ -228,9 +232,9 @@ export default function General() {
                     className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20"
                     placeholder="No validator signing key set"
                     readOnly
-                    value={summary.authorizedSigners.validator}
+                    value={accountSummary.authorizedSigners.validator}
                   />
-                  <CopyText text={summary.authorizedSigners.validator} />
+                  <CopyText text={accountSummary.authorizedSigners.validator} />
                 </div>
               </div>
             </div>

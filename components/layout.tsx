@@ -183,45 +183,18 @@ const tabs = [
     link: '/swap',
     disabled: true,
   },
-  {
-    name: 'History',
-    icon: (
-      <svg
-        className="h-4"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-        />
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-        />
-      </svg>
-    ),
-    link: '/audit',
-    disabled: true,
-  },
 ];
 
 export function WithAppLayout({ children }) {
   const menuRef = useRef(null);
-  const { network, summary } = Base.useContainer();
+  const { network } = Base.useContainer();
   const {
-    kit,
     updateNetwork,
     fornoUrl,
     openModal,
     address,
     destroy,
+    modalIsOpen,
   } = useContractKit();
   const [healthy, setHealthy] = useState(true);
   const [menu, setMenu] = useState(false);
@@ -271,7 +244,6 @@ export function WithAppLayout({ children }) {
       <Toaster
         position="top-right"
         toastOptions={{
-          // className: 'bg-gray-700',
           style: {
             background: '#2a374a',
             width: '22rem',
@@ -280,9 +252,11 @@ export function WithAppLayout({ children }) {
         }}
       />
 
-      {!address && (
+      {!address && !modalIsOpen && (
         <div className="md:hidden rounded-full fixed right-6 bottom-6 z-50 overflow-hidden">
-          <button className="primary-button">Connect</button>
+          <button className="primary-button" onClick={openModal}>
+            Connect
+          </button>
         </div>
       )}
 
@@ -293,36 +267,31 @@ export function WithAppLayout({ children }) {
             ref={menuRef}
             className="absolute top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden"
           >
-            <div className="rounded-lg shadow-md bg-gray-850 ring-1 ring-black ring-opacity-5 overflow-hidden">
-              <div className="px-5 pt-4 flex items-center justify-between">
-                <div></div>
-                <div className="-mr-2">
-                  <button
-                    type="button"
-                    onClick={() => setMenu(false)}
-                    className="rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-                  >
-                    <span className="sr-only">Close menu</span>
-                    {/* Heroicon name: outline/x */}
-                    <svg
-                      className="h-6 w-6"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div className="px-2 pt-2 pb-3">
+            <div className="relative rounded-lg shadow-md bg-gray-900 ring-1 ring-black ring-opacity-5 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setMenu(false)}
+                className="absolute right-2 top-2 rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+              >
+                <span className="sr-only">Close menu</span>
+                {/* Heroicon name: outline/x */}
+                <svg
+                  className="h-6 w-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+              <div className="px-4 py-4">
                 {tabs.map((t) => (
                   <Link href={t.link}>
                     <a
@@ -344,6 +313,20 @@ export function WithAppLayout({ children }) {
                   </Link>
                 ))}
               </div>
+
+              {address && (
+                <>
+                  <div
+                    className="mx-auto bg-gray-800"
+                    style={{ height: '1px', width: '90%' }}
+                  ></div>
+                  <div className="flex px-4 py-4">
+                    <button className="text-gray-300 ml-auto" onClick={destroy}>
+                      Logout
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -413,17 +396,19 @@ export function WithAppLayout({ children }) {
                 </div>
               </div>
 
-              {address && (
-                <DropButton
-                  display={truncateAddress(address)}
-                  groups={[
-                    [
-                      { text: 'Settings', onClick: () => router.push('/') },
-                      { text: 'Logout', onClick: destroy },
-                    ],
-                  ]}
-                />
-              )}
+              <div className="hidden md:flex">
+                {address && (
+                  <DropButton
+                    display={truncateAddress(address)}
+                    groups={[
+                      [
+                        { text: 'Settings', onClick: () => router.push('/') },
+                        { text: 'Logout', onClick: destroy },
+                      ],
+                    ]}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -2,27 +2,21 @@ import { GroupVote } from '@celo/contractkit/lib/wrappers/Election';
 import { PendingWithdrawal } from '@celo/contractkit/lib/wrappers/LockedGold';
 import { ValidatorGroup } from '@celo/contractkit/lib/wrappers/Validators';
 import { BigNumber } from 'bignumber.js';
-import { CopyText, CustomSelectSearch, Panel, Table, toast } from 'components';
-import { useCallback, useEffect, useState } from 'react';
+import {
+  CopyText,
+  CustomSelectSearch,
+  LockCelo,
+  Panel,
+  Table,
+  toast,
+} from 'components';
+import { useCallback, useEffect, useState, Validator } from 'react';
 import Loader from 'react-loader-spinner';
 import { useContractKit } from '@celo-tools/use-contractkit';
-import {
-  formatAmount,
-  getValidatorGroupScore,
-  toWei,
-  truncate,
-  truncateAddress,
-} from 'utils';
+import { formatAmount, toWei, truncate, truncateAddress } from 'utils';
 import Web3 from 'web3';
-
-interface AccountSummary {
-  lockedGold: {
-    total: BigNumber;
-    nonvoting: BigNumber;
-    requirement: BigNumber;
-  };
-  pendingWithdrawals: PendingWithdrawal[];
-}
+import { Base } from 'state';
+import { ContractKit } from '@celo/contractkit';
 
 enum States {
   None,
@@ -33,18 +27,31 @@ enum States {
   Voting,
 }
 
+export async function getValidatorGroupScore(
+  kit: ContractKit,
+  groupAddress: string,
+  electedValidators: any[]
+) {
+  const validators = await kit.contracts.getValidators();
+  const group = await validators.getValidatorGroup(groupAddress, false);
+
+  let totalScore = new BigNumber(0);
+  let electedCount = 0;
+  group.members.forEach((address) => {
+    const v = electedValidators.find((ev) => ev.address === address);
+    if (v) {
+      totalScore = totalScore.plus(v.score);
+      electedCount++;
+    }
+  });
+
+  return { score: totalScore.dividedBy(electedCount), electedCount };
+}
+
 export default function Earn() {
   const { kit, send, address } = useContractKit();
+  const { lockedSummary, fetchLockedSummary, balances } = Base.useContainer();
 
-  const [celo, setCelo] = useState(new BigNumber(0));
-  const [accountSummary, setAccountSummary] = useState<AccountSummary>({
-    lockedGold: {
-      nonvoting: new BigNumber(0),
-      total: new BigNumber(0),
-      requirement: new BigNumber(0),
-    },
-    pendingWithdrawals: [],
-  });
   const [groupVotes, setGroupVotes] = useState<GroupVote[]>([]);
   const [hasActivatablePendingVotes, setHasActivatablePendingVotes] = useState(
     false
@@ -58,7 +65,6 @@ export default function Earn() {
       electedCount: number;
     })[]
   >([]);
-  const [lockAmount, setLockAmount] = useState('');
   const [voteAmount, setVoteAmount] = useState('');
   const [votingAddress, setVotingAddress] = useState('');
 
@@ -81,70 +87,6 @@ export default function Earn() {
     [sort]
   );
 
-  const fetchAccountSummary = useCallback(async () => {
-    if (!address) {
-      return;
-    }
-
-    const election = await kit.contracts.getElection();
-    const votedForGroups = await election.getGroupsVotedForByAccount(address);
-
-    const groupVotes = await Promise.all(
-      votedForGroups.map((groupAddress) =>
-        election.getVotesForGroupByAccount(address, groupAddress)
-      )
-    );
-
-    setHasActivatablePendingVotes(
-      await election.hasActivatablePendingVotes(address)
-    );
-    setGroupVotes(groupVotes);
-
-    const [locked, goldToken] = await Promise.all([
-      kit.contracts.getLockedGold(),
-      kit.contracts.getGoldToken(),
-    ]);
-
-    try {
-      setAccountSummary(await locked.getAccountSummary(address));
-    } catch (_) {}
-    setCelo(await goldToken.balanceOf(address));
-  }, [kit, address]);
-
-  const lock = useCallback(async () => {
-    setState(States.Locking);
-    try {
-      const lockedCelo = await kit.contracts.getLockedGold();
-      await send(lockedCelo.lock(), { value: toWei(lockAmount) });
-      toast.success('CELO locked');
-      setLockAmount('0');
-    } catch (e) {
-      toast.error(e.message);
-    }
-    setState(States.None);
-  }, [kit, send, lockAmount]);
-
-  const unlock = useCallback(async () => {
-    setState(States.Unlocking);
-    try {
-      const lockedCelo = await kit.contracts.getLockedGold();
-      await send(lockedCelo.unlock(toWei(lockAmount)));
-      toast.success('CELO unlocked');
-      setLockAmount('');
-    } catch (e) {
-      toast.error(e.message);
-    }
-    setState(States.None);
-  }, [kit, send, lockAmount]);
-
-  const withdraw = useCallback(
-    async (value: number) => {
-      const lockedCelo = await kit.contracts.getLockedGold();
-      await send(lockedCelo.withdraw(value));
-    },
-    [kit, send, fetchAccountSummary]
-  );
-
   const activate = useCallback(async () => {
     setState(States.Activating);
     try {
@@ -154,9 +96,9 @@ export default function Earn() {
     } catch (e) {
       toast.error(`Unable to activate votes ${e.message}`);
     }
-    fetchAccountSummary();
+    fetchVotingSummary();
     setState(States.None);
-  }, [kit, send, fetchAccountSummary, address]);
+  }, [kit, send, fetchLockedSummary, address]);
 
   const vote = useCallback(
     async (address: string, value: string) => {
@@ -174,10 +116,10 @@ export default function Earn() {
         toast.error(`Unable to vote ${e.message}`);
       } finally {
         setState(States.None);
-        fetchAccountSummary();
+        fetchVotingSummary();
       }
     },
-    [kit, send, fetchAccountSummary]
+    [kit, send, fetchLockedSummary]
   );
 
   const revoke = useCallback(
@@ -197,30 +139,65 @@ export default function Earn() {
         toast.error(`Unable to vote ${e.message}`);
       } finally {
         setState(States.None);
-        fetchAccountSummary();
+        fetchVotingSummary();
       }
     },
-    [kit, send, fetchAccountSummary]
+    [kit, send, fetchLockedSummary]
   );
+
+  const fetchVotingSummary = useCallback(async () => {
+    if (!address) {
+      return;
+    }
+
+    const election = await kit.contracts.getElection();
+    const votedForGroups = await election.getGroupsVotedForByAccount(address);
+
+    setGroupVotes(
+      await Promise.all(
+        votedForGroups.map((groupAddress) =>
+          election.getVotesForGroupByAccount(address, groupAddress)
+        )
+      )
+    );
+
+    setHasActivatablePendingVotes(
+      await election.hasActivatablePendingVotes(address)
+    );
+  }, [kit, address]);
 
   const fetchValidators = useCallback(async () => {
     setLoading(true);
+
     const election = await kit.contracts.getElection();
     const validators = await kit.contracts.getValidators();
+
     setTotalVotes(await election.getTotalVotes());
+
     const registeredGroups = await validators.getRegisteredValidatorGroups();
+    const electedValidatorSigners = await election.getCurrentValidatorSigners();
+
+    const electedValidators = await Promise.all(
+      electedValidatorSigners.map(async (signer) => {
+        const account = await validators.signerToAccount(signer);
+        return validators.getValidator(account);
+      })
+    );
+
     const groupsWithScore = await Promise.all(
       registeredGroups.map(async (g) => {
-        let electedCount = 0;
         const totalVotes = await election.getTotalVotesForGroup(g.address);
-        // @ts-ignore
-        const score = await getValidatorGroupScore(kit, g.address);
+        const { score, electedCount } = await getValidatorGroupScore(
+          kit,
+          g.address,
+          electedValidators
+        );
 
         return {
           ...g,
           score,
-          totalVotes,
           electedCount,
+          totalVotes,
         };
       })
     );
@@ -230,19 +207,22 @@ export default function Earn() {
   }, [kit]);
 
   useEffect(() => {
-    fetchAccountSummary();
-    fetchValidators();
-  }, [fetchAccountSummary, fetchValidators]);
+    fetchVotingSummary();
+  }, [fetchVotingSummary]);
 
-  const voting = accountSummary.lockedGold.total.minus(
-    accountSummary.lockedGold.nonvoting
+  useEffect(() => {
+    fetchValidators();
+  }, [fetchValidators]);
+
+  const voting = lockedSummary.lockedGold.total.minus(
+    lockedSummary.lockedGold.nonvoting
   );
-  const total = accountSummary.lockedGold.total.plus(celo);
-  const nonLocked = celo;
+  const total = lockedSummary.lockedGold.total.plus(balances.celo);
+  const nonLocked = balances.celo;
 
   const votingPct = voting.dividedBy(total).times(100);
-  const nonvotingPct = accountSummary.lockedGold.nonvoting
-    .dividedBy(accountSummary.lockedGold.total)
+  const nonvotingPct = lockedSummary.lockedGold.nonvoting
+    .dividedBy(lockedSummary.lockedGold.total)
     .times(100);
   const notLockedPct = nonLocked.dividedBy(total).times(100);
 
@@ -322,74 +302,9 @@ export default function Earn() {
           </div>
         </div>
       </Panel>
-      <Panel>
-        <div className="md:grid md:grid-cols-4 md:gap-6 py-2">
-          <div className="md:col-span-1">
-            <h3 className="text-xl font-medium leading-6 text-gray-200">
-              Lock
-            </h3>
-          </div>
-          <div className="mt-2 md:mt-0 md:col-span-3">
-            <div className="flex flex-col space-y-4">
-              <div className="text-gray-400 text-sm">
-                {truncateAddress(address || '0x')} currently has{' '}
-                <span className="font-medium text-gray-200">
-                  {formatAmount(accountSummary.lockedGold.total, 2)}
-                </span>{' '}
-                out of{' '}
-                <span className="text-gray-200">{formatAmount(total, 0)}</span>{' '}
-                ({parseFloat(votingPctStr) + parseFloat(nonvotingPctStr)}%) CELO
-                locked for voting. Lock or unlock more for access to more
-                rewards.{' '}
-              </div>
-              <div>
-                <span className="flex flex-col">
-                  <div className="w-full md:w-96 md:mx-auto">
-                    <div className="mt-1 relative rounded-md shadow-sm">
-                      <input
-                        type="text"
-                        value={lockAmount}
-                        onChange={(e) => setLockAmount(e.target.value)}
-                        className="appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-full"
-                        placeholder={'0'}
-                      />
-                      <div className="absolute inset-y-0 right-0 flex items-center">
-                        <div className="flex items-center justify-center focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-4 border-transparent bg-transparent text-gray-300 sm:text-sm rounded-md">
-                          CELO
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex text-gray-400 text-xs mt-2">
-                      {toWei(lockAmount || '0')} CELO (Wei)
-                    </div>
-                  </div>
-                  {state === States.Locking || state === States.Unlocking ? (
-                    <div className="flex items-center justify-center mt-3">
-                      <Loader
-                        type="TailSpin"
-                        color="white"
-                        height="24px"
-                        width="24px"
-                      />
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex space-x-4 justify-center items-center">
-                        <button className="secondary-button" onClick={unlock}>
-                          Unlock
-                        </button>
-                        <button className="secondary-button" onClick={lock}>
-                          Lock
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Panel>
+
+      <LockCelo />
+
       <Panel>
         <div className="md:grid md:grid-cols-4 md:gap-6 py-2">
           <div className="md:col-span-1">
@@ -402,14 +317,9 @@ export default function Earn() {
               <div className="text-gray-400 text-sm">
                 {truncateAddress(address || '0x')} currently has{' '}
                 <span className="font-medium text-gray-200">
-                  {formatAmount(accountSummary.lockedGold.total, 2)} CELO
+                  {formatAmount(lockedSummary.lockedGold.nonvoting, 2)}
                 </span>{' '}
-                ({parseFloat(votingPctStr) + parseFloat(nonvotingPctStr)}%)
-                locked for voting.{' '}
-                <span className="font-medium text-gray-200">
-                  {formatAmount(accountSummary.lockedGold.nonvoting, 2)}
-                </span>{' '}
-                ({nonvotingPctStr}%) of that CELO is free to vote with.
+                ({nonvotingPctStr}%) CELO locked and ready to vote with.
               </div>
 
               <div className="text-gray-400 text-sm">
@@ -450,7 +360,7 @@ export default function Earn() {
                           <span className="inline-flex items-center rounded-md text-xs font-medium text-indigo-600">
                             {formatAmount(gv.active, 2)} ACTIVE (
                             {gv.active
-                              .dividedBy(accountSummary.lockedGold.total)
+                              .dividedBy(lockedSummary.lockedGold.total)
                               .times(100)
                               .toFixed(0)}
                             )%
@@ -458,7 +368,7 @@ export default function Earn() {
                           <span className="inline-flex items-center rounded-md text-xs font-medium text-blue-600 mt-1">
                             {formatAmount(gv.pending, 2)} PENDING (
                             {gv.pending
-                              .dividedBy(accountSummary.lockedGold.total)
+                              .dividedBy(lockedSummary.lockedGold.total)
                               .times(100)
                               .toFixed(0)}
                             )%
@@ -596,7 +506,6 @@ export default function Earn() {
               { displayName: 'Total votes', sortableProperty: 'totalVotes' },
               { displayName: 'Score', sortableProperty: 'score' },
               'Elected',
-              '',
             ]}
             onHeaderClick={(property, desc) => {
               setSort({ property, desc });
@@ -620,7 +529,6 @@ export default function Earn() {
               <div>
                 {g.electedCount} / {g.members.length}
               </div>,
-              <div></div>,
             ])}
           />
         </div>

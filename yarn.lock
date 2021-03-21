@@ -59,9 +59,9 @@
     to-fast-properties "^2.0.0"
 
 "@celo-tools/use-contractkit@*":
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/@celo-tools/use-contractkit/-/use-contractkit-0.0.19.tgz#f77ee7656a13b7931ee15edc2c2c3738e7937a20"
-  integrity sha512-QbF1ktFV457mT1v0sygawRSYhv2Gg5fzGS76dbFgET/mtXZufHJlnaKuW0jYjbedeNmYF4qug4YME8YEOD26pw==
+  version "0.0.21"
+  resolved "https://registry.yarnpkg.com/@celo-tools/use-contractkit/-/use-contractkit-0.0.21.tgz#f738f5d9c5e904e5189e211d254a08352c76cf07"
+  integrity sha512-5v82OiXfoJD8bMEzt9IeFMpRISGJteH8bLmlvKuW9fVEzFVyvWhI9j/hzVO8s2GJzcXFKWOXwxAVSLNqtdK67A==
   dependencies:
     "@celo/contractkit" "1.1.0-beta.1"
     "@celo/wallet-ledger" "1.1.0-beta.1"
