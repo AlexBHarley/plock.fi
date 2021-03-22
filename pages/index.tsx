@@ -1,12 +1,11 @@
 import { useContractKit } from '@celo-tools/use-contractkit';
 import { CopyText, Panel, PanelWithButton, toast } from 'components';
-import { setPriority } from 'os';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Loader from 'react-loader-spinner';
 import { Base } from 'state';
 
 export default function General() {
-  const { kit } = useContractKit();
+  const { kit, address, send } = useContractKit();
   const { accountSummary, fetchAccountSummary } = Base.useContainer();
 
   const [state, setState] = useState({
@@ -33,17 +32,23 @@ export default function General() {
     }
 
     setSaving(true);
+
+    const accounts = await kit.contracts.getAccounts();
+    if (!(await accounts.isAccount(address))) {
+      await send(accounts.createAccount());
+    }
+
     try {
-      const accounts = await kit.contracts.getAccounts();
       if (accountSummary.name !== state.name) {
-        await accounts.setName(state.name).sendAndWaitForReceipt();
+        await send(accounts.setName(state.name));
       }
       if (accountSummary.metadataURL !== state.metadataURL) {
-        await accounts.setMetadataURL(state.metadataURL);
+        await send(accounts.setMetadataURL(state.metadataURL));
       }
 
       toast.success('Account data updated');
     } catch (e) {
+      console.warn(e);
       toast.error('Unable to update data');
     }
 
