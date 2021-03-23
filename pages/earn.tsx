@@ -45,7 +45,11 @@ export async function getValidatorGroupScore(
     }
   });
 
-  return { score: totalScore.dividedBy(electedCount), electedCount };
+  const score =
+    electedCount === 0 || totalScore.eq(0)
+      ? new BigNumber(0)
+      : totalScore.dividedBy(electedCount);
+  return { score, electedCount };
 }
 
 export default function Earn() {
@@ -72,7 +76,7 @@ export default function Earn() {
   const [loading, setLoading] = useState(false);
   const [adding, setAdding] = useState(false);
 
-  const [sort, setSort] = useState({ property: 'totalVotes', desc: true });
+  const [sort, setSort] = useState({ property: 'score', desc: true });
 
   const sortFn = useCallback(
     (a, b) => {
@@ -188,6 +192,7 @@ export default function Earn() {
       registeredGroups.map(async (g) => {
         const totalVotes = await election.getTotalVotesForGroup(g.address);
         const { score, electedCount } = await getValidatorGroupScore(
+          // @ts-ignore
           kit,
           g.address,
           electedValidators
