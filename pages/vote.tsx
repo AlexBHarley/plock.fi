@@ -3,9 +3,14 @@ import { LockCelo, Panel, Table, toast } from 'components';
 import { useCallback, useEffect, useState } from 'react';
 import { ImArrowDown, ImArrowUp } from 'react-icons/im';
 import { FiExternalLink } from 'react-icons/fi';
-import { VoteValue } from '@celo/contractkit/lib/wrappers/Governance';
+import {
+  ProposalStage,
+  VoteValue,
+} from '@celo/contractkit/lib/wrappers/Governance';
 
 import Countdown from 'react-countdown';
+import BigNumber from 'bignumber.js';
+import next from 'next';
 
 export default function Vote() {
   const { kit, openModal, send } = useContractKit();
@@ -16,35 +21,53 @@ export default function Vote() {
     setLoading(true);
     const governance = await kit.contracts.getGovernance();
     const dequeue = await governance.getDequeue();
-    const queue = await governance.getQueue();
 
     const records = await Promise.all(
       dequeue.map(async (id) => {
         const isExpired = await governance.isDequeuedProposalExpired(id);
         const support = await governance.getSupport(id);
-        const percentage = support.required.div(support.total).toFixed(0);
+
+        const percentage = support.total.div(support.required).times(100);
+        const percentageFixed = percentage.isFinite()
+          ? percentage.toFixed(0)
+          : new BigNumber(100).toFixed(0);
 
         const record = await governance.getProposalRecord(id);
+        if (record.stage === ProposalStage.None) {
+          return null;
+        }
+
         const {
           Referendum,
           Execution,
           Approval,
+          Expiration,
         } = await governance.proposalSchedule(id);
 
-        const nextStageTime = [Referendum, Execution, Approval].reduce(
-          (accum, bn) => {
-            if (bn.toNumber() < 0) {
-              return accum;
-            }
+        let nextStageTime;
+        [Approval, Referendum, Execution, Expiration].forEach((bn) => {
+          const date = bn.toNumber() * 1000;
+          const diff = date - Date.now();
 
-            if (bn.toNumber() < accum) {
-              return bn.toNumber();
-            }
+          if (!nextStageTime) {
+            nextStageTime = date;
+          }
 
-            return accum;
-          },
-          Date.now()
-        );
+          if (diff < 0) {
+            return;
+          }
+
+          if (nextStageTime && date < nextStageTime) {
+            nextStageTime = date;
+            return;
+          }
+
+          nextStageTime = date;
+        });
+        if (!nextStageTime) {
+          return null;
+        }
+
         const voteRecord = await governance.getVoteRecord(
           kit.defaultAccount,
           id
@@ -60,12 +83,14 @@ export default function Vote() {
           isApproved,
           proposal: record,
           vote: voteRecord ? voteRecord.value : 'None',
-          nextStageTime: Date.now() + nextStageTime,
-          percentage,
+          nextStageTime,
+          percentage: percentageFixed,
         };
       })
     );
-    setProposals(records.sort((a, b) => b.id.minus(a.id).toNumber()));
+    setProposals(
+      records.filter(Boolean).sort((a, b) => b.id.minus(a.id).toNumber())
+    );
     setLoading(false);
   }, [kit]);
 
@@ -180,6 +205,11 @@ export default function Vote() {
                   ? 'border rounded px-2 py-1 border-green-500 text-green-500'
                   : 'border rounded px-2 py-1 border-red-500 text-red-500';
               } else if (p.proposal.stage === 'Execution') {
+              } else if (p.proposal.stage === 'Expiration') {
+                status = p.isApproved ? 'Executed' : 'Not executed';
+                statusClassName = p.isApproved
+                  ? 'border rounded px-2 py-1 border-green-500 text-green-500'
+                  : 'border rounded px-2 py-1 border-red-500 text-red-500';
               }
 
               return [
@@ -221,8 +251,12 @@ export default function Vote() {
                   </div>
                 </div>,
                 <div>
-                  {p.proposal.stage} (
-                  <Countdown date={new Date(p.nextStageTime)} />)
+                  {p.proposal.stage}{' '}
+                  {p.proposal.stage !== 'Expiration' && (
+                    <>
+                      (<Countdown date={new Date(p.nextStageTime)} />)
+                    </>
+                  )}
                 </div>,
                 <span className={statusClassName}>
                   {status} ({p.percentage}%)
