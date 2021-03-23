@@ -1,3 +1,4 @@
+export * from './circular-progress-bar';
 export * from './copy-text';
 export * from './dropdown';
 export * from './icon';
