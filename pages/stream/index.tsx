@@ -97,7 +97,6 @@ function Stream() {
       revocable: true,
       subjectToLiquidityProvision: false,
     };
-    console.log(releaseCeloConfig);
 
     await deployReleaseCelo(kit, releaseCeloConfig, address);
   }, [kit, address, config]);
