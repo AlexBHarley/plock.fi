@@ -1,5 +1,5 @@
 import { useContractKit } from '@celo-tools/use-contractkit';
-import { LockCelo, Panel, Table, toast } from 'components';
+import { LockCelo, Panel, Table, toast, WithLayout } from 'components';
 import { useCallback, useEffect, useState } from 'react';
 import { ImArrowDown, ImArrowUp } from 'react-icons/im';
 import { FiExternalLink } from 'react-icons/fi';
@@ -12,7 +12,7 @@ import Countdown from 'react-countdown';
 import BigNumber from 'bignumber.js';
 import next from 'next';
 
-export default function Vote() {
+function Vote() {
   const { kit, openModal, send } = useContractKit();
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -279,3 +279,5 @@ export default function Vote() {
     </>
   );
 }
+
+export default WithLayout(Vote);

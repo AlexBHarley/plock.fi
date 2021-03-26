@@ -6,16 +6,17 @@ import ReleaseGoldProxyJson from './abis/ReleaseGoldProxy.json';
 import { _setInitialProxyImplementation } from './celo-protocol';
 
 import Web3 from 'web3';
+import { ContractKit } from '@celo/contractkit';
 
 const celoRegistryAddress = '0x000000000000000000000000000000000000ce10';
 
 export interface ReleaseGoldConfig {
   identifier: string;
-  releaseStartTime: string;
+  releaseStartTime: Date;
   releaseCliffTime: number;
   numReleasePeriods: number;
   releasePeriod: number;
-  amountReleasedPerPeriod: number;
+  amountReleasedPerPeriod: BigNumber;
   revocable: boolean;
   beneficiary: Address;
   releaseOwner: Address;
@@ -31,25 +32,31 @@ const startGold = Web3.utils.toWei('1', 'ether');
 type ReleaseGoldTemplate = Partial<ReleaseGoldConfig>;
 
 export async function deployReleaseCelo(
-  web3: Web3,
+  kit: ContractKit,
   config: ReleaseGoldConfig,
   fromAddress: Address
 ) {
   // Sentinel MAINNET dictates a start time of mainnet launch, April 22 2020 16:00 UTC in this case
   const releaseStartTime = new Date(config.releaseStartTime).getTime() / 1000;
 
-  const weiAmountReleasedPerPeriod = new BigNumber(
-    web3.utils.toWei(config.amountReleasedPerPeriod.toString())
-  );
-
-  let totalValue = weiAmountReleasedPerPeriod.multipliedBy(
+  console.log(config);
+  let totalValue = config.amountReleasedPerPeriod.multipliedBy(
     config.numReleasePeriods
   );
 
-  const adjustedAmountPerPeriod = totalValue
-    .minus(startGold)
-    .div(config.numReleasePeriods)
-    .dp(0);
+  let adjustedAmountPerPeriod = totalValue.div(config.numReleasePeriods).dp(0);
+  const celo = await kit.contracts.getGoldToken();
+  if ((await celo.balanceOf(config.beneficiary)).lt(1)) {
+    adjustedAmountPerPeriod = totalValue
+      .minus(startGold)
+      .div(config.numReleasePeriods)
+      .dp(0);
+  }
+
+  const fromBalance = await await celo.balanceOf(fromAddress);
+  if (fromBalance.lt(totalValue)) {
+    throw new Error('Not enough funds');
+  }
 
   // Reflect any rounding changes from the division above
   totalValue = adjustedAmountPerPeriod.multipliedBy(config.numReleasePeriods);
@@ -71,71 +78,33 @@ export async function deployReleaseCelo(
     celoRegistryAddress,
   ];
 
-  const ReleaseGoldProxy = new web3.eth.Contract(ReleaseGoldProxyJson.abi);
-  const ReleaseGold = new web3.eth.Contract(ReleaseGoldJson.abi);
+  console.log(contractInitializationArgs);
+  const ReleaseGold = new kit.web3.eth.Contract(ReleaseGoldJson.abi);
 
   const initializerAbiRG = checkAndReturnInitializationAbi(
-    ReleaseGold,
+    ReleaseGoldJson,
     'ReleaseGold'
   );
-  const transferImplOwnershipAbiRG = checkAndReturnTransferOwnershipAbi(
-    ReleaseGold,
-    'ReleaseGold'
-  );
-  console.info('  Deploying ReleaseGoldProxy...');
-  const releaseGoldProxy = await ReleaseGoldProxy.deploy({
-    data: ReleaseGoldProxyJson.bytecode,
-  }).send({
-    from: fromAddress,
-  });
 
   const releaseGoldInstance = await ReleaseGold.deploy({
     data: ReleaseGoldJson.bytecode,
   }).send({
     from: fromAddress,
   });
+  console.log('Deployed gold instance', releaseGoldInstance._address);
 
   console.info('Initializing ReleaseGold...');
   await initializeRGImplementation(
-    web3,
+    kit.web3,
     releaseGoldInstance,
     fromAddress,
     initializerAbiRG,
-    transferImplOwnershipAbiRG
+    contractInitializationArgs
   );
-
-  console.info('Initializing ReleaseGoldProxy...');
-  let releaseGoldTxHash;
-  try {
-    releaseGoldTxHash = await _setInitialProxyImplementation(
-      web3,
-      releaseGoldInstance,
-      releaseGoldProxy,
-      'ReleaseGold',
-      {
-        from: fromAddress,
-        value: totalValue.toFixed(),
-      },
-      ...contractInitializationArgs
-    );
-  } catch (e) {
-    console.info(
-      'Something went wrong! Consider using the recover-funds.ts script with the below address'
-    );
-    console.info('ReleaseGoldProxy', releaseGoldProxy.address);
-    throw e;
-  }
-  const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address);
-  await proxiedReleaseGold.transferOwnership(releaseGoldMultiSigProxy.address, {
-    from: fromAddress,
-  });
-  await releaseGoldProxy._transferOwnership(releaseGoldMultiSigProxy.address, {
-    from: fromAddress,
-  });
 
   // Send starting gold amount to the beneficiary so they can perform transactions.
   console.info('  Sending beneficiary starting gold...');
-  await web3.eth.sendTransaction({
+  await kit.web3.eth.sendTransaction({
     from: fromAddress,
     to: config.beneficiary,
     value: startGold,
@@ -147,75 +116,41 @@ async function initializeRGImplementation(
   releaseGoldInstance: any,
   from: string,
   initializerAbiRG: string,
-  transferImplOwnershipAbiRG: string
+  initialisationArgs: any[]
 ) {
   // We need to fund the RG implementation instance in order to initialize it.
   console.info(
-    'Funding ReleaseGold implementation so it can be initialized...'
+    `Funding ReleaseGold implementation (${releaseGoldInstance._address}) so it can be initialized...`
   );
   await web3.eth.sendTransaction({
     from,
-    to: releaseGoldInstance.address,
-    value: 1,
+    to: releaseGoldInstance._address,
+    value: 1000,
   });
-  // Initialize and lock ownership of RG implementation
-  const implementationInitArgs = [
-    Math.round(new Date().getTime() / 1000),
-    0,
-    1,
-    1,
-    1,
-    false, // should not be revokable
-    '0x0000000000000000000000000000000000000001',
-    NULL_ADDRESS,
-    NULL_ADDRESS,
-    true, // subjectToLiquidityProivision
-    0,
-    false, // canValidate
-    false, // canVote
-    '0x0000000000000000000000000000000000000001',
-  ];
-  const implementationTransferOwnershipArgs = [
-    '0x0000000000000000000000000000000000000001',
-  ];
-  checkFunctionArgsLength(implementationInitArgs, initializerAbiRG);
-  checkFunctionArgsLength(
-    implementationTransferOwnershipArgs,
-    transferImplOwnershipAbiRG
-  );
+  console.log('ReleaseGold funded');
+
+  checkFunctionArgsLength(initialisationArgs, initializerAbiRG);
+
   const implInitCallData = web3.eth.abi.encodeFunctionCall(
-    // @ts-ignore
     initializerAbiRG,
-    implementationInitArgs
+    initialisationArgs
   );
-  const transferImplOwnershipCallData = web3.eth.abi.encodeFunctionCall(
-    // @ts-ignore
-    transferImplOwnershipAbiRG,
-    implementationTransferOwnershipArgs
-  );
-  console.info('Sending initialize tx...');
+
+  console.info('Sending initialize tx...', implInitCallData);
   await web3.eth.sendTransaction({
     from,
-    to: releaseGoldInstance.address,
+    to: releaseGoldInstance._address,
     data: implInitCallData,
-    gas: 3000000,
+    gas: 300000,
   });
   console.info('Returned from initialization tx');
+
   if (!(await (releaseGoldInstance as any).initialized())) {
     console.error(
-      `Failed to initialize ReleaseGold implementation at address ${releaseGoldInstance.address}`
+      `Failed to initialize ReleaseGold implementation at address ${releaseGoldInstance._address}`
     );
   }
   console.info('ReleaseGold implementation has been successfully initialized!');
-
-  console.info(
-    'Transferring ownsership of ReleaseGold implementation to 0x0000000000000000000000000000000000000001'
-  );
-  await web3.eth.sendTransaction({
-    from,
-    to: releaseGoldInstance.address,
-    data: transferImplOwnershipCallData,
-  });
 }
 
 function checkAndReturnInitializationAbi(Contract: any, name: string) {
@@ -228,18 +163,6 @@ function checkAndReturnInitializationAbi(Contract: any, name: string) {
     );
   }
   return initializerAbi;
-}
-
-function checkAndReturnTransferOwnershipAbi(Contract: any, name: string) {
-  const transferImplOwnershipAbi: string = Contract.abi.find(
-    (abi: any) => abi.type === 'function' && abi.name === 'transferOwnership'
-  );
-  if (!transferImplOwnershipAbi) {
-    throw new Error(
-      `Attempting to deploy implementation contract ${name} that does not have a _transferOwnership() function. Abort.`
-    );
-  }
-  return transferImplOwnershipAbi;
 }
 
 export function checkFunctionArgsLength(args: any[], abi: any) {

@@ -4,11 +4,16 @@ import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Base } from 'state';
-import { Networks, useContractKit } from '@celo-tools/use-contractkit';
+import {
+  ContractKitProvider,
+  Networks,
+  useContractKit,
+} from '@celo-tools/use-contractkit';
 import { truncateAddress } from 'utils';
 import { CopyText } from './copy-text';
 import { PulsatingDot } from './pulsating-dot';
 import { DropButton, Dropdown } from './dropdown';
+import { ApolloProvider } from '@apollo/client';
 
 export function Sidebar({
   items,
@@ -207,7 +212,6 @@ const tabs = [
       </svg>
     ),
     link: '/swap',
-    disabled: true,
   },
 ];
 
@@ -428,7 +432,10 @@ export function WithAppLayout({ children }) {
                     display={truncateAddress(address)}
                     groups={[
                       [
-                        { text: 'Settings', onClick: () => router.push('/') },
+                        {
+                          text: 'Settings',
+                          onClick: () => router.push('/settings'),
+                        },
                         { text: 'Logout', onClick: destroy },
                       ],
                     ]}
@@ -511,7 +518,17 @@ export function WithAppLayout({ children }) {
   );
 }
 
-export function WithSidebar({ children }: any) {
+function WithApollo({ children }: any) {
+  const { graphql } = Base.useContainer();
+
+  return (
+    <ApolloProvider client={graphql}>
+      <WithAppLayout>{children}</WithAppLayout>
+    </ApolloProvider>
+  );
+}
+
+function WithSidebar({ children }: any) {
   return (
     <div className="lg:grid lg:grid-cols-12 lg:gap-x-5">
       <Sidebar items={tabs} />
@@ -520,3 +537,17 @@ export function WithSidebar({ children }: any) {
     </div>
   );
 }
+
+export const WithLayout = (Component: any) => {
+  return () => (
+    <ContractKitProvider dappName="CeloTools">
+      <Base.Provider>
+        <WithApollo>
+          <WithSidebar>
+            <Component />
+          </WithSidebar>
+        </WithApollo>
+      </Base.Provider>
+    </ContractKitProvider>
+  );
+};

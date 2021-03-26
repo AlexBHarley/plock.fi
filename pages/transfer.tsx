@@ -1,5 +1,12 @@
 import { gql, useLazyQuery } from '@apollo/client';
-import { CopyText, Panel, Table, toast } from 'components';
+import {
+  Balances,
+  CopyText,
+  Panel,
+  Table,
+  toast,
+  WithLayout,
+} from 'components';
 import { Toggle } from 'components/toggle';
 import { getGraphQlUrl } from '../constants';
 import { useCallback, useEffect, useState } from 'react';
@@ -33,7 +40,7 @@ const transferQuery = gql`
   }
 `;
 
-export default function Transfer() {
+function Transfer() {
   const { address, kit, network, send } = useContractKit();
   const { balances, fetchBalances } = Base.useContainer();
   const [showTiny, setShowTiny] = useState(false);
@@ -86,50 +93,6 @@ export default function Transfer() {
 
   return (
     <>
-      <Panel>
-        <div>
-          <h3 className="text-lg font-medium leading-6 text-gray-200">
-            Balances
-          </h3>
-        </div>
-        <div className="">
-          <div>
-            <dl className="grid grid-cols-1 rounded-lg bg-gray-750 overflow-hidden shadow divide-y divide-gray-700 md:grid-cols-3 md:divide-y-0 md:divide-x">
-              <div>
-                <div className="px-4 py-5 sm:p-6">
-                  <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
-                    <div className="flex items-baseline text-2xl font-semibold text-indigo-300">
-                      {formatAmount(balances.celo, 2)}{' '}
-                      <span className="text-sm text-gray-400 ml-2">CELO</span>
-                    </div>
-                  </dd>
-                </div>
-              </div>
-              <div>
-                <div className="px-4 py-5 sm:p-6">
-                  <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
-                    <div className="flex items-baseline text-2xl font-semibold text-indigo-300">
-                      {formatAmount(balances.cusd, 2)}
-                      <span className="text-sm text-gray-400 ml-2">cUSD</span>
-                    </div>
-                  </dd>
-                </div>
-              </div>
-              <div>
-                <div className="px-4 py-5 sm:p-6">
-                  <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
-                    <div className="flex items-baseline text-2xl font-semibold text-indigo-300">
-                      {formatAmount(balances.ceur, 2)}
-                      <span className="text-sm text-gray-400 ml-2">cEUR</span>
-                    </div>
-                  </dd>
-                </div>
-              </div>
-            </dl>
-          </div>
-        </div>
-      </Panel>
-
       <Panel>
         <h3 className="text-gray-200">New Transfer</h3>
         <div>
@@ -188,6 +151,9 @@ export default function Transfer() {
           Send
         </button>
       </Panel>
+
+      <Balances />
+
       <Panel>
         <div className="flex flex-col md:flex-row md:items-center">
           <h3 className="text-gray-300 whitespace-nowrap mb-3 md:mb-0">
@@ -263,3 +229,5 @@ export default function Transfer() {
     </>
   );
 }
+
+export default WithLayout(Transfer);

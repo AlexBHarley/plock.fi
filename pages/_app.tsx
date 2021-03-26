@@ -6,16 +6,6 @@ import { ContractKitProvider } from '@celo-tools/use-contractkit';
 import '@celo-tools/use-contractkit/lib/styles.css';
 import '../styles/globals.css';
 
-function BaseComponent({ children }: any) {
-  const { graphql } = Base.useContainer();
-
-  return (
-    <ApolloProvider client={graphql}>
-      <WithAppLayout>{children}</WithAppLayout>
-    </ApolloProvider>
-  );
-}
-
 function MyApp({ Component, pageProps }) {
   return (
     <>
@@ -33,15 +23,7 @@ function MyApp({ Component, pageProps }) {
         )}
       </Head>
 
-      <ContractKitProvider dappName="CeloTools">
-        <Base.Provider>
-          <BaseComponent>
-            <WithSidebar>
-              <Component {...pageProps} />
-            </WithSidebar>
-          </BaseComponent>
-        </Base.Provider>
-      </ContractKitProvider>
+      <Component {...pageProps} />
     </>
   );
 }

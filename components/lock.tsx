@@ -46,7 +46,7 @@ export function LockCelo() {
     setState(States.None);
   }, [kit, send, lockAmount]);
 
-  const total = lockedSummary.lockedGold.total.plus(balances.celo);
+  const total = lockedSummary.lockedGold.total.plus(balances.CELO);
   const lockedPct = lockedSummary.lockedGold.total
     .dividedBy(total)
     .times(100)

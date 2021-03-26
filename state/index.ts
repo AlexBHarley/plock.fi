@@ -53,9 +53,9 @@ const defaultAccountSummary = {
 };
 
 const defaultBalances = {
-  celo: new BigNumber(0),
-  cusd: new BigNumber(0),
-  ceur: new BigNumber(0),
+  CELO: new BigNumber(0),
+  cUSD: new BigNumber(0),
+  cEUR: new BigNumber(0),
 };
 const defaultLockedSummary = {
   lockedGold: {
@@ -77,9 +77,9 @@ function State() {
     defaultLockedSummary
   );
   const [balances, setBalances] = useState<{
-    celo: BigNumber;
-    cusd: BigNumber;
-    ceur: BigNumber;
+    CELO: BigNumber;
+    cUSD: BigNumber;
+    cEUR: BigNumber;
   }>(defaultBalances);
 
   useEffect(() => {
@@ -101,14 +101,14 @@ function State() {
       kit.contracts.getStableToken(),
     ]);
 
-    const [celo, cusd] = await Promise.all([
+    const [CELO, cUSD] = await Promise.all([
       celoContract.balanceOf(address),
       cusdContract.balanceOf(address),
     ]);
     setBalances({
       ...defaultBalances,
-      celo,
-      cusd,
+      CELO,
+      cUSD,
     });
   }, [address]);
 

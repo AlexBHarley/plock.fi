@@ -9,6 +9,7 @@ import {
   Panel,
   Table,
   toast,
+  WithLayout,
 } from 'components';
 import { useCallback, useEffect, useState, Validator } from 'react';
 import Loader from 'react-loader-spinner';
@@ -52,7 +53,7 @@ export async function getValidatorGroupScore(
   return { score, electedCount };
 }
 
-export default function Earn() {
+function Earn() {
   const { kit, send, address } = useContractKit();
   const { lockedSummary, fetchLockedSummary, balances } = Base.useContainer();
 
@@ -222,8 +223,8 @@ export default function Earn() {
   const voting = lockedSummary.lockedGold.total.minus(
     lockedSummary.lockedGold.nonvoting
   );
-  const total = lockedSummary.lockedGold.total.plus(balances.celo);
-  const nonLocked = balances.celo;
+  const total = lockedSummary.lockedGold.total.plus(balances.CELO);
+  const nonLocked = balances.CELO;
 
   const votingPct = voting.dividedBy(total).times(100);
   const nonvotingPct = lockedSummary.lockedGold.nonvoting
@@ -541,3 +542,5 @@ export default function Earn() {
     </>
   );
 }
+
+export default WithLayout(Earn);

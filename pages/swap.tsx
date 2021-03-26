@@ -1,9 +1,17 @@
-import { Panel } from 'components';
+import { Balances, Panel, WithLayout } from 'components';
 
-export default function Swap() {
+function Swap() {
   return (
-    <Panel>
-      <div className="flex justify-center text-gray-300">Coming soon</div>
-    </Panel>
+    <>
+      <Panel>
+        <div className="flex justify-center text-gray-300">Coming soon</div>
+      </Panel>
+
+      <Panel>
+        <Balances />
+      </Panel>
+    </>
   );
 }
+
+export default WithLayout(Swap);
