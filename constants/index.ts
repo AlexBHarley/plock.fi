@@ -1,4 +1,6 @@
 import { Networks } from '@celo-tools/use-contractkit';
+export * from './tokens';
+export * as ubeswap from './ubeswap';
 
 const apiUrls = {
   [Networks.Alfajores]:
