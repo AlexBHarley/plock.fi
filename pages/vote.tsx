@@ -21,6 +21,7 @@ function Vote() {
     setLoading(true);
     const governance = await kit.contracts.getGovernance();
     const dequeue = await governance.getDequeue();
+    const queue = await governance.getQueue();
 
     const records = await Promise.all(
       dequeue.map(async (id) => {

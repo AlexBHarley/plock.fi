@@ -1,6 +1,6 @@
 import { Address } from '@celo/utils/lib/address';
 import Web3 from 'web3';
-import { checkFunctionArgsLength } from './deploy-release-celo';
+import { checkFunctionArgsLength } from './deploy-release-celo-bak';
 import { retryTx } from './web3-utils';
 
 export async function setAndInitializeImplementation(

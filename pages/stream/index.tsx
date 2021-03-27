@@ -76,29 +76,27 @@ function Stream() {
       throw new Error('Not working right now');
     }
 
-    console.log('amountPerSecond', amountPerSecond.toString());
-
     // we want CELO to be released every second. So we must find the amount
     // that can be released per second. It may be
     // must calculate smallest amount that can get released per second
 
     const releaseCeloConfig = {
-      amountReleasedPerPeriod: amountPerSecond,
       beneficiary: config.beneficiary,
       canValidate: false,
       canVote: false,
       initialDistributionRatio: 1000,
-      numReleasePeriods: secondsDiff,
-      refundAddress: address,
+      amountReleasedPerPeriod: new BigNumber('1'), // amountPerSecond,
+      releasePeriod: 1,
+      numReleasePeriods: 2, // secondsDiff,
+      refundAddress: '0x0000000000000000000000000000000000000000',
       releaseOwner: address,
       releaseCliffTime: 0,
-      releasePeriod: 1,
       releaseStartTime: config.start,
-      revocable: true,
+      revocable: false,
       subjectToLiquidityProvision: false,
     };
 
-    await deployReleaseCelo(kit, releaseCeloConfig, address);
+    await deployReleaseCelo(kit.web3, releaseCeloConfig, address);
   }, [kit, address, config]);
 
   const withdraw = useCallback(async () => {
@@ -139,9 +137,11 @@ function Stream() {
     ]);
 
     let withdrawable = false;
-    if ((await accounts.signerToAccount(beneficiary)) === address) {
-      withdrawable = true;
-    }
+    try {
+      if ((await accounts.signerToAccount(beneficiary)) === address) {
+        withdrawable = true;
+      }
+    } catch (e) {}
 
     setStream({
       total,
@@ -164,6 +164,9 @@ function Stream() {
   const outerRingValue = stream
     ? (stream.released.toNumber() / stream.total.toNumber()) * 100
     : 0;
+  const releasedPercent = stream
+    ? stream.released.dividedBy(stream.total).multipliedBy(100).toFixed()
+    : '0';
 
   return (
     <>
@@ -344,7 +347,7 @@ function Stream() {
               <span className="text-gray-400">Released:</span>
               <span className="text-gray-200">
                 {formatAmount(stream.released, 2)} /{' '}
-                {formatAmount(stream.total, 2)} CELO
+                {formatAmount(stream.total, 2)} CELO ({releasedPercent}%)
               </span>
             </div>
 
@@ -393,7 +396,5 @@ function Stream() {
     </>
   );
 }
-
-console.log(WithLayout(Stream));
 
 export default WithLayout(Stream);
