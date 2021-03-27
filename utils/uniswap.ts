@@ -35,7 +35,7 @@ export async function swap(
   );
   await router.methods
     .swapExactTokensForTokens(
-      1,
+      amount,
       1,
       [from, to],
       kit.defaultAccount,
