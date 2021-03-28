@@ -31,10 +31,18 @@ function About() {
 
         <h2>Why?</h2>
         <p className="text-gray-500">
-          For years parents have espoused the health benefits of eating garlic
-          bread with cheese to their children, with the food earning such an
-          iconic status in our culture that kids will often dress up as warm,
-          cheesy loaf for Halloween.
+          Plock started from humble beginnings as a frontend to the{' '}
+          <a
+            href="https://docs.celo.org/command-line-interface/introduction"
+            target="_blank"
+          >
+            Celo CLI
+          </a>{' '}
+          , a tool for developers and computer professionals to interact with
+          the Celo network. Democratising this access to the rest of the world
+          was a great step, however as the number of decentralised applications
+          (DApps) grew on Celo, it became apparent that for wider adoption a
+          consistent and friendly interface was needed.
         </p>
 
         <h2>Who?</h2>

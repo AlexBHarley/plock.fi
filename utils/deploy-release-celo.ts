@@ -1,11 +1,9 @@
 import { ContractKit } from '@celo/contractkit';
-import { Address, isValidAddress } from '@celo/utils/lib/address';
+import { Address } from '@celo/utils/lib/address';
 import BigNumber from 'bignumber.js';
-import { differenceInDays, differenceInSeconds } from 'date-fns';
+import { differenceInSeconds } from 'date-fns';
 import Web3 from 'web3';
-
 import ReleaseGoldJson from './abis/ReleaseGold.json';
-import { _setInitialProxyImplementation } from './celo-protocol';
 import { retry } from './web3-utils';
 
 const celoRegistryAddress = '0x000000000000000000000000000000000000ce10';
