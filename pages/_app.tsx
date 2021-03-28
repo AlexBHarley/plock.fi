@@ -17,8 +17,8 @@ function MyApp({ Component, pageProps }) {
           <script
             async
             defer
-            data-domain="celotools.com"
-            src="https://stats.celotools.com/js/index.js"
+            data-domain="plock.fi"
+            src="https://stats.plock.fi/js/plausible.js"
           />
         )}
       </Head>
