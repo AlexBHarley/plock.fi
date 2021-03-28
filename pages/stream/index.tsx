@@ -28,6 +28,7 @@ import React from 'react';
 
 class GradientSVG extends React.Component {
   render() {
+    // @ts-ignore
     let { startColor, endColor, idCSS, rotation } = this.props;
 
     let gradientTransform = `rotate(${rotation})`;
@@ -80,9 +81,10 @@ function Stream() {
 
   const connect = useCallback(
     async (rgAddress: string) => {
-      // const releaseCelo = await kit._web3Contracts.
       const rgw = new ReleaseGoldWrapper(
+        // @ts-ignore
         kit,
+        // @ts-ignore
         newReleaseGold(kit.connection.web3, rgAddress)
       );
       const accounts = await kit.contracts.getAccounts();
@@ -145,6 +147,7 @@ function Stream() {
           start: config.start,
           end: config.end,
         },
+        // @ts-ignore
         kit
       );
       toast.success('Release succeeded');
@@ -154,7 +157,9 @@ function Stream() {
 
   const withdraw = useCallback(async () => {
     const rgw = new ReleaseGoldWrapper(
+      // @ts-ignore
       kit,
+      // @ts-ignore
       newReleaseGold(kit.connection.web3, stream.address)
     );
 
@@ -192,12 +197,12 @@ function Stream() {
             Stream
           </h3>
           <p className="text-gray-400 text-xs md:text-sm mt-2">
-            With Plock.fi you can stream funds to recipients for realtime
-            payments. This allows recipients to claim their funds on an ongoing
-            basis as soon as it becomes available to them.
+            With Plock you can stream funds to recipients for realtime payments.
+            This allows recipients to claim their funds on an ongoing basis as
+            soon as it becomes available to them.
           </p>
           <p className="text-gray-400 text-xs md:text-sm mt-2">
-            Plock.fi enables this functionality via{' '}
+            Plock enables this functionality via{' '}
             <a
               href="https://docs.celo.org/celo-owner-guide/release-gold"
               className="text-blue-500"
@@ -296,7 +301,7 @@ function Stream() {
         <button
           onClick={deploy}
           disabled={loading}
-          className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+          className="ml-auto primary-button"
         >
           {loading ? (
             <Loader type="TailSpin" height={24} width={24} color="white" />
@@ -338,7 +343,7 @@ function Stream() {
               <button
                 onClick={() => connect(streamAddress)}
                 disabled={loading}
-                className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                className="ml-auto primary-button"
               >
                 {loading ? (
                   <Loader
@@ -358,6 +363,7 @@ function Stream() {
         {stream && (
           <div className="flex flex-col my-2">
             <GradientSVG
+              // @ts-ignore
               startColor="#60A5FA"
               endColor="#1E40AF"
               rotation="90"
@@ -365,6 +371,7 @@ function Stream() {
             />
 
             <GradientSVG
+              // @ts-ignore
               startColor="#B45309"
               endColor="#FCD34D"
               rotation="90"
@@ -403,10 +410,7 @@ function Stream() {
             </div>
 
             {stream.withdrawable && (
-              <button
-                onClick={withdraw}
-                className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-              >
+              <button onClick={withdraw} className="ml-auto primary-button">
                 Withdraw Remaining
               </button>
             )}

@@ -6,7 +6,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <title>plock.fi - DeFi dashboard</title>
+        <title>Plock - DeFi Dashboard</title>
         <link rel="icon" href="/logo.png" />
         <meta name="keywords" content="celo, cryptocurrency, defi" />
         <meta name="description" content="The Defi dashboard for Celo" />

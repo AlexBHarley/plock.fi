@@ -93,7 +93,7 @@ function Swap() {
         <div>
           <h3 className="text-lg font-medium leading-6 text-gray-200">Swap</h3>
           <p className="text-gray-400 mt-2 text-sm">
-            Plock.fi uses{' '}
+            Plock uses{' '}
             <a
               className="text-blue-500"
               target="_blank"
@@ -111,14 +111,12 @@ function Swap() {
 
           <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row items-center justify-around md:space-x-6">
             <div className="relative rounded-md shadow-sm w-full">
-              <input
+              <Input
                 type="text"
                 name="price"
                 id="price"
                 value={fromAmount}
                 onChange={(e) => setFromAmount(e.target.value)}
-                // className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
-                className="w-full appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20 w-64"
                 placeholder={'0'}
               />
               <div className="absolute inset-y-0 right-0 flex items-center">
@@ -150,7 +148,7 @@ function Swap() {
             <div className="text-gray-200">to</div>
 
             <div className="relative rounded-md shadow-sm w-full">
-              <input
+              <Input
                 type="text"
                 name="price"
                 id="price"
@@ -163,7 +161,6 @@ function Swap() {
                     ] || new BigNumber(0)
                   )
                   .toFixed(2)}`}
-                className="w-full appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20 w-64"
                 placeholder={'0'}
               />
               <div className="absolute inset-y-0 right-0 flex items-center">
@@ -196,7 +193,7 @@ function Swap() {
         <button
           onClick={handleSwap}
           disabled={state === States.Swapping}
-          className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+          className="ml-auto primary-button"
         >
           {state === States.Swapping ? (
             <Loader type="TailSpin" height={24} width={24} color="white" />

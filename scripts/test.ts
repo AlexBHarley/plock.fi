@@ -1,4 +1,4 @@
-import { newKit, StableToken } from '@celo/contractkit';
+import { newKit } from '@celo/contractkit';
 
 export async function main() {
   const kit = newKit('https://alfajores-forno.celo-testnet.org');

@@ -18,6 +18,11 @@
       "use-contractkit": ["use-contractkit"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "components/circular-progress-bar.jsx"
+  ],
   "exclude": ["node_modules"]
 }

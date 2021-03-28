@@ -124,7 +124,7 @@ function Settings() {
         <button
           onClick={save}
           disabled={saving}
-          className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+          className="ml-auto primary-button"
         >
           {saving ? (
             <Loader type="TailSpin" height={24} width={24} color="white" />

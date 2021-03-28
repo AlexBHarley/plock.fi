@@ -20,8 +20,8 @@ function About() {
           <a href="https://celo.org" target="_blank" className="text-celo-gold">
             Celo
           </a>
-          , Plock.fi is able to offer a fast and inexpensive interface to the
-          DeFi world. In simple terms our goals are:
+          , Plock is able to offer a fast and inexpensive interface to the DeFi
+          world. In simple terms our goals are:
           <ul>
             <li>to be as simple as possible but not simpler</li>
             <li>offer a mobile first experience</li>
@@ -39,7 +39,7 @@ function About() {
 
         <h2>Who?</h2>
         <p className="text-gray-500">
-          Plock.fi is run by Alex from{' '}
+          Plock is run by Alex from{' '}
           <a
             className="text-celo-green"
             href="https://clabs.co/"

@@ -1,8 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 export const WithMarketingLayout = (Component: any) => () => {
   const [menu, setMenu] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: any) {
+      // @ts-ignore
+      if (ref.current && !ref.current.contains(event.target)) {
+        setMenu(false);
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [ref.current]);
 
   return (
     <>
@@ -12,7 +27,7 @@ export const WithMarketingLayout = (Component: any) => () => {
             <div className="flex justify-between items-center max-w-7xl mx-auto px-4 py-6 sm:px-6 md:justify-start md:space-x-10 lg:px-8">
               <div className="flex justify-start lg:w-0 lg:flex-1">
                 <a href="/">
-                  <span className="sr-only">Plock.fi</span>
+                  <span className="sr-only">Plock</span>
                   <Image src="/logo.png" height={'24px'} width={'24px'} />
                 </a>
               </div>
@@ -59,7 +74,7 @@ export const WithMarketingLayout = (Component: any) => () => {
               <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
                 <a
                   href="/transfer"
-                  className="ml-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                  className="ml-8 whitespace-nowrap inline-flex items-center justify-center primary-button"
                 >
                   To app
                 </a>
@@ -76,7 +91,10 @@ export const WithMarketingLayout = (Component: any) => () => {
     To: "opacity-0 scale-95"
 */}
             {menu && (
-              <div className="absolute z-30 top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden">
+              <div
+                ref={ref}
+                className="absolute z-30 top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden"
+              >
                 <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50">
                   <div className="pt-5 pb-6 px-5">
                     <div className="flex items-center justify-between">
@@ -86,6 +104,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                       <div className="-mr-2">
                         <button
                           type="button"
+                          onClick={() => setMenu(false)}
                           className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
                         >
                           <span className="sr-only">Close menu</span>
@@ -241,7 +260,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                     <div className="mt-6">
                       <a
                         href="#"
-                        className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                        className="w-full flex items-center justify-center primary-button"
                       >
                         Sign up
                       </a>
@@ -266,7 +285,7 @@ export const WithMarketingLayout = (Component: any) => () => {
             Footer
           </h2>
           <div className="max-w-7xl mx-auto pt-16 pb-8 px-4 sm:px-6 lg:pt-24 lg:px-8">
-            <div className="xl:grid xl:grid-cols-3 xl:gap-8">
+            {/* <div className="xl:grid xl:grid-cols-3 xl:gap-8">
               <div className="grid grid-cols-2 gap-8 xl:col-span-2">
                 <div className="md:grid md:grid-cols-2 md:gap-8">
                   <div>
@@ -429,7 +448,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
             <div className="mt-12 border-t border-gray-200 pt-8 md:flex md:items-center md:justify-between lg:mt-16">
               <div className="flex space-x-6 md:order-2">
                 <a href="#" className="text-gray-400 hover:text-gray-500">
@@ -505,7 +524,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                 </a>
               </div>
               <p className="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
-                © 2021 Plock.fi. All rights reserved.
+                © 2021 Plock. All rights reserved.
               </p>
             </div>
           </div>

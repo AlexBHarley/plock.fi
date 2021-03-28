@@ -5,6 +5,7 @@ import { Base } from 'state';
 import { useCallback, useState } from 'react';
 import { toast } from 'components';
 import Loader from 'react-loader-spinner';
+import { Input } from './input';
 
 enum States {
   None,
@@ -75,11 +76,10 @@ export function LockCelo() {
               <span className="flex flex-col">
                 <div className="w-full md:w-96 md:mx-auto">
                   <div className="mt-1 relative rounded-md shadow-sm">
-                    <input
+                    <Input
                       type="text"
                       value={lockAmount}
                       onChange={(e) => setLockAmount(e.target.value)}
-                      className="appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-full"
                       placeholder={'0'}
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center">

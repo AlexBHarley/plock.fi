@@ -20,7 +20,7 @@ function Index() {
               />
             </div>
             <div className="relative px-4 py-16 sm:px-6 sm:py-24 lg:py-32 lg:px-8">
-              <h1 className="text-center text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+              <h1 className="text-center text-3xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
                 <span className="block text-white">The DeFi dashboard</span>
                 <span className="block text-indigo-200">for Celo</span>
               </h1>
@@ -249,18 +249,18 @@ function Index() {
               Access financial tools for a fraction of the usual cost
             </p>
             <p className="mt-5 text-lg text-gray-300">
-              Plock.fi is a transformative DeFi dashboard in that we integrate
-              with as many partners as possible in the DeFi ecosystem. By
-              picking Celo as the bedrock for our platform, we're building on
-              top of the mobile first ethos and enabling anyone to access
-              financial primitives.
+              Plock is a transformative DeFi dashboard in that we integrate with
+              as many partners as possible in the DeFi ecosystem. By picking
+              Celo as the bedrock for our platform, we're building on top of the
+              mobile first ethos and enabling anyone to access financial
+              primitives.
             </p>
             <div className="mt-12 grid grid-cols-1 gap-y-12 gap-x-6 sm:grid-cols-2">
               <p>
                 <span className="block text-2xl font-bold text-white">10+</span>
                 <span className="mt-1 block text-base text-gray-300">
                   <span className="font-medium text-white">Integrations</span>{' '}
-                  are available for use via the Plock.fi dashboard.
+                  are available for use via the Plock dashboard.
                 </span>
               </p>
               <p>
@@ -271,7 +271,7 @@ function Index() {
                   <span className="font-medium text-white">
                     Staked and invested
                   </span>{' '}
-                  through the Plock.fi dashboard.
+                  through the Plock dashboard.
                 </span>
               </p>
               <p>

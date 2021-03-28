@@ -457,7 +457,7 @@ export function WithAppLayout({ children }) {
             <div className="flex items-center">
               <Image src="/logo.png" height="24px" width="24px" />
               <p className="text-center text-base font-medium text-gray-300 ml-2">
-                Plock.fi
+                Plock
               </p>
             </div>
           </div>
@@ -540,7 +540,7 @@ function WithSidebar({ children }: any) {
 
 export const WithLayout = (Component: any) => {
   return () => (
-    <ContractKitProvider dappName="Plock.fi">
+    <ContractKitProvider dappName="Plock">
       <Base.Provider>
         <WithApollo>
           <WithSidebar>

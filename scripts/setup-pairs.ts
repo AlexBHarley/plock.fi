@@ -1,11 +1,8 @@
-import { newKit } from '@celo/contractkit';
-import { Address } from '@celo/utils/lib/address';
 import { Networks } from '@celo-tools/use-contractkit';
+import { newKit } from '@celo/contractkit';
 import { AbiItem } from 'web3-utils';
-
-import { tokens, ubeswap, getFornoUrl } from '../constants';
-
-import FactoryAbi from './abis/uniswap/Factory.json';
+import { getFornoUrl, tokens, ubeswap } from '../constants';
+import FactoryAbi from '../utils/abis/uniswap/Factory.json';
 
 const network = process.env.NETWORK;
 const privateKey = process.env.PRIVATE_KEY;
