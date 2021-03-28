@@ -326,7 +326,6 @@ function Stream() {
                 </label>
                 <div className="mt-1 flex rounded-md shadow-sm">
                   <Input
-                    className="w-full appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600  w-20 w-64"
                     type="text"
                     value={streamAddress}
                     onChange={(e) => setStreamAddress(e.target.value)}
@@ -346,7 +345,7 @@ function Stream() {
                     color="white"
                   />
                 ) : (
-                  'Submit'
+                  'View'
                 )}
               </button>
             </div>

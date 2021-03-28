@@ -374,15 +374,6 @@ export function WithAppLayout({ children }) {
               </div>
             </div>
             <div className="flex items-center md:space-x-6">
-              {!address && (
-                <button
-                  onClick={openModal}
-                  className="hidden md:inline-block primary-button"
-                >
-                  Connect
-                </button>
-              )}
-
               <div className="flex items-center space-x-4">
                 <div className="hidden md:flex">
                   <div className={healthy ? 'text-green-600' : 'text-red-600'}>
@@ -416,8 +407,17 @@ export function WithAppLayout({ children }) {
                 </button>
               </div>
 
-              <div className="hidden md:flex">
-                {address && (
+              {!address && (
+                <button
+                  onClick={openModal}
+                  className="hidden md:inline-block primary-button"
+                >
+                  Connect
+                </button>
+              )}
+
+              {address && (
+                <div className="hidden md:flex">
                   <DropButton
                     display={truncateAddress(address)}
                     groups={[
@@ -430,8 +430,8 @@ export function WithAppLayout({ children }) {
                       ],
                     ]}
                   />
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
