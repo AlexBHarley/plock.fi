@@ -1,11 +1,10 @@
-export async function retryTx(fn: any, args: any[], retries = 5) {
+export async function retry(fn: () => Promise<any>, retries = 5) {
   let lastError = null;
   for (let i = 0; i < retries; i++) {
     try {
-      const rvalue = await fn(...args);
+      const rvalue = await fn();
       return rvalue;
     } catch (e) {
-      console.error(e);
       lastError = e;
     }
   }

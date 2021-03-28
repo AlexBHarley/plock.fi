@@ -1,14 +1,16 @@
+import { ContractKit } from '@celo/contractkit';
 import { Address, isValidAddress } from '@celo/utils/lib/address';
 import BigNumber from 'bignumber.js';
+import { differenceInDays, differenceInSeconds } from 'date-fns';
 import Web3 from 'web3';
 
 import ReleaseGoldJson from './abis/ReleaseGold.json';
 import { _setInitialProxyImplementation } from './celo-protocol';
+import { retry } from './web3-utils';
 
 const celoRegistryAddress = '0x000000000000000000000000000000000000ce10';
 
 interface ReleaseGoldConfig {
-  identifier: string;
   releaseStartTime: string;
   releaseCliffTime: number;
   numReleasePeriods: number;
@@ -25,90 +27,76 @@ interface ReleaseGoldConfig {
 }
 
 export async function deployReleaseCelo(
-  web3: Web3,
-  config: ReleaseGoldConfig,
-  from: string
+  config: {
+    start: Date;
+    end: Date;
+    amount: string;
+    to: string;
+    from: string;
+  },
+  kit: ContractKit
 ) {
-  const releaseStartTime = new Date(config.releaseStartTime).getTime() / 1000;
+  const secondsDiff = Math.abs(differenceInSeconds(config.start, config.end));
 
-  let totalValue = config.amountReleasedPerPeriod.multipliedBy(
-    config.numReleasePeriods
-  );
-
-  const adjustedAmountPerPeriod = totalValue
-    .div(config.numReleasePeriods)
-    .dp(0);
+  const weiAmount = new BigNumber(Web3.utils.toWei(config.amount));
+  const amountPerSecond = weiAmount.div(secondsDiff).dp(0);
+  if (amountPerSecond.lt(1)) {
+    // we need to change to release 1 wei per period, not 1 wei per second
+    throw new Error('Amount to small for distribution period');
+  }
   // Reflect any rounding changes from the division above
-  totalValue = adjustedAmountPerPeriod.multipliedBy(config.numReleasePeriods);
+  const totalValue = amountPerSecond.multipliedBy(secondsDiff);
+  console.log('Total Value', totalValue.toString());
 
+  const releaseStartTime = config.start.getTime() / 1000;
   const contractInitializationArgs = [
     Math.round(releaseStartTime),
-    config.releaseCliffTime,
-    config.numReleasePeriods,
-    config.releasePeriod,
-    adjustedAmountPerPeriod.toFixed(),
-    config.revocable,
-    config.beneficiary,
-    config.releaseOwner,
-    config.refundAddress,
-    config.subjectToLiquidityProvision,
-    config.initialDistributionRatio,
-    config.canValidate,
-    config.canVote,
+    0, // releaseCliffTime
+    secondsDiff, // numReleasePeriods
+    1, // config.releasePeriod,
+    amountPerSecond.toFixed(), // adjustedAmountPerPeriod.toFixed(),
+    true, // config.revocable,
+    config.to, // config.beneficiary,
+    config.from, // config.releaseOwner,
+    config.from, // config.refundAddress,
+    false, // config.subjectToLiquidityProvision,
+    1000, // config.initialDistributionRatio,
+    false, // config.canValidate,
+    false, // config.canVote,
     celoRegistryAddress,
   ];
 
-  console.log('Total value', totalValue.toString());
-  console.log(
-    'Calculated value',
-    new BigNumber(config.numReleasePeriods)
-      .multipliedBy(adjustedAmountPerPeriod.toFixed())
-      .toString()
-  );
-
-  const ReleaseGold = new web3.eth.Contract(ReleaseGoldJson.abi);
-  console.log('ReleaseGold', ReleaseGold);
+  // @ts-ignore
+  const ReleaseGold = new kit.web3.eth.Contract(ReleaseGoldJson.abi);
   const releaseGoldInstance = await ReleaseGold.deploy({
     data: ReleaseGoldJson.bytecode,
     arguments: [true],
   }).send({
-    from,
+    from: config.from,
   });
-  console.log('Deployed ReleaseGold instance', releaseGoldInstance);
 
-  console.log(
-    'releaseGoldInstance._address',
-    releaseGoldInstance._address,
-    totalValue.toFixed()
+  await retry(() =>
+    kit.web3.eth.sendTransaction({
+      from: config.from,
+      // @ts-ignore
+      to: releaseGoldInstance._address,
+      value: totalValue.toFixed(),
+    })
   );
-  for (let i = 0; i < 5; i++) {
-    try {
-      await web3.eth.sendTransaction({
-        from,
-        to: releaseGoldInstance._address,
-        value: totalValue.toFixed(),
-      });
-      break;
-      console.log('Funded');
-    } catch (e) {
-      console.log(e);
-    }
-  }
 
   console.log(
     'Funded with',
-    await web3.eth.getBalance(releaseGoldInstance._address)
+    // @ts-ignore
+    await kit.web3.eth.getBalance(releaseGoldInstance._address)
   );
 
-  for (let i = 0; i < 5; i++) {
-    try {
-      await releaseGoldInstance.methods
-        .initialize(...contractInitializationArgs)
-        .send({ from });
-      console.log('Done');
-      break;
-    } catch (e) {
-      console.log(e);
-    }
-  }
+  await retry(() =>
+    releaseGoldInstance.methods
+      .initialize(...contractInitializationArgs)
+      .send({ from: config.from })
+  );
+  console.log('Done');
+
+  // @ts-ignore
+  return releaseGoldInstance._address;
 }

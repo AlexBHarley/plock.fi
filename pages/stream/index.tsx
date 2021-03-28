@@ -21,10 +21,7 @@ import {
 import Loader from 'react-loader-spinner';
 import { Base } from 'state';
 import { formatAmount, toWei, truncateAddress } from 'utils';
-import {
-  deployReleaseCelo,
-  ReleaseGoldConfig,
-} from '../../utils/deploy-release-celo';
+import { deployReleaseCelo } from '../../utils/deploy-release-celo';
 import Web3 from 'web3';
 
 function Stream() {
@@ -61,43 +58,31 @@ function Stream() {
   } | null>(null);
 
   const deploy = useCallback(async () => {
-    const secondsDiff = Math.abs(differenceInSeconds(config.start, config.end));
-    const daysDiff = Math.abs(differenceInDays(config.start, config.end));
-    if (daysDiff < 1) {
-      setError('Dates must be at least a day apart');
+    if (config.start.getTime() < config.end.getTime()) {
+      toast.error('End date must be after start date');
       return;
     }
 
-    const weiAmount = new BigNumber(Web3.utils.toWei(config.amount));
-    const amountPerSecond = weiAmount.div(secondsDiff);
-
-    if (amountPerSecond.lt(1)) {
-      // we need to change to release 1 wei per period, not 1 wei per second
-      throw new Error('Not working right now');
+    if (!config.amount || !config.beneficiary) {
+      toast.error('Missing parameters');
+      return;
     }
 
-    // we want CELO to be released every second. So we must find the amount
-    // that can be released per second. It may be
-    // must calculate smallest amount that can get released per second
-
-    const releaseCeloConfig = {
-      beneficiary: config.beneficiary,
-      canValidate: false,
-      canVote: false,
-      initialDistributionRatio: 1000,
-      amountReleasedPerPeriod: new BigNumber('1'), // amountPerSecond,
-      releasePeriod: 1,
-      numReleasePeriods: 2, // secondsDiff,
-      refundAddress: '0x0000000000000000000000000000000000000000',
-      releaseOwner: address,
-      releaseCliffTime: 0,
-      releaseStartTime: config.start,
-      revocable: false,
-      subjectToLiquidityProvision: false,
-    };
-
-    await deployReleaseCelo(kit.web3, releaseCeloConfig, address);
-  }, [kit, address, config]);
+    try {
+      const rgAddress = await deployReleaseCelo(
+        {
+          from: address,
+          to: config.beneficiary,
+          amount: amount,
+          start: config.start,
+          end: config.end,
+        },
+        kit
+      );
+      toast.success('Release succeeded');
+      connect(rgAddress);
+    } catch (e) {}
+  }, [kit, address, config, connect]);
 
   const withdraw = useCallback(async () => {
     const rgw = new ReleaseGoldWrapper(
@@ -113,46 +98,49 @@ function Stream() {
     }
   }, [stream]);
 
-  const connect = useCallback(async () => {
-    // const releaseCelo = await kit._web3Contracts.
-    const rgw = new ReleaseGoldWrapper(
-      kit,
-      newReleaseGold(kit.connection.web3, streamAddress)
-    );
-    const accounts = await kit.contracts.getAccounts();
-    const [
-      total,
-      withdrawn,
-      released,
-      locked,
-      unlocked,
-      beneficiary,
-    ] = await Promise.all([
-      rgw.getTotalBalance(),
-      rgw.getTotalWithdrawn(),
-      rgw.getCurrentReleasedTotalAmount(),
-      rgw.getRemainingLockedBalance(),
-      rgw.getRemainingUnlockedBalance(),
-      rgw.getBeneficiary(),
-    ]);
+  const connect = useCallback(
+    async (rgAddress: string) => {
+      // const releaseCelo = await kit._web3Contracts.
+      const rgw = new ReleaseGoldWrapper(
+        kit,
+        newReleaseGold(kit.connection.web3, rgAddress)
+      );
+      const accounts = await kit.contracts.getAccounts();
+      const [
+        total,
+        withdrawn,
+        released,
+        locked,
+        unlocked,
+        beneficiary,
+      ] = await Promise.all([
+        rgw.getTotalBalance(),
+        rgw.getTotalWithdrawn(),
+        rgw.getCurrentReleasedTotalAmount(),
+        rgw.getRemainingLockedBalance(),
+        rgw.getRemainingUnlockedBalance(),
+        rgw.getBeneficiary(),
+      ]);
 
-    let withdrawable = false;
-    try {
-      if ((await accounts.signerToAccount(beneficiary)) === address) {
-        withdrawable = true;
-      }
-    } catch (e) {}
+      let withdrawable = false;
+      try {
+        if ((await accounts.signerToAccount(beneficiary)) === address) {
+          withdrawable = true;
+        }
+      } catch (e) {}
 
-    setStream({
-      total,
-      withdrawn,
-      released,
-      locked,
-      unlocked,
-      address: streamAddress,
-      withdrawable,
-    });
-  }, [kit, streamAddress]);
+      setStream({
+        total,
+        withdrawn,
+        released,
+        locked,
+        unlocked,
+        address: rgAddress,
+        withdrawable,
+      });
+    },
+    [kit]
+  );
 
   useEffect(() => {
     fetchBalances();
