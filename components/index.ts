@@ -10,6 +10,7 @@ export * as toast from './toast';
 export * from './toggle';
 export * from './table';
 export * from './panel';
+export * from './marketing-layout';
 export * from './modals';
 export * from './pulsating-dot';
 export * from './select';

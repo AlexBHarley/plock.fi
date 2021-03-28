@@ -11,6 +11,9 @@ module.exports = {
         'gray-850': 'rgb(26, 32, 44)',
 
         orange: colors.orange,
+
+        'celo-green': '#35D07F',
+        'celo-gold': '#FBCC5C',
       },
     },
   },
@@ -19,5 +22,5 @@ module.exports = {
       borderRadius: ['first', 'last'],
     },
   },
-  plugins: [require('@tailwindcss/forms')],
+  plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')],
 };
