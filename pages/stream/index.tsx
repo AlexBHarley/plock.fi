@@ -128,7 +128,7 @@ function Stream() {
   );
 
   const deploy = useCallback(async () => {
-    if (config.start.getTime() < config.end.getTime()) {
+    if (config.end.getTime() < config.start.getTime()) {
       toast.error('End date must be after start date');
       return;
     }
@@ -163,7 +163,6 @@ function Stream() {
       newReleaseGold(kit.connection.web3, stream.address)
     );
 
-    console.log(stream);
     try {
       await rgw
         .withdraw(stream.released.minus(stream.withdrawn))

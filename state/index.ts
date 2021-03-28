@@ -73,9 +73,7 @@ const defaultSettings = {
 const LOCALSTORAGE_KEY = 'plock/settings';
 let localSettings = {};
 if (typeof localStorage !== 'undefined') {
-  localSettings = JSON.stringify(
-    localStorage.getItem(LOCALSTORAGE_KEY) || '{}'
-  );
+  localSettings = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) || '{}');
 }
 const initialSettings = {
   ...defaultSettings,

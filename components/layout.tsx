@@ -216,7 +216,7 @@ const tabs = [
 
 export function WithAppLayout({ children }) {
   const menuRef = useRef(null);
-  const { network } = Base.useContainer();
+  const { network, settings } = Base.useContainer();
   const {
     updateNetwork,
     fornoUrl,
@@ -277,7 +277,7 @@ export function WithAppLayout({ children }) {
         position="top-right"
         toastOptions={{
           style: {
-            background: '#2a374a',
+            background: settings.darkMode ? '#2a374a' : 'white',
             width: '22rem',
             padding: '0px',
           },
@@ -513,7 +513,7 @@ function WithSidebar({ children }: any) {
 
 export const WithLayout = (Component: any) => {
   return () => (
-    <ContractKitProvider dappName="Plock" network={Networks.Mainnet}>
+    <ContractKitProvider dappName="Plock">
       <Base.Provider>
         <WithApollo>
           <WithSidebar>
