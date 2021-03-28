@@ -39,6 +39,7 @@ function Swap() {
     try {
       setState(States.Swapping);
       await swap(
+        // @ts-ignore
         kit,
         fromToken.networks[network],
         toToken.networks[network],
@@ -70,6 +71,7 @@ function Swap() {
     async function f() {
       if (!exchangeRateCache[key]) {
         const [one, two] = await quote(
+          // @ts-ignore
           kit,
           fromToken.networks[network],
           10000, // just to get some more decimal places
@@ -87,106 +89,106 @@ function Swap() {
 
   return (
     <>
-      <Panel>
-        <h3 className="text-lg font-medium leading-6 text-gray-200">Swap</h3>
-        <p className="text-gray-400 mt-2 text-sm">
-          Celo uses a formal on-chain governance mechanism to manage and upgrade
-          the protocol. You can have your say in this by{' '}
-          <a
-            className="text-blue-500"
-            target="_blank"
-            href="https://docs.celo.org/celo-owner-guide/voting-governance"
-          ></a>
-          voting on proposals and being active in the community. More
-          information around this can be found in the{' '}
-          <a
-            className="text-blue-500"
-            target="_blank"
-            href="https://docs.celo.org/celo-codebase/protocol/governance"
-          >
-            Governance documentation
-          </a>
-          .
-        </p>
-      </Panel>
-
       <PanelWithButton>
-        <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row items-center justify-around md:space-x-6">
-          <div className="relative rounded-md shadow-sm w-full">
-            <input
-              type="text"
-              name="price"
-              id="price"
-              value={fromAmount}
-              onChange={(e) => setFromAmount(e.target.value)}
-              // className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
-              className="w-full appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20 w-64"
-              placeholder={'0'}
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center">
-              <label htmlFor="currency" className="sr-only">
-                Currency
-              </label>
-              <select
-                id="currency"
-                name="currency"
-                className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-2 mr-2 border-transparent bg-transparent text-gray-300 sm:text-sm rounded-md"
-                value={fromToken.ticker}
-                onChange={(e) =>
-                  setFromToken(tokens.find((t) => t.ticker === e.target.value))
-                }
-              >
-                {tokens
-                  .filter((t) => !!t.networks[network])
-                  .map((t) => (
-                    <option value={t.ticker}>
-                      {t.ticker} ({t.name})
-                    </option>
-                  ))}
-              </select>
+        <div>
+          <h3 className="text-lg font-medium leading-6 text-gray-200">Swap</h3>
+          <p className="text-gray-400 mt-2 text-sm">
+            Plock.fi uses{' '}
+            <a
+              className="text-blue-500"
+              target="_blank"
+              href="https://ubeswap.org"
+            >
+              Ubeswap
+            </a>
+            , a decentralised exchange to handle swapping tokens.
+            <p className="mt-2">
+              Remember that the exact amount exchanged may differ from what we
+              display on the swap interface below, it is only an estimation.
+            </p>
+            .
+          </p>
+
+          <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row items-center justify-around md:space-x-6">
+            <div className="relative rounded-md shadow-sm w-full">
+              <input
+                type="text"
+                name="price"
+                id="price"
+                value={fromAmount}
+                onChange={(e) => setFromAmount(e.target.value)}
+                // className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
+                className="w-full appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20 w-64"
+                placeholder={'0'}
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center">
+                <label htmlFor="currency" className="sr-only">
+                  Currency
+                </label>
+                <select
+                  id="currency"
+                  name="currency"
+                  className="w-36 focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 border-transparent bg-transparent text-gray-300 sm:text-sm rounded-md"
+                  value={fromToken.ticker}
+                  onChange={(e) =>
+                    setFromToken(
+                      tokens.find((t) => t.ticker === e.target.value)
+                    )
+                  }
+                >
+                  {tokens
+                    .filter((t) => !!t.networks[network])
+                    .map((t) => (
+                      <option value={t.ticker}>
+                        {t.ticker} ({t.name})
+                      </option>
+                    ))}
+                </select>
+              </div>
             </div>
-          </div>
 
-          <div className="text-gray-200">to</div>
+            <div className="text-gray-200">to</div>
 
-          <div className="relative rounded-md shadow-sm w-full">
-            <input
-              type="text"
-              name="price"
-              id="price"
-              readOnly
-              disabled
-              value={`${new BigNumber(fromAmount || 0)
-                .multipliedBy(
-                  exchangeRateCache[`${fromToken.ticker}-${toToken.ticker}`] ||
-                    new BigNumber(0)
-                )
-                .toFixed(2)} (estimated)`}
-              className="w-full appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20 w-64"
-              placeholder={'0'}
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center">
-              <label htmlFor="currency" className="sr-only">
-                Currency
-              </label>
-              <select
-                id="currency"
-                name="currency"
-                className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-2 mr-2 border-transparent bg-transparent text-gray-300 sm:text-sm rounded-md"
-                value={toToken.ticker}
-                onChange={(e) => {
-                  console.log(e.target.value);
-                  setToToken(tokens.find((t) => t.ticker === e.target.value));
-                }}
-              >
-                {tokens
-                  .filter((t) => !!t.networks[network])
-                  .map((t) => (
-                    <option value={t.ticker}>
-                      {t.ticker} ({t.name})
-                    </option>
-                  ))}
-              </select>
+            <div className="relative rounded-md shadow-sm w-full">
+              <input
+                type="text"
+                name="price"
+                id="price"
+                readOnly
+                disabled
+                value={`${new BigNumber(fromAmount || 0)
+                  .multipliedBy(
+                    exchangeRateCache[
+                      `${fromToken.ticker}-${toToken.ticker}`
+                    ] || new BigNumber(0)
+                  )
+                  .toFixed(2)}`}
+                className="w-full appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20 w-64"
+                placeholder={'0'}
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center">
+                <label htmlFor="currency" className="sr-only">
+                  Currency
+                </label>
+                <select
+                  id="currency"
+                  name="currency"
+                  className="w-36 focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-2 mr-2 border-transparent bg-transparent text-gray-300 sm:text-sm rounded-md"
+                  value={toToken.ticker}
+                  onChange={(e) => {
+                    setToToken(tokens.find((t) => t.ticker === e.target.value));
+                  }}
+                >
+                  {tokens
+                    .filter((t) => !!t.networks[network])
+                    .map((t) => (
+                      <option
+                        value={t.ticker}
+                        label={`${t.ticker} (${t.name})`}
+                      />
+                    ))}
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -202,12 +204,6 @@ function Swap() {
             'Swap'
           )}
         </button>
-
-        {/* <div className="text-gray-400 text-xs mt-2">
-              Sending <span className="text-white">{toWei(amount)} </span>
-              <span className="text-white">{currency} </span>to{' '}
-              <span className="text-white">{toAddress}</span>
-            </div> */}
       </PanelWithButton>
 
       <Balances />

@@ -107,7 +107,7 @@ function Stream() {
         if (eqAddress(beneficiary, address)) {
           withdrawable = true;
         }
-        if ((eqAddress(await accounts.signerToAccount(beneficiary)), address)) {
+        if (eqAddress(await accounts.signerToAccount(beneficiary), address)) {
           withdrawable = true;
         }
       } catch (e) {}
@@ -356,7 +356,7 @@ function Stream() {
         </div>
 
         {stream && (
-          <div className="flex flex-col space-y-2 mt-2">
+          <div className="flex flex-col my-2">
             <GradientSVG
               startColor="#60A5FA"
               endColor="#1E40AF"
@@ -405,7 +405,7 @@ function Stream() {
             {stream.withdrawable && (
               <button
                 onClick={withdraw}
-                className="pt-4 ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
               >
                 Withdraw Remaining
               </button>

@@ -207,7 +207,7 @@ function Transfer() {
                   </div>
                 </div>,
                 <span className={toMe ? 'text-green-500' : 'text-red-400'}>
-                  {formatAmount(node.value, 2)} {node.token}
+                  {formatAmount(node.value)} {node.token}
                 </span>,
                 <div className="text-sm text-gray-900">{node.comment}</div>,
                 <span className="px-2 inline-flex text-xs leading-5 font-semibold text-gray-400">

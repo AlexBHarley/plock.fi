@@ -385,7 +385,7 @@ export function WithAppLayout({ children }) {
                 <select
                   name=""
                   id=""
-                  className="bg-gray-750 text-gray-300 rounded-md border border-gray-500"
+                  className="p-2 bg-gray-750 text-gray-300 rounded-md border border-gray-500"
                   value={network}
                   onChange={(e) => updateNetwork(e.target.value as Networks)}
                 >
@@ -457,7 +457,7 @@ export function WithAppLayout({ children }) {
             <div className="flex items-center">
               <Image src="/logo.png" height="24px" width="24px" />
               <p className="text-center text-base font-medium text-gray-300 ml-2">
-                CeloTools
+                Plock.fi
               </p>
             </div>
           </div>
@@ -540,7 +540,7 @@ function WithSidebar({ children }: any) {
 
 export const WithLayout = (Component: any) => {
   return () => (
-    <ContractKitProvider dappName="CeloTools">
+    <ContractKitProvider dappName="Plock.fi">
       <Base.Provider>
         <WithApollo>
           <WithSidebar>

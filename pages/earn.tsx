@@ -323,7 +323,7 @@ function Earn() {
               <div className="text-gray-400 text-sm">
                 {truncateAddress(address || '0x')} currently has{' '}
                 <span className="font-medium text-gray-200">
-                  {formatAmount(lockedSummary.lockedGold.nonvoting, 2)}
+                  {formatAmount(lockedSummary.lockedGold.nonvoting)}
                 </span>{' '}
                 ({nonvotingPctStr}%) CELO locked and ready to vote with.
               </div>
@@ -364,7 +364,7 @@ function Earn() {
 
                         <div className="relative flex flex-col mt-2">
                           <span className="inline-flex items-center rounded-md text-xs font-medium text-indigo-600">
-                            {formatAmount(gv.active, 2)} ACTIVE (
+                            {formatAmount(gv.active)} ACTIVE (
                             {gv.active
                               .dividedBy(lockedSummary.lockedGold.total)
                               .times(100)
@@ -372,7 +372,7 @@ function Earn() {
                             )%
                           </span>
                           <span className="inline-flex items-center rounded-md text-xs font-medium text-blue-600 mt-1">
-                            {formatAmount(gv.pending, 2)} PENDING (
+                            {formatAmount(gv.pending,)} PENDING (
                             {gv.pending
                               .dividedBy(lockedSummary.lockedGold.total)
                               .times(100)

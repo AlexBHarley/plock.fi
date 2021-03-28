@@ -1,16 +1,12 @@
-import { ApolloProvider } from '@apollo/client';
-import { WithAppLayout, WithSidebar } from 'components';
-import Head from 'next/head';
-import { Base } from 'state';
-import { ContractKitProvider } from '@celo-tools/use-contractkit';
 import '@celo-tools/use-contractkit/lib/styles.css';
+import Head from 'next/head';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <title>CeloTools</title>
+        <title>Plock.fi</title>
         <link rel="icon" href="/favicon.ico" />
 
         {process.browser && (
