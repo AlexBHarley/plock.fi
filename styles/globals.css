@@ -62,3 +62,11 @@
 .secondary-button {
   @apply px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-gradient bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 outline-none focus:outline-none;
 }
+
+.OuterCircularProgressbar .CircularProgressbar-path {
+  stroke: url(#outer);
+}
+
+.InnerCircularProgressbar .CircularProgressbar-path {
+  stroke: url(#inner);
+}

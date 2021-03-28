@@ -1,16 +1,11 @@
 import BigNumber from 'bignumber.js';
 import Web3 from 'web3';
 
-export function formatAmount(raw: string | BigNumber, decimalPlaces: number) {
+export function formatAmount(raw: string | BigNumber) {
   const wei = typeof raw === 'string' ? raw : raw.toFixed(0);
   const ether = Web3.utils.fromWei(wei, 'ether');
 
-  const [integer, decimals] = ether.split('.');
-
-  if (decimals) {
-    return `${integer}.${decimals.slice(0, 2)}`;
-  }
-  return integer;
+  return Number(ether).toLocaleString('en');
 }
 
 export function toWei(raw: string) {

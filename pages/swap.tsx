@@ -155,6 +155,7 @@ function Swap() {
               name="price"
               id="price"
               readOnly
+              disabled
               value={`${new BigNumber(fromAmount || 0)
                 .multipliedBy(
                   exchangeRateCache[`${fromToken.ticker}-${toToken.ticker}`] ||

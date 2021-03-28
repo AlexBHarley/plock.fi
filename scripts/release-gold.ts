@@ -11,7 +11,7 @@ export async function main() {
   kit.defaultAccount = account;
 
   const start = new Date();
-  const end = add(new Date(), { weeks: 1 });
+  const end = add(new Date(), { hours: 1 });
 
   const releaseGoldAddress = await deployReleaseCelo(
     {

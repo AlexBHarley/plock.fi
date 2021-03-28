@@ -2,6 +2,7 @@ import { useContractKit } from '@celo-tools/use-contractkit';
 import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold';
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold';
 import { CURRENCIES } from '@celo/utils';
+import { eqAddress } from '@celo/base/lib/address';
 import BigNumber from 'bignumber.js';
 import {
   CopyText,
@@ -9,6 +10,7 @@ import {
   Panel,
   PanelWithButton,
   toast,
+  TokenIcons,
   WithLayout,
 } from 'components';
 import { format, differenceInDays, differenceInSeconds } from 'date-fns';
@@ -22,7 +24,26 @@ import Loader from 'react-loader-spinner';
 import { Base } from 'state';
 import { formatAmount, toWei, truncateAddress } from 'utils';
 import { deployReleaseCelo } from '../../utils/deploy-release-celo';
-import Web3 from 'web3';
+import React from 'react';
+
+class GradientSVG extends React.Component {
+  render() {
+    let { startColor, endColor, idCSS, rotation } = this.props;
+
+    let gradientTransform = `rotate(${rotation})`;
+
+    return (
+      <svg style={{ height: 0 }}>
+        <defs>
+          <linearGradient id={idCSS} gradientTransform={gradientTransform}>
+            <stop offset="0%" stopColor={startColor} />
+            <stop offset="100%" stopColor={endColor} />
+          </linearGradient>
+        </defs>
+      </svg>
+    );
+  }
+}
 
 function Stream() {
   const { address, kit, network, send } = useContractKit();
@@ -57,6 +78,53 @@ function Stream() {
     withdrawable: boolean;
   } | null>(null);
 
+  const connect = useCallback(
+    async (rgAddress: string) => {
+      // const releaseCelo = await kit._web3Contracts.
+      const rgw = new ReleaseGoldWrapper(
+        kit,
+        newReleaseGold(kit.connection.web3, rgAddress)
+      );
+      const accounts = await kit.contracts.getAccounts();
+      const [
+        total,
+        withdrawn,
+        released,
+        locked,
+        unlocked,
+        beneficiary,
+      ] = await Promise.all([
+        rgw.getTotalBalance(),
+        rgw.getTotalWithdrawn(),
+        rgw.getCurrentReleasedTotalAmount(),
+        rgw.getRemainingLockedBalance(),
+        rgw.getRemainingUnlockedBalance(),
+        rgw.getBeneficiary(),
+      ]);
+
+      let withdrawable = false;
+      try {
+        if (eqAddress(beneficiary, address)) {
+          withdrawable = true;
+        }
+        if ((eqAddress(await accounts.signerToAccount(beneficiary)), address)) {
+          withdrawable = true;
+        }
+      } catch (e) {}
+
+      setStream({
+        total,
+        withdrawn,
+        released,
+        locked,
+        unlocked,
+        address: rgAddress,
+        withdrawable,
+      });
+    },
+    [kit]
+  );
+
   const deploy = useCallback(async () => {
     if (config.start.getTime() < config.end.getTime()) {
       toast.error('End date must be after start date');
@@ -90,57 +158,17 @@ function Stream() {
       newReleaseGold(kit.connection.web3, stream.address)
     );
 
+    console.log(stream);
     try {
-      await send(rgw.withdraw(stream.unlocked));
+      await rgw
+        .withdraw(stream.released.minus(stream.withdrawn))
+        .sendAndWaitForReceipt({ from: address });
+      connect(stream.address);
       toast.success('Withdrawn');
     } catch (e) {
       toast.error(e.message);
     }
-  }, [stream]);
-
-  const connect = useCallback(
-    async (rgAddress: string) => {
-      // const releaseCelo = await kit._web3Contracts.
-      const rgw = new ReleaseGoldWrapper(
-        kit,
-        newReleaseGold(kit.connection.web3, rgAddress)
-      );
-      const accounts = await kit.contracts.getAccounts();
-      const [
-        total,
-        withdrawn,
-        released,
-        locked,
-        unlocked,
-        beneficiary,
-      ] = await Promise.all([
-        rgw.getTotalBalance(),
-        rgw.getTotalWithdrawn(),
-        rgw.getCurrentReleasedTotalAmount(),
-        rgw.getRemainingLockedBalance(),
-        rgw.getRemainingUnlockedBalance(),
-        rgw.getBeneficiary(),
-      ]);
-
-      let withdrawable = false;
-      try {
-        if ((await accounts.signerToAccount(beneficiary)) === address) {
-          withdrawable = true;
-        }
-      } catch (e) {}
-
-      setStream({
-        total,
-        withdrawn,
-        released,
-        locked,
-        unlocked,
-        address: rgAddress,
-        withdrawable,
-      });
-    },
-    [kit]
-  );
+  }, [stream, address, connect]);
 
   useEffect(() => {
     fetchBalances();
@@ -153,7 +181,7 @@ function Stream() {
     ? (stream.released.toNumber() / stream.total.toNumber()) * 100
     : 0;
   const releasedPercent = stream
-    ? stream.released.dividedBy(stream.total).multipliedBy(100).toFixed()
+    ? stream.released.dividedBy(stream.total).multipliedBy(100).toFixed(0)
     : '0';
 
   return (
@@ -164,7 +192,12 @@ function Stream() {
             Stream
           </h3>
           <p className="text-gray-400 text-xs md:text-sm mt-2">
-            With CELO you can easily stream funds to recipients via{' '}
+            With Plock.fi you can stream funds to recipients for realtime
+            payments. This allows recipients to claim their funds on an ongoing
+            basis as soon as it becomes available to them.
+          </p>
+          <p className="text-gray-400 text-xs md:text-sm mt-2">
+            Plock.fi enables this functionality via{' '}
             <a
               href="https://docs.celo.org/celo-owner-guide/release-gold"
               className="text-blue-500"
@@ -172,8 +205,7 @@ function Stream() {
             >
               ReleaseCelo
             </a>{' '}
-            functionality. Recipients of a stream can claim their funds as soon
-            as it is released.
+            if you'd like to read more about how it works.
           </p>
         </div>
       </Panel>
@@ -188,21 +220,19 @@ function Stream() {
           </div>
           <div className="mt-5 md:mt-0 md:col-span-2">
             <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-6">
-                <div className="col-span-3 sm:col-span-2">
-                  <label
-                    htmlFor="company_website"
-                    className="block text-sm font-medium text-gray-300"
-                  >
-                    Beneficiary
-                  </label>
-                  <div className="mt-1 flex rounded-md shadow-sm">
-                    <Input
-                      type="text"
-                      value={config.beneficiary}
-                      onChange={(e) => update('beneficiary', e.target.value)}
-                    />
-                  </div>
+              <div>
+                <label
+                  htmlFor="company_website"
+                  className="block text-sm font-medium text-gray-300"
+                >
+                  Beneficiary
+                </label>
+                <div className="mt-1">
+                  <Input
+                    type="text"
+                    value={config.beneficiary}
+                    onChange={(e) => update('beneficiary', e.target.value)}
+                  />
                 </div>
               </div>
 
@@ -214,21 +244,15 @@ function Stream() {
                   Start Date
                 </label>
                 <div className="mt-1">
-                  <input
+                  <Input
                     type="date"
                     id="start"
                     name="start"
                     value={format(config.start, 'yyyy-MM-dd')}
-                    onChange={(e) => {
-                      console.log('start', e.target.value);
-                      update('start', new Date(e.target.value));
-                    }}
+                    onChange={(e) => update('start', new Date(e.target.value))}
                     min="2020-05-01"
                   />
                 </div>
-                <p className="mt-2 text-sm text-gray-500">
-                  Brief description for your profile. URLs are hyperlinked.
-                </p>
               </div>
 
               <div>
@@ -239,7 +263,7 @@ function Stream() {
                   End Date
                 </label>
                 <div className="mt-1">
-                  <input
+                  <Input
                     type="date"
                     id="end"
                     name="end"
@@ -267,12 +291,6 @@ function Stream() {
               </div>
             </div>
           </div>
-
-          {error && (
-            <div>
-              <div className="text-sm text-red-500">{error}</div>
-            </div>
-          )}
         </div>
 
         <button
@@ -288,99 +306,113 @@ function Stream() {
         </button>
       </PanelWithButton>
 
-      <PanelWithButton>
-        <div>
-          <h3 className="text-lg font-medium leading-6 text-gray-200">
-            Connect
-          </h3>
-          <p className="text-gray-400 text-xs md:text-sm mt-2">
-            Enter the address of a stream below to get an overview and interact
-            with it.
-          </p>
-
-          <div className="pt-4">
-            <input
-              className="w-full appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20 w-64"
-              type="text"
-              value={streamAddress}
-              onChange={(e) => setStreamAddress(e.target.value)}
-            />
+      <Panel>
+        <div className="md:grid md:grid-cols-3 md:gap-6">
+          <div className="md:col-span-1">
+            <h3 className="text-lg font-medium leading-6 text-gray-200">
+              View
+            </h3>
+            <p className="mt-1 text-sm text-gray-400">
+              Enter the address of a stream to get an overview and withdraw
+              funds.
+            </p>
+          </div>
+          <div className="mt-5 md:mt-0 md:col-span-2">
+            <div className="flex flex-col space-y-4">
+              <div>
+                <label
+                  htmlFor="company_website"
+                  className="block text-sm font-medium text-gray-300"
+                >
+                  Stream address
+                </label>
+                <div className="mt-1 flex rounded-md shadow-sm">
+                  <Input
+                    className="w-full appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20 w-64"
+                    type="text"
+                    value={streamAddress}
+                    onChange={(e) => setStreamAddress(e.target.value)}
+                  />
+                </div>
+              </div>
+              <button
+                onClick={() => connect(streamAddress)}
+                disabled={loading}
+                className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              >
+                {loading ? (
+                  <Loader
+                    type="TailSpin"
+                    height={24}
+                    width={24}
+                    color="white"
+                  />
+                ) : (
+                  'Submit'
+                )}
+              </button>
+            </div>
           </div>
         </div>
-        <button
-          onClick={connect}
-          disabled={loading}
-          className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-        >
-          {loading ? (
-            <Loader type="TailSpin" height={24} width={24} color="white" />
-          ) : (
-            'Submit'
-          )}
-        </button>
-      </PanelWithButton>
 
-      {stream && (
-        <Panel>
-          <div className="">
-            <div className="space-x-2">
-              <span className="text-gray-400">ReleaseCelo:</span>
-              <span className="text-gray-200">
-                {truncateAddress(stream.address)}
-              </span>
-              <CopyText text={stream.address} />
+        {stream && (
+          <div className="flex flex-col space-y-2 mt-2">
+            <GradientSVG
+              startColor="#60A5FA"
+              endColor="#1E40AF"
+              rotation="90"
+              idCSS="outer"
+            />
+
+            <GradientSVG
+              startColor="#B45309"
+              endColor="#FCD34D"
+              rotation="90"
+              idCSS="inner"
+            />
+
+            <div className="md:px-24">
+              <CircularProgressbarWithChildren
+                value={outerRingValue}
+                strokeWidth={5}
+                className="OuterCircularProgressbar"
+              >
+                <div style={{ width: '84%' }}>
+                  <CircularProgressbarWithChildren
+                    strokeWidth={5}
+                    value={innerRingValue}
+                    className="InnerCircularProgressbar"
+                  >
+                    <div className="flex flex-col items-center justify-center">
+                      <span className="mb-4">
+                        <TokenIcons.CELO height="40px" width="40px" />
+                      </span>
+
+                      <div className="text-2xl md:text-5xl font-medium text-gray-200 mb-2">
+                        {formatAmount(stream.released)}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-gray-300 md:text-2xl">
+                          / {formatAmount(stream.total)} CELO total
+                        </span>
+                      </div>
+                    </div>
+                  </CircularProgressbarWithChildren>
+                </div>
+              </CircularProgressbarWithChildren>
             </div>
 
-            <div className="space-x-2">
-              <span className="text-gray-400">Released:</span>
-              <span className="text-gray-200">
-                {formatAmount(stream.released, 2)} /{' '}
-                {formatAmount(stream.total, 2)} CELO ({releasedPercent}%)
-              </span>
-            </div>
-
-            <div className="space-x-2">
-              <span className="text-gray-400">Claimed:</span>
-              <span className="text-gray-200">
-                {formatAmount(stream.withdrawn, 2)} /{' '}
-                {formatAmount(stream.total, 2)} CELO
-              </span>
-            </div>
+            {stream.withdrawable && (
+              <button
+                onClick={withdraw}
+                className="pt-4 ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+              >
+                Withdraw Remaining
+              </button>
+            )}
           </div>
-
-          <CircularProgressbarWithChildren
-            value={outerRingValue}
-            strokeWidth={8}
-            styles={buildStyles({
-              pathColor: '#f00',
-              trailColor: 'transparent',
-            })}
-          >
-            {/*
-          Width here needs to be (100 - 2 * strokeWidth)%
-          in order to fit exactly inside the outer progressbar.
-        */}
-            <div style={{ width: '84%' }}>
-              <CircularProgressbar
-                value={innerRingValue}
-                styles={buildStyles({
-                  pathColor: 'green',
-                  trailColor: 'transparent',
-                })}
-              />
-            </div>
-          </CircularProgressbarWithChildren>
-
-          {stream.withdrawable && (
-            <button
-              onClick={withdraw}
-              className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-            >
-              Withdraw Remaining
-            </button>
-          )}
-        </Panel>
-      )}
+        )}
+      </Panel>
     </>
   );
 }
