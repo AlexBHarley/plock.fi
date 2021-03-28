@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Image from 'next/image';
 
 export const WithMarketingLayout = (Component: any) => () => {
   const [menu, setMenu] = useState(false);
@@ -10,17 +11,15 @@ export const WithMarketingLayout = (Component: any) => () => {
           <div className="relative bg-white">
             <div className="flex justify-between items-center max-w-7xl mx-auto px-4 py-6 sm:px-6 md:justify-start md:space-x-10 lg:px-8">
               <div className="flex justify-start lg:w-0 lg:flex-1">
-                <a href="#">
-                  <span className="sr-only">Workflow</span>
-                  <img
-                    className="h-8 w-auto sm:h-10"
-                    src="https://tailwindui.com/img/logos/workflow-mark-purple-600-to-indigo-600.svg"
-                  />
+                <a href="/">
+                  <span className="sr-only">Plock.fi</span>
+                  <Image src="/logo.png" height={'24px'} width={'24px'} />
                 </a>
               </div>
               <div className="-mr-2 -my-2 md:hidden">
                 <button
                   type="button"
+                  onClick={() => setMenu(true)}
                   className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
                   aria-expanded="false"
                 >
@@ -44,6 +43,12 @@ export const WithMarketingLayout = (Component: any) => () => {
                 </button>
               </div>
               <nav className="hidden md:flex space-x-10">
+                <a
+                  href="/#features"
+                  className="text-base font-medium text-gray-500 hover:text-gray-900"
+                >
+                  Features
+                </a>
                 <a
                   href="/about"
                   className="text-base font-medium text-gray-500 hover:text-gray-900"
@@ -76,11 +81,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                   <div className="pt-5 pb-6 px-5">
                     <div className="flex items-center justify-between">
                       <div>
-                        <img
-                          className="h-8 w-auto"
-                          src="https://tailwindui.com/img/logos/workflow-mark-purple-600-to-indigo-600.svg"
-                          alt="Workflow"
-                        />
+                        <Image src="/logo.png" height={'24px'} width={'24px'} />
                       </div>
                       <div className="-mr-2">
                         <button
@@ -428,37 +429,6 @@ export const WithMarketingLayout = (Component: any) => () => {
                   </div>
                 </div>
               </div>
-              <div className="mt-12 xl:mt-0">
-                <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
-                  Subscribe to our newsletter
-                </h3>
-                <p className="mt-4 text-base text-gray-500">
-                  The latest news, articles, and resources, sent to your inbox
-                  weekly.
-                </p>
-                <form className="mt-4 sm:flex sm:max-w-md">
-                  <label htmlFor="emailAddress" className="sr-only">
-                    Email address
-                  </label>
-                  <input
-                    type="email"
-                    name="emailAddress"
-                    id="emailAddress"
-                    autoComplete="email"
-                    required
-                    className="appearance-none min-w-0 w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-4 text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:placeholder-gray-400"
-                    placeholder="Enter your email"
-                  />
-                  <div className="mt-3 rounded-md sm:mt-0 sm:ml-3 sm:flex-shrink-0">
-                    <button
-                      type="submit"
-                      className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-                    >
-                      Subscribe
-                    </button>
-                  </div>
-                </form>
-              </div>
             </div>
             <div className="mt-12 border-t border-gray-200 pt-8 md:flex md:items-center md:justify-between lg:mt-16">
               <div className="flex space-x-6 md:order-2">
@@ -535,7 +505,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                 </a>
               </div>
               <p className="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
-                © 2020 Workflow, Inc. All rights reserved.
+                © 2021 Plock.fi. All rights reserved.
               </p>
             </div>
           </div>

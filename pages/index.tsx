@@ -25,8 +25,8 @@ function Index() {
                 <span className="block text-indigo-200">for Celo</span>
               </h1>
               <p className="mt-6 max-w-lg mx-auto text-center text-xl text-indigo-200 sm:max-w-3xl">
-                Manage all your assets in one place with swaps, lending pools,
-                staking and more.
+                Manage all your Celo assets in one place with swaps, lending
+                pools, staking and more.
               </p>
               <div className="mt-10 max-w-sm mx-auto sm:max-w-none sm:flex sm:justify-center">
                 <div className="space-y-4 sm:space-y-0 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5">
@@ -93,282 +93,97 @@ function Index() {
           </div>
         </div>
       </div>
-      {/* Alternating Feature Sections */}
-      <div className="relative pt-16 pb-32 overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-gray-100"
-        />
-        <div className="relative">
-          <div className="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24">
-            <div className="px-4 max-w-xl mx-auto sm:px-6 lg:py-16 lg:max-w-none lg:mx-0 lg:px-0">
-              <div>
-                <div>
-                  <span className="h-12 w-12 rounded-md flex items-center justify-center bg-gradient-to-r from-purple-600 to-indigo-600">
-                    {/* Heroicon name: outline/inbox */}
-                    <svg
-                      className="h-6 w-6 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                      />
-                    </svg>
-                  </span>
-                </div>
-                <div className="mt-6">
-                  <h2 className="text-3xl font-extrabold tracking-tight text-gray-900">
-                    Stay on top of customer support
-                  </h2>
-                  <p className="mt-4 text-lg text-gray-500">
-                    Semper curabitur ullamcorper posuere nunc sed. Ornare
-                    iaculis bibendum malesuada faucibus lacinia porttitor.
-                    Pulvinar laoreet sagittis viverra duis. In venenatis sem
-                    arcu pretium pharetra at. Lectus viverra dui tellus ornare
-                    pharetra.
-                  </p>
-                  <div className="mt-6">
-                    <a
-                      href="#"
-                      className="inline-flex px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-                    >
-                      Get started
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-8 border-t border-gray-200 pt-6">
-                <blockquote>
-                  <div>
-                    <p className="text-base text-gray-500">
-                      “Cras velit quis eros eget rhoncus lacus ultrices sed
-                      diam. Sit orci risus aenean curabitur donec aliquet. Mi
-                      venenatis in euismod ut.”
-                    </p>
-                  </div>
-                  <footer className="mt-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="flex-shrink-0">
-                        <img
-                          className="h-6 w-6 rounded-full"
-                          src="https://images.unsplash.com/photo-1509783236416-c9ad59bae472?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80"
-                        />
-                      </div>
-                      <div className="text-base font-medium text-gray-700">
-                        Marcia Hill, Digital Marketing Manager
-                      </div>
-                    </div>
-                  </footer>
-                </blockquote>
-              </div>
-            </div>
-            <div className="mt-12 sm:mt-16 lg:mt-0">
-              <div className="pl-4 -mr-48 sm:pl-6 md:-mr-16 lg:px-0 lg:m-0 lg:relative lg:h-full">
-                <img
-                  className="w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
-                  src="https://tailwindui.com/img/component-images/inbox-app-screenshot-1.jpg"
-                  alt="Inbox user interface"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="mt-24">
-          <div className="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24">
-            <div className="px-4 max-w-xl mx-auto sm:px-6 lg:py-32 lg:max-w-none lg:mx-0 lg:px-0 lg:col-start-2">
-              <div>
-                <div>
-                  <span className="h-12 w-12 rounded-md flex items-center justify-center bg-gradient-to-r from-purple-600 to-indigo-600">
-                    {/* Heroicon name: outline/sparkles */}
-                    <svg
-                      className="h-6 w-6 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                      />
-                    </svg>
-                  </span>
-                </div>
-                <div className="mt-6">
-                  <h2 className="text-3xl font-extrabold tracking-tight text-gray-900">
-                    Better understand your customers
-                  </h2>
-                  <p className="mt-4 text-lg text-gray-500">
-                    Semper curabitur ullamcorper posuere nunc sed. Ornare
-                    iaculis bibendum malesuada faucibus lacinia porttitor.
-                    Pulvinar laoreet sagittis viverra duis. In venenatis sem
-                    arcu pretium pharetra at. Lectus viverra dui tellus ornare
-                    pharetra.
-                  </p>
-                  <div className="mt-6">
-                    <a
-                      href="#"
-                      className="inline-flex px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-                    >
-                      Get started
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="mt-12 sm:mt-16 lg:mt-0 lg:col-start-1">
-              <div className="pr-4 -ml-48 sm:pr-6 md:-ml-16 lg:px-0 lg:m-0 lg:relative lg:h-full">
-                <img
-                  className="w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:absolute lg:right-0 lg:h-full lg:w-auto lg:max-w-none"
-                  src="https://tailwindui.com/img/component-images/inbox-app-screenshot-2.jpg"
-                  alt="Customer profile user interface"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+
       {/* Gradient Feature Section */}
       <div className="bg-gradient-to-r from-purple-800 to-indigo-700">
         <div className="max-w-4xl mx-auto px-4 py-16 sm:px-6 sm:pt-20 sm:pb-24 lg:max-w-7xl lg:pt-24 lg:px-8">
           <h2 className="text-3xl font-extrabold text-white tracking-tight">
-            Inbox support built for efficiency
+            A dashboard built for DeFi
           </h2>
           <p className="mt-4 max-w-3xl text-lg text-purple-200">
-            Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et
-            magna sit morbi lobortis. Blandit aliquam sit nisl euismod mattis
-            in.
+            Everything you need to leverage DeFi bundled into one easy to use
+            and accesible frontend.
           </p>
           <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:mt-16 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-16">
             <div>
               <div>
                 <span className="flex items-center justify-center h-12 w-12 rounded-md bg-white bg-opacity-10">
-                  {/* Heroicon name: outline/inbox */}
                   <svg
                     className="h-6 w-6 text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
                     />
                   </svg>
                 </span>
               </div>
               <div className="mt-6">
-                <h3 className="text-lg font-medium text-white">
-                  Unlimited Inboxes
-                </h3>
+                <h3 className="text-lg font-medium text-white">Token Swaps</h3>
                 <p className="mt-2 text-base text-purple-200">
-                  Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus.
-                  Et magna sit morbi lobortis.
+                  Leverage Ubeswap (a fork of SushiSwap on Celo) to switch
+                  between your tokens with ease.
                 </p>
               </div>
             </div>
             <div>
               <div>
                 <span className="flex items-center justify-center h-12 w-12 rounded-md bg-white bg-opacity-10">
-                  {/* Heroicon name: outline/users */}
                   <svg
                     className="h-6 w-6 text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                      d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                     />
                   </svg>
                 </span>
               </div>
               <div className="mt-6">
-                <h3 className="text-lg font-medium text-white">
-                  Manage Team Members
-                </h3>
+                <h3 className="text-lg font-medium text-white">Staking</h3>
                 <p className="mt-2 text-base text-purple-200">
-                  Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus.
-                  Et magna sit morbi lobortis.
+                  Stake your CELO with validator groups to earn passive rewards.
                 </p>
               </div>
             </div>
             <div>
               <div>
                 <span className="flex items-center justify-center h-12 w-12 rounded-md bg-white bg-opacity-10">
-                  {/* Heroicon name: outline/trash */}
                   <svg
                     className="h-6 w-6 text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                </span>
-              </div>
-              <div className="mt-6">
-                <h3 className="text-lg font-medium text-white">Spam Report</h3>
-                <p className="mt-2 text-base text-purple-200">
-                  Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus.
-                  Et magna sit morbi lobortis.
-                </p>
-              </div>
-            </div>
-            <div>
-              <div>
-                <span className="flex items-center justify-center h-12 w-12 rounded-md bg-white bg-opacity-10">
-                  {/* Heroicon name: outline/pencil-alt */}
-                  <svg
-                    className="h-6 w-6 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
                     />
                   </svg>
                 </span>
               </div>
               <div className="mt-6">
                 <h3 className="text-lg font-medium text-white">
-                  Compose in Markdown
+                  Governance Voting
                 </h3>
                 <p className="mt-2 text-base text-purple-200">
-                  Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus.
-                  Et magna sit morbi lobortis.
+                  Have your say in what happens on the network by voting on
+                  proposals.
                 </p>
               </div>
             </div>
@@ -395,104 +210,11 @@ function Index() {
               </div>
               <div className="mt-6">
                 <h3 className="text-lg font-medium text-white">
-                  Team Reporting
+                  Yield Farming
                 </h3>
                 <p className="mt-2 text-base text-purple-200">
-                  Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus.
-                  Et magna sit morbi lobortis.
-                </p>
-              </div>
-            </div>
-            <div>
-              <div>
-                <span className="flex items-center justify-center h-12 w-12 rounded-md bg-white bg-opacity-10">
-                  {/* Heroicon name: outline/reply */}
-                  <svg
-                    className="h-6 w-6 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
-                    />
-                  </svg>
-                </span>
-              </div>
-              <div className="mt-6">
-                <h3 className="text-lg font-medium text-white">
-                  Saved Replies
-                </h3>
-                <p className="mt-2 text-base text-purple-200">
-                  Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus.
-                  Et magna sit morbi lobortis.
-                </p>
-              </div>
-            </div>
-            <div>
-              <div>
-                <span className="flex items-center justify-center h-12 w-12 rounded-md bg-white bg-opacity-10">
-                  {/* Heroicon name: outline/chat-alt */}
-                  <svg
-                    className="h-6 w-6 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-                    />
-                  </svg>
-                </span>
-              </div>
-              <div className="mt-6">
-                <h3 className="text-lg font-medium text-white">
-                  Email Commenting
-                </h3>
-                <p className="mt-2 text-base text-purple-200">
-                  Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus.
-                  Et magna sit morbi lobortis.
-                </p>
-              </div>
-            </div>
-            <div>
-              <div>
-                <span className="flex items-center justify-center h-12 w-12 rounded-md bg-white bg-opacity-10">
-                  {/* Heroicon name: outline/heart */}
-                  <svg
-                    className="h-6 w-6 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                    />
-                  </svg>
-                </span>
-              </div>
-              <div className="mt-6">
-                <h3 className="text-lg font-medium text-white">
-                  Connect with Customers
-                </h3>
-                <p className="mt-2 text-base text-purple-200">
-                  Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus.
-                  Et magna sit morbi lobortis.
+                  Provide liquidity and farm for yield with Moola Market (a fork
+                  of Aave on Celo).
                 </p>
               </div>
             </div>
@@ -520,36 +242,36 @@ function Index() {
           <div className="relative pt-12 pb-64 sm:pt-24 sm:pb-64 xl:col-start-1 xl:pb-24">
             <h2 className="text-sm font-semibold tracking-wide uppercase">
               <span className="bg-gradient-to-r from-purple-300 to-indigo-300 bg-clip-text text-transparent">
-                Valuable Metrics
+                Trusted Worldwide
               </span>
             </h2>
             <p className="mt-3 text-3xl font-extrabold text-white">
-              Get actionable data that will help grow your business
+              Access financial tools for a fraction of the usual cost
             </p>
             <p className="mt-5 text-lg text-gray-300">
-              Rhoncus sagittis risus arcu erat lectus bibendum. Ut in adipiscing
-              quis in viverra tristique sem. Ornare feugiat viverra eleifend
-              fusce orci in quis amet. Sit in et vitae tortor, massa. Dapibus
-              laoreet amet lacus nibh integer quis. Eu vulputate diam sit tellus
-              quis at.
+              Plock.fi is a transformative DeFi dashboard in that we integrate
+              with as many partners as possible in the DeFi ecosystem. By
+              picking Celo as the bedrock for our platform, we're building on
+              top of the mobile first ethos and enabling anyone to access
+              financial primitives.
             </p>
             <div className="mt-12 grid grid-cols-1 gap-y-12 gap-x-6 sm:grid-cols-2">
               <p>
-                <span className="block text-2xl font-bold text-white">8K+</span>
+                <span className="block text-2xl font-bold text-white">10+</span>
                 <span className="mt-1 block text-base text-gray-300">
-                  <span className="font-medium text-white">Companies</span> use
-                  laoreet amet lacus nibh integer quis.
+                  <span className="font-medium text-white">Integrations</span>{' '}
+                  are available for use via the Plock.fi dashboard.
                 </span>
               </p>
               <p>
                 <span className="block text-2xl font-bold text-white">
-                  25K+
+                  $1M+
                 </span>
                 <span className="mt-1 block text-base text-gray-300">
                   <span className="font-medium text-white">
-                    Countries around the globe
+                    Staked and invested
                   </span>{' '}
-                  lacus nibh integer quis.
+                  through the Plock.fi dashboard.
                 </span>
               </p>
               <p>
@@ -558,7 +280,7 @@ function Index() {
                   <span className="font-medium text-white">
                     Customer satisfaction
                   </span>{' '}
-                  laoreet amet lacus nibh integer quis.
+                  achieved via accessible and straightforward interfaces.
                 </span>
               </p>
               <p>
@@ -573,31 +295,6 @@ function Index() {
                 </span>
               </p>
             </div>
-          </div>
-        </div>
-      </div>
-      {/* CTA Section */}
-      <div className="bg-white">
-        <div className="max-w-4xl mx-auto py-16 px-4 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8 lg:flex lg:items-center lg:justify-between">
-          <h2 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            <span className="block">Ready to get started?</span>
-            <span className="block bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Get in touch or create an account.
-            </span>
-          </h2>
-          <div className="mt-6 space-y-4 sm:space-y-0 sm:flex sm:space-x-5">
-            <a
-              href="#"
-              className="flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-            >
-              Learn more
-            </a>
-            <a
-              href="#"
-              className="flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-indigo-800 bg-indigo-50 hover:bg-indigo-100"
-            >
-              Get started
-            </a>
           </div>
         </div>
       </div>
