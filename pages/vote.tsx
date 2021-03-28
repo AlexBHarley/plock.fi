@@ -134,10 +134,10 @@ function Vote() {
     <>
       <Panel>
         <div>
-          <h3 className="text-lg font-medium leading-6 text-gray-200">
+          <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
             Governance
           </h3>
-          <p className="text-gray-400 mt-2 text-sm">
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">
             Celo uses a formal on-chain governance mechanism to manage and
             upgrade the protocol. You can have your say in this by{' '}
             <a
@@ -157,7 +157,7 @@ function Vote() {
             .
           </p>
 
-          <p className="text-gray-400 mt-2 text-sm">
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">
             As with voting for validator groups (or staking), you need to lock
             Celo before voting on active proposals.
           </p>
@@ -167,7 +167,7 @@ function Vote() {
       <LockCelo />
 
       <Panel>
-        <h3 className="text-lg font-medium leading-6 text-gray-200">
+        <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
           Proposals
         </h3>
         <div className="-mx-5">
@@ -246,7 +246,7 @@ function Vote() {
 
                 <div className="flex items-center">
                   <div className="">
-                    <div className="text-sm font-medium text-gray-200">
+                    <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
                       {p.id.toString()}
                     </div>
                   </div>
@@ -266,7 +266,7 @@ function Vote() {
                   <a
                     href={p.proposal.metadata?.descriptionURL}
                     target="_blank"
-                    className="flex items-center text-gray-300 hover:text-gray-400 cursor-pointer space-x-2"
+                    className="flex items-center  hover:text-gray-600 dark:text-gray-400 cursor-pointer space-x-2"
                   >
                     <span>Link</span>
                     <FiExternalLink />

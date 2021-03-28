@@ -35,7 +35,9 @@ export function Balances() {
 
   return (
     <Panel>
-      <h3 className="text-xl font-medium leading-6 text-gray-200">Balances</h3>
+      <h3 className="text-xl font-medium leading-6 text-gray-900 dark:text-gray-200">
+        Balances
+      </h3>
 
       <div className="-mx-5">
         <Table
@@ -48,14 +50,14 @@ export function Balances() {
               <div className="flex items-center space-x-2">
                 {Icon ? <Icon height="25px" width="25px" /> : <></>}
                 <div className="spacey-y-1">
-                  <div className="text-sm font-medium text-gray-200">
+                  <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
                     {symbol}
                   </div>
-                  <div className="text-xs text-gray-300">{names[symbol]}</div>
+                  <div className="text-xs ">{names[symbol]}</div>
                 </div>
               </div>,
-              <span className={'text-gray-300'}>{formatAmount(balance)}</span>,
-              <span className={'text-gray-300'}>Coming soon...</span>,
+              <span className={''}>{formatAmount(balance)}</span>,
+              <span className={''}>Coming soon...</span>,
             ];
           })}
         />

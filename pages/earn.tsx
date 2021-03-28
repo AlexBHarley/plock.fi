@@ -240,10 +240,10 @@ function Earn() {
     <>
       <Panel>
         <div>
-          <div className="text-gray-200 text-xl font-medium">
+          <div className="text-gray-900 dark:text-gray-200 text-xl font-medium">
             Earn with CELO
           </div>
-          <p className="text-gray-400 text-xs md:text-sm mt-2">
+          <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm mt-2">
             Staking your CELO is a great way to earn passive rewards. To begin
             staking you first need to lock your CELO, then you're free to vote
             for validator groups of your choosing.
@@ -268,10 +268,10 @@ function Earn() {
 
             <span
               style={{ width: 'fit-content' }}
-              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 whitespace-no-wrap"
+              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-400 dark:bg-gray-100 text-gray-800 whitespace-no-wrap"
             >
               <svg
-                className="-ml-0.5 mr-1.5 h-2 w-2 text-gray-400"
+                className="-ml-0.5 mr-1.5 h-2 w-2 text-gray-600 dark:text-gray-400"
                 fill="currentColor"
                 viewBox="0 0 8 8"
               >
@@ -282,10 +282,10 @@ function Earn() {
 
             <span
               style={{ width: 'fit-content' }}
-              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-400 text-gray-900 whitespace-no-wrap"
+              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-200 dark:bg-gray-400 text-gray-900 whitespace-no-wrap"
             >
               <svg
-                className="-ml-0.5 mr-1.5 h-2 w-2 text-gray-900"
+                className="-ml-0.5 mr-1.5 h-2 w-2 text-gray-600 dark:text-gray-900"
                 fill="currentColor"
                 viewBox="0 0 8 8"
               >
@@ -294,15 +294,15 @@ function Earn() {
               Not Locked ({notLockedPctStr}%)
             </span>
           </div>
-          <div className="bg-gray-600 w-full flex rounded h-2">
+          <div className="bg-gray-200 w-full flex rounded h-2">
             <div
               id="voting"
-              className="bg-green-700 rounded-l"
+              className="bg-green-300 dark:bg-green-700 rounded-l"
               style={{ width: `${votingPctStr}%` }}
             ></div>
             <div
               id="locked"
-              className="bg-gray-400"
+              className="bg-gray-400 dark:bg-gray-400"
               style={{ width: `${nonvotingPctStr}%` }}
             ></div>
           </div>
@@ -314,31 +314,37 @@ function Earn() {
       <Panel>
         <div className="md:grid md:grid-cols-4 md:gap-6 py-2">
           <div className="md:col-span-1">
-            <h3 className="text-lg font-medium leading-6 text-gray-200">
+            <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
               Vote
             </h3>
           </div>
           <div className="mt-2 md:mt-0 md:col-span-3">
             <div className="space-y-6">
-              <div className="text-gray-400 text-sm">
+              <div className="text-gray-600 dark:text-gray-400 text-sm">
                 {truncateAddress(address || '0x')} currently has{' '}
-                <span className="font-medium text-gray-200">
+                <span className="font-medium text-gray-900 dark:text-gray-200">
                   {formatAmount(lockedSummary.lockedGold.nonvoting)}
                 </span>{' '}
                 ({nonvotingPctStr}%) CELO locked and ready to vote with.
               </div>
 
-              <div className="text-gray-400 text-sm">
+              <div className="text-gray-600 dark:text-gray-400 text-sm">
                 After voting for any group there is a{' '}
-                <span className="text-gray-200">24</span> hour waiting period
-                you must observe before activating your votes. Please ensure you
-                check back here to activate any votes and start earning rewards.
+                <span className="text-gray-900 dark:text-gray-200 font-medium">
+                  24
+                </span>{' '}
+                hour waiting period you must observe before activating your
+                votes. Please ensure you check back here to activate any votes
+                and start earning rewards.
               </div>
 
               {hasActivatablePendingVotes && (
                 <div className="flex">
-                  <button onClick={activate} className="ml-auto primary-button">
-                    Activate Pending
+                  <button
+                    onClick={activate}
+                    className="ml-auto secondary-button"
+                  >
+                    Activate All Pending Votes
                   </button>
                 </div>
               )}
@@ -352,11 +358,11 @@ function Earn() {
                     }
                     return (
                       <li className="flex flex-col mb-3">
-                        <div className="line-clamp-1">
-                          <span className="text-gray-300 text-sm">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm">
                             {truncate(group.name, 30)}
                           </span>
-                          <span className="text-gray-400 text-sm flex space-x-2 mt-1">
+                          <span className="text-gray-600 dark:text-gray-400 text-sm inline-flex space-x-1">
                             <span>({truncateAddress(group.address)})</span>
                             <CopyText text={group.address} />
                           </span>
@@ -372,7 +378,7 @@ function Earn() {
                             )%
                           </span>
                           <span className="inline-flex items-center rounded-md text-xs font-medium text-blue-600 mt-1">
-                            {formatAmount(gv.pending,)} PENDING (
+                            {formatAmount(gv.pending)} PENDING (
                             {gv.pending
                               .dividedBy(lockedSummary.lockedGold.total)
                               .times(100)
@@ -391,7 +397,7 @@ function Earn() {
                                   />
                                 ) : (
                                   <button
-                                    className="text-gray-300 text-sm hover:text-gray-400"
+                                    className=" text-sm hover:text-gray-600 dark:text-gray-400"
                                     onClick={() =>
                                       revoke(gv.group, gv.active.toString())
                                     }
@@ -432,11 +438,11 @@ function Earn() {
                           value={voteAmount}
                           onChange={(e) => setVoteAmount(e.target.value)}
                           // className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
-                          className="appearance-none block pl-3 pr-16 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-full"
+                          className="appearance-none block pl-3 pr-16 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600  w-full"
                           placeholder={'0'}
                         />
                         <div className="absolute inset-y-0 right-0 flex items-center">
-                          <div className="flex items-center justify-center focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-4 border-transparent bg-transparent text-gray-300 sm:text-sm rounded-md">
+                          <div className="flex items-center justify-center focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-4 border-transparent bg-transparent  sm:text-sm rounded-md">
                             CELO
                           </div>
                         </div>
@@ -455,13 +461,13 @@ function Earn() {
                         </button>
                       )}
                     </div>
-                    <div className="text-xs text-right text-gray-400 mt-2">
+                    <div className="text-xs text-right text-gray-600 dark:text-gray-400 mt-2">
                       Staking{' '}
-                      <span className="text-gray-200">
+                      <span className="text-gray-900 dark:text-gray-200">
                         {toWei(voteAmount)} CELO (Wei)
                       </span>{' '}
                       with{' '}
-                      <span className="text-gray-200">
+                      <span className="text-gray-900 dark:text-gray-200">
                         {truncate(
                           groups.find((vg) => vg.address === votingAddress)
                             ?.name || '',
@@ -472,12 +478,14 @@ function Earn() {
                     </div>
                   </div>
                 ) : (
-                  <button
-                    onClick={() => setAdding(true)}
-                    className="rounded-md px-4 py-1 text-gray-300 text-sm font-medium bg-gray-700 hover:bg-gray-750"
-                  >
-                    New vote
-                  </button>
+                  <div className="flex">
+                    <button
+                      onClick={() => setAdding(true)}
+                      className="ml-auto rounded-md px-4 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-750 transition"
+                    >
+                      New vote
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -487,10 +495,10 @@ function Earn() {
 
       <Panel>
         <div>
-          <h3 className="text-lg font-medium leading-6 text-gray-200">
+          <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
             Elected validator groups
           </h3>
-          <p className="text-gray-400 mt-2 text-sm">
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">
             Take a look at the below validator groups before voting to have a
             more informed choice. More information around what you should be
             looking for in a validator group can be found in the{' '}

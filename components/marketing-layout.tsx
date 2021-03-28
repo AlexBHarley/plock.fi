@@ -39,7 +39,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                 <button
                   type="button"
                   onClick={() => setMenu(true)}
-                  className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                  className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
                   aria-expanded="false"
                 >
                   <span className="sr-only">Open menu</span>
@@ -109,7 +109,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                         <button
                           type="button"
                           onClick={() => setMenu(false)}
-                          className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                          className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
                         >
                           <span className="sr-only">Close menu</span>
                           {/* Heroicon name: outline/x */}
@@ -237,7 +237,7 @@ export const WithMarketingLayout = (Component: any) => () => {
               <div className="grid grid-cols-2 gap-8 xl:col-span-2">
                 <div className="md:grid md:grid-cols-2 md:gap-8">
                   <div className="mt-12 md:mt-0">
-                    <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
+                    <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 tracking-wider uppercase">
                       Support
                     </h3>
                     <ul className="mt-4 space-y-4">
@@ -278,7 +278,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                 </div>
                 <div className="md:grid md:grid-cols-2 md:gap-8">
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
+                    <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 tracking-wider uppercase">
                       Company
                     </h3>
                     <ul className="mt-4 space-y-4">
@@ -325,7 +325,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                     </ul>
                   </div>
                   {/* <div className="mt-12 md:mt-0">
-                    <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
+                    <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 tracking-wider uppercase">
                       Legal
                     </h3>
                     <ul className="mt-4 space-y-4">
@@ -360,7 +360,7 @@ export const WithMarketingLayout = (Component: any) => () => {
             </div> */}
             <div className="pt-8 md:flex md:items-center md:justify-between">
               <div className="flex space-x-6 md:order-2">
-                {/* <a href="#" className="text-gray-400 hover:text-gray-500">
+                {/* <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-gray-500">
                   <span className="sr-only">Twitter</span>
                   <svg
                     className="h-6 w-6"
@@ -373,7 +373,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                 </a> */}
                 <a
                   href="https://github.com/alexbharley"
-                  className="text-gray-400 hover:text-gray-500"
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-500"
                 >
                   <span className="sr-only">GitHub</span>
                   <svg
@@ -389,7 +389,10 @@ export const WithMarketingLayout = (Component: any) => () => {
                     />
                   </svg>
                 </a>
-                <a href="#" className="text-gray-400 hover:text-gray-500">
+                <a
+                  href="#"
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-500"
+                >
                   <span className="sr-only">Discord</span>
                   <svg
                     className="h-6 w-6"
@@ -407,7 +410,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                   </svg>
                 </a>
               </div>
-              <p className="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
+              <p className="mt-8 text-base text-gray-600 dark:text-gray-400 md:mt-0 md:order-1">
                 © 2021 Plock. All rights reserved.
               </p>
             </div>

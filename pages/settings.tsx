@@ -1,18 +1,27 @@
-import { useContractKit } from '@celo-tools/use-contractkit';
+import { Networks, useContractKit } from '@celo-tools/use-contractkit';
 import {
   CopyText,
+  Input,
   Panel,
   PanelWithButton,
   toast,
+  Toggle,
   WithLayout,
 } from 'components';
+import { FiatCurrency } from '../constants';
 import { useEffect, useState } from 'react';
 import Loader from 'react-loader-spinner';
 import { Base } from 'state';
 
 function Settings() {
-  const { kit, address, send } = useContractKit();
-  const { accountSummary, fetchAccountSummary } = Base.useContainer();
+  const { kit, address, send, updateNetwork, network } = useContractKit();
+  const {
+    accountSummary,
+    fetchAccountSummary,
+    settings,
+    toggleDarkMode,
+    updateDefaultFiatCurrency,
+  } = Base.useContainer();
 
   const [state, setState] = useState({
     name: '',
@@ -68,27 +77,23 @@ function Settings() {
         <div>
           <div className="md:grid md:grid-cols-3 md:gap-6">
             <div className="md:col-span-1">
-              <h3 className="text-lg font-medium leading-6 text-gray-200">
+              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
                 General
               </h3>
-              <p className="mt-1 text-sm text-gray-400">
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 Allow people to identify you on the Celo network.
               </p>
             </div>
             <div className="mt-5 md:mt-0 md:col-span-2">
               <div className="space-y-6">
                 <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-300"
-                  >
+                  <label htmlFor="name" className="block text-sm font-medium ">
                     Name
                   </label>
                   <div className="mt-1">
-                    <input
+                    <Input
                       id="name"
                       name="name"
-                      className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20"
                       placeholder="John Doe"
                       value={state.name}
                       onChange={(e) => changeProperty('name', e.target.value)}
@@ -99,15 +104,14 @@ function Settings() {
                 <div>
                   <label
                     htmlFor="metadataURL"
-                    className="block text-sm font-medium text-gray-300"
+                    className="block text-sm font-medium "
                   >
                     Metadata URL
                   </label>
                   <div className="mt-1">
-                    <input
+                    <Input
                       id="metadataURL"
                       name="metadataURL"
-                      className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20"
                       placeholder="https://example.com/metadata.json"
                       value={state.metadataURL}
                       onChange={(e) =>
@@ -137,46 +141,33 @@ function Settings() {
       <Panel>
         <div className="md:grid md:grid-cols-3 md:gap-6 py-2">
           <div className="md:col-span-1">
-            <h3 className="text-lg font-medium leading-6 text-gray-200">
+            <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
               Account data
             </h3>
-            <p className="mt-1 text-sm text-gray-400">
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
               Addresses and signing keys associated with your account
             </p>
           </div>
           <div className="mt-5 md:mt-0 md:col-span-2">
             <div className="space-y-6">
               <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-300"
-                >
+                <label htmlFor="name" className="block text-sm font-medium ">
                   Address
                 </label>
                 <div className="mt-1 flex items-center space-x-3">
-                  <input
-                    id="name"
-                    name="name"
-                    className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20"
-                    readOnly
-                    value={address}
-                  />
+                  <Input id="name" name="name" readOnly value={address} />
                   <CopyText text={address} />
                 </div>
               </div>
 
               <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-300"
-                >
+                <label htmlFor="name" className="block text-sm font-medium ">
                   Wallet address
                 </label>
                 <div className="mt-1 flex items-center space-x-3">
-                  <input
+                  <Input
                     id="name"
                     name="name"
-                    className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20"
                     placeholder="No wallet address set"
                     readOnly
                     value={accountSummary.wallet}
@@ -186,17 +177,13 @@ function Settings() {
               </div>
 
               <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-300"
-                >
+                <label htmlFor="name" className="block text-sm font-medium ">
                   Vote signer
                 </label>
                 <div className="mt-1 flex items-center space-x-3">
-                  <input
+                  <Input
                     id="name"
                     name="name"
-                    className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20"
                     placeholder="No vote signing key set"
                     readOnly
                     value={accountSummary.authorizedSigners.attestation}
@@ -208,17 +195,13 @@ function Settings() {
               </div>
 
               <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-300"
-                >
+                <label htmlFor="name" className="block text-sm font-medium ">
                   Attestation signer
                 </label>
                 <div className="mt-1 flex items-center space-x-3">
-                  <input
+                  <Input
                     id="name"
                     name="name"
-                    className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20"
                     placeholder="No attestation signing key set"
                     readOnly
                     value={accountSummary.authorizedSigners.attestation}
@@ -230,22 +213,88 @@ function Settings() {
               </div>
 
               <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-300"
-                >
+                <label htmlFor="name" className="block text-sm font-medium ">
                   Validator signer
                 </label>
                 <div className="mt-1 flex items-center space-x-3">
-                  <input
+                  <Input
                     id="name"
                     name="name"
-                    className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20"
                     placeholder="No validator signing key set"
                     readOnly
                     value={accountSummary.authorizedSigners.validator}
                   />
                   <CopyText text={accountSummary.authorizedSigners.validator} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Panel>
+
+      <Panel>
+        <div>
+          <div className="md:grid md:grid-cols-3 md:gap-6">
+            <div className="md:col-span-1">
+              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
+                Plock
+              </h3>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                Change behaviour of Plock to suit your usage better.
+              </p>
+            </div>
+            <div className="mt-5 md:mt-0 md:col-span-2">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="name" className="block text-sm font-medium ">
+                    Network
+                  </label>
+
+                  <select
+                    name=""
+                    id=""
+                    className="p-2 dark:bg-gray-750 rounded-md border border-gray-300 dark:border-gray-500"
+                    value={network}
+                    onChange={(e) => updateNetwork(e.target.value as Networks)}
+                  >
+                    {Object.values(Networks).map((n) => (
+                      <option value={n}>{n}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <label htmlFor="name" className="block text-sm font-medium ">
+                    Default Currency
+                  </label>
+
+                  <select
+                    name=""
+                    id=""
+                    className="p-2 dark:bg-gray-750 rounded-md border border-gray-300 dark:border-gray-500"
+                    value={settings.currency}
+                    onChange={(e) =>
+                      updateDefaultFiatCurrency(e.target.value as FiatCurrency)
+                    }
+                  >
+                    {Object.values(FiatCurrency).map((n) => (
+                      <option value={n}>{n}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="metadataURL"
+                    className="block text-sm font-medium "
+                  >
+                    Dark Mode
+                  </label>
+
+                  <Toggle
+                    active={settings.darkMode}
+                    onChange={toggleDarkMode}
+                  />
                 </div>
               </div>
             </div>

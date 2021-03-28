@@ -11,6 +11,8 @@ function MyApp({ Component, pageProps }) {
         <meta name="keywords" content="celo, cryptocurrency, defi" />
         <meta name="description" content="The Defi dashboard for Celo" />
 
+        <script async src="/dark-mode.js" />
+
         {process.browser && (
           <script
             async

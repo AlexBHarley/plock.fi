@@ -44,13 +44,13 @@ export function Dropdown({
           aria-haspopup="listbox"
           aria-expanded="true"
           aria-labelledby="listbox-label"
-          className="bg-gray-800 relative w-full border border-gray-600 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm h-10 p-2"
+          className="bg-gray-50 dark:bg-gray-800 relative w-full border border-gray-600 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm h-10 p-2"
         >
           <span className="block truncate text-white">{selected}</span>
           <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
             {/* <!-- Heroicon name: selector --> */}
             <svg
-              className="h-5 w-5 text-gray-400"
+              className="h-5 w-5 text-gray-600 dark:text-gray-400"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
               fill="currentColor"
@@ -106,7 +106,7 @@ export function Dropdown({
                   <span
                     className={`${
                       selected === o ? 'font-semibold' : 'font-normal'
-                    }  block truncate text-gray-300`}
+                    }  block truncate `}
                   >
                     {o}
                   </span>
@@ -179,8 +179,8 @@ export function DropButton({
       <div>
         <button
           type="button"
-          className={`flex justify-between rounded-md px-2 py-2 text-sm text-gray-300 border border-gray-500 px-4 py-2 focus:ring-0 focus:outline-none ${
-            !disabled && 'hover:bg-gray-800'
+          className={`flex justify-between rounded-md px-2 py-2 text-sm border border-gray-400 dark:border-gray-500 px-4 py-2 focus:ring-0 focus:outline-none ${
+            !disabled && 'dark:hover:bg-gray-800'
           } whitespace-nowrap transition`}
           id="options-menu"
           aria-haspopup="true"
@@ -206,7 +206,7 @@ export function DropButton({
       <div className="relative">
         {open && (
           <div
-            className="z-50 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-gray-700 ring-1 ring-black ring-opacity-5 divide-y divide-gray-100"
+            className="z-50 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 divide-y divide-gray-100"
             role="menu"
             aria-orientation="vertical"
             aria-labelledby="options-menu"
@@ -215,7 +215,7 @@ export function DropButton({
               <div className="py-1">
                 {group.map(({ onClick, text }) => (
                   <button
-                    className="block px-4 py-2 text-sm transition text-gray-300 hover:bg-gray-825 w-full text-left"
+                    className="block px-4 py-2 text-sm transition hover:bg-gray-100 dark:hover:bg-gray-825 w-full text-left"
                     role="menuitem"
                     onClick={(e) => {
                       e.preventDefault();

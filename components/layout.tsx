@@ -1,19 +1,18 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
-import { Toaster } from 'react-hot-toast';
-import { Base } from 'state';
+import { ApolloProvider } from '@apollo/client';
 import {
   ContractKitProvider,
   Networks,
   useContractKit,
 } from '@celo-tools/use-contractkit';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useEffect, useRef, useState } from 'react';
+import { Toaster } from 'react-hot-toast';
+import { Base } from 'state';
 import { truncateAddress } from 'utils';
-import { CopyText } from './copy-text';
+import { DropButton } from './dropdown';
 import { PulsatingDot } from './pulsating-dot';
-import { DropButton, Dropdown } from './dropdown';
-import { ApolloProvider } from '@apollo/client';
 
 export function Sidebar({
   items,
@@ -38,11 +37,11 @@ export function Sidebar({
               className={`${
                 (item.strict && router.asPath === item.link) ||
                 (!item.strict && router.asPath.startsWith(item.link))
-                  ? 'bg-gray-600'
+                  ? 'bg-gray-300 dark:bg-gray-600'
                   : item.disabled
                   ? ''
-                  : 'hover:bg-gray-900 transition'
-              } w-full text-gray-300 group rounded-md px-3 py-2 flex items-center text-sm font-medium focus:outline-none`}
+                  : 'hover:bg-gray-200 dark:hover:bg-gray-900 transition'
+              } w-full group rounded-md px-3 py-2 flex items-center text-sm font-medium focus:outline-none`}
             >
               <span className="mr-4">{item.icon}</span>
 
@@ -66,7 +65,7 @@ export function Sidebar({
 
 const tabs = [
   {
-    name: 'General',
+    name: 'Transfer',
     icon: (
       <svg
         className="h-4"
@@ -79,12 +78,31 @@ const tabs = [
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
     ),
-    link: '/',
-    strict: true,
+    link: '/transfer',
+  },
+  {
+    name: 'Swap',
+    icon: (
+      <svg
+        className="h-4"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M13 10V3L4 14h7v7l9-11h-7z"
+        />
+      </svg>
+    ),
+    link: '/swap',
   },
   {
     name: 'Earn',
@@ -127,26 +145,6 @@ const tabs = [
     link: '/vote',
   },
   {
-    name: 'Transfer',
-    icon: (
-      <svg
-        className="h-4"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-    ),
-    link: '/transfer',
-  },
-  {
     name: 'Stream',
     icon: (
       <svg
@@ -173,6 +171,27 @@ const tabs = [
     link: '/stream',
   },
   {
+    name: 'Settings',
+    icon: (
+      <svg
+        className="h-4"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    ),
+    link: '/settings',
+    strict: true,
+  },
+  {
     name: 'Lend',
     icon: (
       <svg
@@ -192,26 +211,6 @@ const tabs = [
     ),
     link: '/lend',
     disabled: true,
-  },
-  {
-    name: 'Swap',
-    icon: (
-      <svg
-        className="h-4"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M13 10V3L4 14h7v7l9-11h-7z"
-        />
-      </svg>
-    ),
-    link: '/swap',
   },
 ];
 
@@ -270,7 +269,10 @@ export function WithAppLayout({ children }) {
   }, [fornoUrl]);
 
   return (
-    <div className="bg-gray-800 flex flex-col" style={{ minHeight: '100vh' }}>
+    <div
+      className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 flex flex-col"
+      style={{ minHeight: '100vh' }}
+    >
       <Toaster
         position="top-right"
         toastOptions={{
@@ -297,11 +299,11 @@ export function WithAppLayout({ children }) {
             ref={menuRef}
             className="absolute top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden"
           >
-            <div className="relative rounded-lg shadow-md bg-gray-900 ring-1 ring-black ring-opacity-5 overflow-hidden">
+            <div className="relative rounded-lg shadow-md bg-white dark:bg-gray-900 ring-1 ring-black ring-opacity-5 overflow-hidden">
               <button
                 type="button"
                 onClick={() => setMenu(false)}
-                className="absolute right-2 top-2 rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                className="absolute right-2 top-2 rounded-md p-2 inline-flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-gray-500 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
               >
                 <span className="sr-only">Close menu</span>
                 {/* Heroicon name: outline/x */}
@@ -329,7 +331,7 @@ export function WithAppLayout({ children }) {
                         (t.strict && router.asPath === t.link) ||
                         (!t.strict && router.asPath.startsWith(t.link))
                           ? 'text-indigo-600'
-                          : `text-gray-300`
+                          : ``
                       }`}
                     >
                       <span>{t.icon}</span>
@@ -347,11 +349,11 @@ export function WithAppLayout({ children }) {
               {address && (
                 <>
                   <div
-                    className="mx-auto bg-gray-800"
+                    className="mx-auto bg-gray-200 dark:bg-gray-800"
                     style={{ height: '1px', width: '90%' }}
                   ></div>
                   <div className="flex px-4 py-4">
-                    <button className="text-gray-300 ml-auto" onClick={destroy}>
+                    <button className=" ml-auto" onClick={destroy}>
                       Logout
                     </button>
                   </div>
@@ -382,22 +384,16 @@ export function WithAppLayout({ children }) {
               )}
 
               <div className="flex items-center space-x-4">
-                <select
-                  name=""
-                  id=""
-                  className="p-2 bg-gray-750 text-gray-300 rounded-md border border-gray-500"
-                  value={network}
-                  onChange={(e) => updateNetwork(e.target.value as Networks)}
-                >
-                  {Object.values(Networks).map((n) => (
-                    <option value={n}>{n}</option>
-                  ))}
-                </select>
+                <div className="hidden md:flex">
+                  <div className={healthy ? 'text-green-600' : 'text-red-600'}>
+                    <PulsatingDot />
+                  </div>
+                </div>
 
                 <button
                   type="button"
                   onClick={() => setMenu(true)}
-                  className="md:hidden rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                  className="md:hidden rounded-md p-2 inline-flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
                   aria-expanded="false"
                 >
                   <span className="sr-only">Open main menu</span>
@@ -421,12 +417,6 @@ export function WithAppLayout({ children }) {
               </div>
 
               <div className="hidden md:flex">
-                <div className={healthy ? 'text-green-600' : 'text-red-600'}>
-                  <PulsatingDot />
-                </div>
-              </div>
-
-              <div className="hidden md:flex">
                 {address && (
                   <DropButton
                     display={truncateAddress(address)}
@@ -447,25 +437,23 @@ export function WithAppLayout({ children }) {
         </div>
       </header>
 
-      <div className="w-full md:max-w-screen-lg mx-auto bg-gray-800 flex-grow py-6 md:py-8 px-2 md:px-4">
+      <div className="w-full md:max-w-screen-lg mx-auto flex-grow py-6 md:py-8 px-2 md:px-4">
         {children}
       </div>
 
-      <footer className="bg-gray-850 pb-12 md:pb-0">
+      <footer className="dark:bg-gray-850 pb-12 md:pb-0">
         <div className="max-w-screen-lg mx-auto py-8 px-4 space-y-8 md:space-y-0 sm:px-6 md:flex md:items-center md:justify-between lg:px-8">
           <div className="mt-8 md:mt-0">
             <div className="flex items-center">
               <Image src="/logo.png" height="24px" width="24px" />
-              <p className="text-center text-base font-medium text-gray-300 ml-2">
-                Plock
-              </p>
+              <p className="text-center text-base font-medium ml-2">Plock</p>
             </div>
           </div>
           <div className="flex items-center space-x-6">
             <a
               href="https://github.com/alexbharley/celo-manager"
               target="_blank"
-              className="text-gray-400 hover:text-gray-500"
+              className="text-gray-600 dark:text-gray-400 hover:text-gray-500"
             >
               <span className="sr-only">GitHub</span>
               <svg
@@ -484,7 +472,7 @@ export function WithAppLayout({ children }) {
             <a
               href="https://twitter.com/"
               target="_blank"
-              className="text-gray-400 hover:text-gray-500"
+              className="text-gray-600 dark:text-gray-400 hover:text-gray-500"
             >
               <span className="sr-only">Twitter</span>
               <svg
@@ -497,21 +485,6 @@ export function WithAppLayout({ children }) {
               </svg>
             </a>
           </div>
-
-          <a
-            target="_blank"
-            href={`https://github.com/AlexBHarley/celo-manager/commit/${process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}`}
-            className="flex items-center space-x-3 "
-          >
-            <div className="text-gray-400 text-sm">
-              {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA
-                ? process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA.slice(0, 6)
-                : '0x1234'}
-            </div>
-            <div className="text-green-600 text-sm border border-green-600 px-3 py-1 rounded-md">
-              VERIFIED
-            </div>
-          </a>
         </div>
       </footer>
     </div>
@@ -540,7 +513,7 @@ function WithSidebar({ children }: any) {
 
 export const WithLayout = (Component: any) => {
   return () => (
-    <ContractKitProvider dappName="Plock">
+    <ContractKitProvider dappName="Plock" network={Networks.Mainnet}>
       <Base.Provider>
         <WithApollo>
           <WithSidebar>

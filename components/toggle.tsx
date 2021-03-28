@@ -3,7 +3,7 @@ export function Toggle({
   onChange,
   disabled,
 }: {
-  disabled: boolean;
+  disabled?: boolean;
   active: boolean;
   onChange: (newValue: boolean) => void;
 }) {

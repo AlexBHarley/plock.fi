@@ -57,20 +57,22 @@ export function LockCelo() {
     <Panel>
       <div className="md:grid md:grid-cols-4 md:gap-6 py-2">
         <div className="md:col-span-1">
-          <h3 className="text-xl font-medium leading-6 text-gray-200">
+          <h3 className="text-xl font-medium leading-6 text-gray-900 dark:text-gray-200">
             Lock CELO
           </h3>
         </div>
         <div className="mt-2 md:mt-0 md:col-span-3">
           <div className="flex flex-col space-y-4">
-            <div className="text-gray-400 text-sm">
+            <div className="text-gray-600 dark:text-gray-400 text-sm">
               {truncateAddress(address || '0x')} currently has{' '}
-              <span className="font-medium text-gray-200">
+              <span className="font-medium text-gray-900 dark:text-gray-200">
                 {formatAmount(lockedSummary.lockedGold.total)}
               </span>{' '}
               out of{' '}
-              <span className="text-gray-200">{formatAmount(total)}</span> (
-              {parseFloat(lockedPct)}%) CELO locked for voting.
+              <span className="text-gray-900 dark:text-gray-200">
+                {formatAmount(total)}
+              </span>{' '}
+              ({parseFloat(lockedPct)}%) CELO locked for voting.
             </div>
             <div>
               <span className="flex flex-col">
@@ -83,12 +85,12 @@ export function LockCelo() {
                       placeholder={'0'}
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center">
-                      <div className="flex items-center justify-center focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-4 border-transparent bg-transparent text-gray-300 sm:text-sm rounded-md">
+                      <div className="flex items-center justify-center focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-4 border-transparent bg-transparent  sm:text-sm rounded-md">
                         CELO
                       </div>
                     </div>
                   </div>
-                  <div className="flex text-gray-400 text-xs mt-2">
+                  <div className="flex text-gray-600 dark:text-gray-400 text-xs mt-2">
                     {toWei(lockAmount || '0')} CELO (Wei)
                   </div>
                 </div>

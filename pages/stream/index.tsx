@@ -193,15 +193,15 @@ function Stream() {
     <>
       <Panel>
         <div>
-          <h3 className="text-lg font-medium leading-6 text-gray-200">
+          <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
             Stream
           </h3>
-          <p className="text-gray-400 text-xs md:text-sm mt-2">
+          <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm mt-2">
             With Plock you can stream funds to recipients for realtime payments.
             This allows recipients to claim their funds on an ongoing basis as
             soon as it becomes available to them.
           </p>
-          <p className="text-gray-400 text-xs md:text-sm mt-2">
+          <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm mt-2">
             Plock enables this functionality via{' '}
             <a
               href="https://docs.celo.org/celo-owner-guide/release-gold"
@@ -218,17 +218,19 @@ function Stream() {
       <PanelWithButton>
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <div className="md:col-span-1">
-            <h3 className="text-lg font-medium leading-6 text-gray-200">
+            <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
               Deploy
             </h3>
-            <p className="mt-1 text-sm text-gray-400">Create a new stream</p>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              Create a new stream
+            </p>
           </div>
           <div className="mt-5 md:mt-0 md:col-span-2">
             <div className="space-y-4">
               <div>
                 <label
                   htmlFor="company_website"
-                  className="block text-sm font-medium text-gray-300"
+                  className="block text-sm font-medium "
                 >
                   Beneficiary
                 </label>
@@ -242,10 +244,7 @@ function Stream() {
               </div>
 
               <div>
-                <label
-                  htmlFor="about"
-                  className="block text-sm font-medium text-gray-300"
-                >
+                <label htmlFor="about" className="block text-sm font-medium ">
                   Start Date
                 </label>
                 <div className="mt-1">
@@ -261,10 +260,7 @@ function Stream() {
               </div>
 
               <div>
-                <label
-                  htmlFor="about"
-                  className="block text-sm font-medium text-gray-300"
-                >
+                <label htmlFor="about" className="block text-sm font-medium ">
                   End Date
                 </label>
                 <div className="mt-1">
@@ -280,10 +276,7 @@ function Stream() {
               </div>
 
               <div>
-                <label
-                  htmlFor="about"
-                  className="block text-sm font-medium text-gray-300"
-                >
+                <label htmlFor="about" className="block text-sm font-medium ">
                   Amount
                 </label>
                 <div className="mt-1">
@@ -314,10 +307,10 @@ function Stream() {
       <Panel>
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <div className="md:col-span-1">
-            <h3 className="text-lg font-medium leading-6 text-gray-200">
+            <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
               View
             </h3>
-            <p className="mt-1 text-sm text-gray-400">
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
               Enter the address of a stream to get an overview and withdraw
               funds.
             </p>
@@ -327,13 +320,13 @@ function Stream() {
               <div>
                 <label
                   htmlFor="company_website"
-                  className="block text-sm font-medium text-gray-300"
+                  className="block text-sm font-medium "
                 >
                   Stream address
                 </label>
                 <div className="mt-1 flex rounded-md shadow-sm">
                   <Input
-                    className="w-full appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20 w-64"
+                    className="w-full appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600  w-20 w-64"
                     type="text"
                     value={streamAddress}
                     onChange={(e) => setStreamAddress(e.target.value)}
@@ -395,11 +388,11 @@ function Stream() {
                         <TokenIcons.CELO height="40px" width="40px" />
                       </span>
 
-                      <div className="text-2xl md:text-5xl font-medium text-gray-200 mb-2">
+                      <div className="text-2xl md:text-5xl font-medium text-gray-900 dark:text-gray-200 mb-2">
                         {formatAmount(stream.released)}
                       </div>
                       <div className="flex items-center space-x-2">
-                        <span className="text-gray-300 md:text-2xl">
+                        <span className=" md:text-2xl">
                           / {formatAmount(stream.total)} CELO total
                         </span>
                       </div>

@@ -91,8 +91,10 @@ function Swap() {
     <>
       <PanelWithButton>
         <div>
-          <h3 className="text-lg font-medium leading-6 text-gray-200">Swap</h3>
-          <p className="text-gray-400 mt-2 text-sm">
+          <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
+            Swap
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">
             Plock uses{' '}
             <a
               className="text-blue-500"
@@ -126,7 +128,7 @@ function Swap() {
                 <select
                   id="currency"
                   name="currency"
-                  className="w-36 focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 border-transparent bg-transparent text-gray-300 sm:text-sm rounded-md"
+                  className="w-36 focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 border-transparent bg-transparent  sm:text-sm rounded-md"
                   value={fromToken.ticker}
                   onChange={(e) =>
                     setFromToken(
@@ -145,7 +147,7 @@ function Swap() {
               </div>
             </div>
 
-            <div className="text-gray-200">to</div>
+            <div className="text-gray-900 dark:text-gray-200">to</div>
 
             <div className="relative rounded-md shadow-sm w-full">
               <Input
@@ -170,7 +172,7 @@ function Swap() {
                 <select
                   id="currency"
                   name="currency"
-                  className="w-36 focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-2 mr-2 border-transparent bg-transparent text-gray-300 sm:text-sm rounded-md"
+                  className="w-36 focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-2 mr-2 border-transparent bg-transparent  sm:text-sm rounded-md"
                   value={toToken.ticker}
                   onChange={(e) => {
                     setToToken(tokens.find((t) => t.ticker === e.target.value));

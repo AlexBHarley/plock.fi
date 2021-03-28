@@ -22,8 +22,8 @@ export function Table({
     <div className="flex flex-col">
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-          <div className="overflow-hidden border-b border-gray-900">
-            <table className="min-w-full divide-y divide-gray-600">
+          <div className="overflow-hidden border-b border-gray-300 dark:border-gray-900">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
               <thead className="">
                 <tr>
                   {headers.map((h) => {
@@ -38,7 +38,7 @@ export function Table({
                                 onHeaderClick(h.sortableProperty, true);
                               }
                             }}
-                            className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider flex items-center space-x-2 outline-none whitespace-nowrap focus:outline-none"
+                            className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider flex items-center space-x-2 outline-none whitespace-nowrap focus:outline-none"
                           >
                             <span>{h.displayName}</span>
 
@@ -67,7 +67,7 @@ export function Table({
                     return (
                       <th
                         scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap"
+                        className="px-6 py-3 text-left text-xs font-medium  uppercase tracking-wider whitespace-nowrap"
                       >
                         {h}
                       </th>
@@ -76,7 +76,7 @@ export function Table({
                 </tr>
               </thead>
 
-              <tbody className="bg-gray-700 divide-y divide-gray-750">
+              <tbody className="dark:bg-gray-700 divide-y divide-gray-200 dark:divide-gray-750">
                 {loading ? (
                   <tr>
                     <td colSpan={100}>
@@ -94,7 +94,7 @@ export function Table({
                 ) : rows.length === 0 ? (
                   <tr>
                     <td colSpan={100}>
-                      <div className="text-center text-gray-400 text-sm py-6 w-full">
+                      <div className="text-center text-gray-600 dark:text-gray-400 text-sm py-6 w-full">
                         {noDataMessage}
                       </div>
                     </td>
@@ -104,7 +104,7 @@ export function Table({
                     return (
                       <tr>
                         {r.map((column) => (
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm ">
                             {column}
                           </td>
                         ))}

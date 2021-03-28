@@ -18,7 +18,7 @@ export function CopyText({ text }: { text: string }) {
       {copied ? (
         <BsCheck className="text-green-700" />
       ) : (
-        <BsClipboard className="text-gray-400" />
+        <BsClipboard className="text-gray-600 dark:text-gray-400" />
       )}
     </button>
   );

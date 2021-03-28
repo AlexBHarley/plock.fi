@@ -2,6 +2,7 @@ import { gql, useLazyQuery } from '@apollo/client';
 import {
   Balances,
   CopyText,
+  Input,
   Panel,
   Table,
   toast,
@@ -94,18 +95,18 @@ function Transfer() {
   return (
     <>
       <Panel>
-        <h3 className="text-gray-200">New Transfer</h3>
+        <h3 className="text-gray-900 dark:text-gray-900 dark:text-gray-200">
+          New Transfer
+        </h3>
         <div>
           <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row items-center md:space-x-2">
             <div className="mt-1 relative rounded-md shadow-sm w-full">
-              <input
+              <Input
                 type="text"
                 name="price"
                 id="price"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                // className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
-                className="w-full appearance-none block px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20 w-64"
                 placeholder={'0'}
               />
               <div className="absolute inset-y-0 right-0 flex items-center">
@@ -115,7 +116,7 @@ function Transfer() {
                 <select
                   id="currency"
                   name="currency"
-                  className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-10 border-transparent bg-transparent text-gray-300 sm:text-sm rounded-md"
+                  className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-10 border-transparent bg-transparent  sm:text-sm rounded-md"
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value as Currencies)}
                 >
@@ -126,18 +127,17 @@ function Transfer() {
               </div>
             </div>
 
-            <div className="text-gray-200">to</div>
+            <div className="text-gray-900 dark:text-gray-200">to</div>
 
-            <input
+            <Input
               type="text"
-              placeholder="0x1234567890987654321"
+              placeholder="0x7d21685c17607338b313a7174bab6620bad0aab7"
               value={toAddress}
               onChange={(e) => setToAddress(e.target.value)}
-              className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600 text-gray-300 w-20"
             />
           </div>
 
-          <div className="text-gray-400 text-xs mt-2">
+          <div className="text-gray-600 dark:text-gray-400 text-xs mt-2">
             Sending <span className="text-white">{toWei(amount)} </span>
             <span className="text-white">{currency} </span>to{' '}
             <span className="text-white">{toAddress}</span>
@@ -153,13 +153,11 @@ function Transfer() {
 
       <Panel>
         <div className="flex flex-col md:flex-row md:items-center">
-          <h3 className="text-gray-300 whitespace-nowrap mb-3 md:mb-0">
-            Past transfers
-          </h3>
+          <h3 className=" whitespace-nowrap mb-3 md:mb-0">Past transfers</h3>
 
           <div className="flex items-center justify-between space-x-8 md:ml-auto">
             <div className="flex items-center space-x-3">
-              <div className="text-xs text-gray-300">Show tiny transfers</div>
+              <div className="text-xs ">Show tiny transfers</div>
               <Toggle
                 active={showTiny}
                 onChange={(value) => setShowTiny(value)}
@@ -169,7 +167,7 @@ function Transfer() {
 
             <button className="" onClick={() => refetch()}>
               <IoMdRefresh
-                className="text-gray-300"
+                className=""
                 style={{ height: '20px', width: '20px' }}
               />
             </button>
@@ -194,10 +192,8 @@ function Transfer() {
               return [
                 <div className="flex items-center">
                   <div className="">
-                    <div className="text-sm font-medium text-gray-300">
-                      Unknown
-                    </div>
-                    <div className="text-sm text-gray-400 flex-items-center space-x-2">
+                    <div className="text-sm font-medium">Unknown</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 flex-items-center space-x-2">
                       <span>{truncateAddress(displayAddress)}</span>
                       <CopyText text={displayAddress} />
                     </div>
@@ -207,7 +203,7 @@ function Transfer() {
                   {formatAmount(node.value)} {node.token}
                 </span>,
                 <div className="text-sm text-gray-900">{node.comment}</div>,
-                <span className="px-2 inline-flex text-xs leading-5 font-semibold text-gray-400">
+                <span className="px-2 inline-flex text-xs leading-5 font-semibold text-gray-600 dark:text-gray-400">
                   <a
                     className="flex space-x-2 items-center"
                     href={`${getGraphQlUrl(network)}/txs/${

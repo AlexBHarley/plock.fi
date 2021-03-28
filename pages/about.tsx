@@ -40,9 +40,9 @@ function About() {
           </a>{' '}
           , a tool for developers and computer professionals to interact with
           the Celo network. Democratising this access to the rest of the world
-          was a great step, however as the number of decentralised applications
-          (DApps) grew on Celo, it became apparent that for wider adoption a
-          consistent and friendly interface was needed.
+          was a first great step, however as the number of decentralised
+          applications (DApps) grew on Celo, it became apparent that for wider
+          adoption a consistent and friendly interface was needed.
         </p>
 
         <h2>Who?</h2>

@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { useCallback, useEffect, useState } from 'react';
 import { createContainer } from 'unstated-next';
-import { getGraphQlUrl } from '../constants';
+import { FiatCurrency, getGraphQlUrl } from '../constants';
 import { Networks, useContractKit } from '@celo-tools/use-contractkit';
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts';
 import { Accounts } from '@celo/contractkit/lib/generated/Accounts';
@@ -66,9 +66,26 @@ const defaultLockedSummary = {
   pendingWithdrawals: [],
 };
 
+const defaultSettings = {
+  currency: FiatCurrency.USD,
+  darkMode: false,
+};
+const LOCALSTORAGE_KEY = 'plock/settings';
+let localSettings = {};
+if (typeof localStorage !== 'undefined') {
+  localSettings = JSON.stringify(
+    localStorage.getItem(LOCALSTORAGE_KEY) || '{}'
+  );
+}
+const initialSettings = {
+  ...defaultSettings,
+  ...localSettings,
+};
+
 function State() {
   const { network, kit, address } = useContractKit();
   const [graphql, setGraphql] = useState(getApolloClient(network));
+  const [settings, setSettings] = useState(initialSettings);
 
   const [accountSummary, setAccountSummary] = useState<AccountSummary>(
     defaultAccountSummary
@@ -134,6 +151,35 @@ function State() {
     } catch (_) {}
   }, [kit, address]);
 
+  const updateSetting = useCallback(
+    (property: string, value: any) => {
+      setSettings((s) => {
+        const newSettings = { ...s, [property]: value };
+        localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(newSettings));
+        return newSettings;
+      });
+      localStorage;
+    },
+    [settings]
+  );
+
+  const toggleDarkMode = useCallback(() => {
+    if (settings.darkMode) {
+      document.querySelector('html').classList.remove('dark');
+      updateSetting('darkMode', false);
+    } else {
+      document.querySelector('html').classList.add('dark');
+      updateSetting('darkMode', true);
+    }
+  }, [settings, updateSetting]);
+
+  const updateDefaultFiatCurrency = useCallback(
+    (c: FiatCurrency) => {
+      updateSetting('currency', c);
+    },
+    [updateSetting]
+  );
+
   useEffect(() => {
     fetchAccountSummary();
     fetchBalances();
@@ -149,6 +195,10 @@ function State() {
     balances,
     lockedSummary,
     fetchLockedSummary,
+
+    toggleDarkMode,
+    updateDefaultFiatCurrency,
+    settings,
   };
 }
 
