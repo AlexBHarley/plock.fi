@@ -66,10 +66,10 @@ export function LockCelo() {
             <div className="text-gray-400 text-sm">
               {truncateAddress(address || '0x')} currently has{' '}
               <span className="font-medium text-gray-200">
-                {formatAmount(lockedSummary.lockedGold.total, 2)}
+                {formatAmount(lockedSummary.lockedGold.total)}
               </span>{' '}
               out of{' '}
-              <span className="text-gray-200">{formatAmount(total, 0)}</span> (
+              <span className="text-gray-200">{formatAmount(total)}</span> (
               {parseFloat(lockedPct)}%) CELO locked for voting.
             </div>
             <div>
