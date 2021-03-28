@@ -248,7 +248,7 @@ function Index() {
             <p className="mt-3 text-3xl font-extrabold text-white">
               Access financial tools for a fraction of the usual cost
             </p>
-            <p className="mt-5 text-lg ">
+            <p className="mt-5 text-lg text-gray-100">
               Plock is a transformative DeFi dashboard in that we integrate with
               as many partners as possible in the DeFi ecosystem. By picking
               Celo as the bedrock for our platform, we're building on top of the
@@ -258,7 +258,7 @@ function Index() {
             <div className="mt-12 grid grid-cols-1 gap-y-12 gap-x-6 sm:grid-cols-2">
               <p>
                 <span className="block text-2xl font-bold text-white">10+</span>
-                <span className="mt-1 block text-base ">
+                <span className="mt-1 block text-base text-gray-100">
                   <span className="font-medium text-white">Integrations</span>{' '}
                   are available for use via the Plock dashboard.
                 </span>
@@ -267,7 +267,7 @@ function Index() {
                 <span className="block text-2xl font-bold text-white">
                   $1M+
                 </span>
-                <span className="mt-1 block text-base ">
+                <span className="mt-1 block text-base text-gray-100">
                   <span className="font-medium text-white">
                     Staked and invested
                   </span>{' '}
@@ -276,7 +276,7 @@ function Index() {
               </p>
               <p>
                 <span className="block text-2xl font-bold text-white">98%</span>
-                <span className="mt-1 block text-base ">
+                <span className="mt-1 block text-base text-gray-100">
                   <span className="font-medium text-white">
                     Customer satisfaction
                   </span>{' '}
@@ -287,7 +287,7 @@ function Index() {
                 <span className="block text-2xl font-bold text-white">
                   12M+
                 </span>
-                <span className="mt-1 block text-base ">
+                <span className="mt-1 block text-base text-gray-100">
                   <span className="font-medium text-white">
                     Issues resolved
                   </span>{' '}
