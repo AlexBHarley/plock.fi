@@ -29,7 +29,7 @@ export const CustomSelectSearch = ({
             return 'z-50 absolute top-10 rounded-md shadow-md w-64';
           }
           if (c === 'option') {
-            return 'bg-gray-50 bg-gray-800 text-gray-600 dark:text-gray-400 px-3 py-3 hover:bg-gray-750 w-full text-left text-sm';
+            return 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-3 py-3 hover:bg-gray-200 dark:hover:bg-gray-750 w-full text-left text-sm';
           }
         }}
       />

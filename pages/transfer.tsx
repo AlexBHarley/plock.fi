@@ -16,12 +16,9 @@ import { useContractKit } from '@celo-tools/use-contractkit';
 import { formatAmount, toWei, truncateAddress } from 'utils';
 import Web3 from 'web3';
 import { Base } from 'state';
+import { Celo, tokens } from '../constants';
 
-enum Currencies {
-  CELO = 'CELO',
-  cUSD = 'cUSD',
-  cEUR = 'cEUR',
-}
+import ERC20 from '../utils/abis/ERC20.json';
 
 const transferQuery = gql`
   query Transfers($address: String) {
@@ -53,23 +50,23 @@ function Transfer() {
     }
   );
   const [amount, setAmount] = useState('0');
-  const [currency, setCurrency] = useState(Currencies.CELO);
+  const [currency, setCurrency] = useState(Celo);
   const [toAddress, setToAddress] = useState('');
 
   const transfer = useCallback(async () => {
-    let contract;
-    if (currency === Currencies.CELO) {
-      contract = await kit.contracts.getGoldToken();
-    } else if (currency === Currencies.cUSD) {
-      contract = await kit.contracts.getStableToken();
-    } else {
-      throw new Error('Unsupported currency');
+    const contractAddress = currency.networks[network.name];
+    if (!contractAddress) {
+      toast.error(`${currency.name} not deployed on ${network.name}`);
+      return;
     }
 
-    await send(contract.transfer(toAddress, Web3.utils.toWei(amount, 'ether')));
+    const erc20 = new kit.web3.eth.Contract(ERC20 as any, contractAddress);
+    await send(
+      erc20.methods.transfer(toAddress, Web3.utils.toWei(amount, 'ether'))
+    );
     toast.success(`${amount} ${currency} sent`);
     fetchBalances();
-  }, [amount, currency, kit, fetchBalances, send]);
+  }, [amount, currency, kit, fetchBalances, send, network]);
 
   useEffect(() => {
     fetchBalances();
@@ -116,12 +113,17 @@ function Transfer() {
                   id="currency"
                   name="currency"
                   className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-10 border-transparent bg-transparent  sm:text-sm rounded-md"
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value as Currencies)}
+                  value={currency.name}
+                  onChange={(e) => {
+                    const token = tokens.find((t) => t.name === e.target.value);
+                    setCurrency(token);
+                  }}
                 >
-                  {Object.values(Currencies).map((c) => (
-                    <option>{c}</option>
-                  ))}
+                  {tokens
+                    .filter((t) => t.networks[network.name])
+                    .map((t) => (
+                      <option>{t.ticker}</option>
+                    ))}
                 </select>
               </div>
             </div>
@@ -137,9 +139,15 @@ function Transfer() {
           </div>
 
           <div className="text-gray-600 dark:text-gray-400 text-xs mt-2">
-            Sending <span className="text-white">{toWei(amount)} </span>
-            <span className="text-white">{currency} </span>to{' '}
-            <span className="text-white">{toAddress}</span>
+            Sending{' '}
+            <span className="text-gray-900 dark:text-white">
+              {toWei(amount)}{' '}
+            </span>
+            <span className="text-gray-900 dark:text-white">
+              {currency.name}{' '}
+            </span>
+            to{' '}
+            <span className="text-gray-900 dark:text-white">{toAddress}</span>
           </div>
         </div>
 

@@ -6,6 +6,7 @@ import { BigNumber } from 'bignumber.js';
 import {
   CopyText,
   CustomSelectSearch,
+  Input,
   LockCelo,
   Panel,
   Table,
@@ -430,14 +431,12 @@ function Earn() {
                       />
 
                       <div className="relative rounded-md shadow-sm mt-4 md:mt-0 w-full">
-                        <input
+                        <Input
                           type="text"
                           name="price"
                           id="price"
                           value={voteAmount}
                           onChange={(e) => setVoteAmount(e.target.value)}
-                          // className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-12 sm:text-sm border-gray-300 rounded-md"
-                          className="appearance-none block pl-3 pr-16 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-600  w-full"
                           placeholder={'0'}
                         />
                         <div className="absolute inset-y-0 right-0 flex items-center">
