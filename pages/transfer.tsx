@@ -9,7 +9,6 @@ import {
   WithLayout,
 } from 'components';
 import { Toggle } from 'components/toggle';
-import { getGraphQlUrl } from '../constants';
 import { useCallback, useEffect, useState } from 'react';
 import { IoMdRefresh } from 'react-icons/io';
 import { HiOutlineExternalLink } from 'react-icons/hi';
@@ -206,9 +205,7 @@ function Transfer() {
                 <span className="px-2 inline-flex text-xs leading-5 font-semibold text-gray-600 dark:text-gray-400">
                   <a
                     className="flex space-x-2 items-center"
-                    href={`${getGraphQlUrl(network)}/txs/${
-                      node.transactionHash
-                    }`}
+                    href={`${network.graphQl}/txs/${node.transactionHash}`}
                   >
                     <span>{node.transactionHash.slice(0, 8)}...</span>
                     <HiOutlineExternalLink />

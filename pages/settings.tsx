@@ -1,4 +1,4 @@
-import { Networks, useContractKit } from '@celo-tools/use-contractkit';
+import { NetworkNames, useContractKit } from '@celo-tools/use-contractkit';
 import {
   CopyText,
   Input,
@@ -8,7 +8,7 @@ import {
   Toggle,
   WithLayout,
 } from 'components';
-import { FiatCurrency } from '../constants';
+import { FiatCurrency, networks } from '../constants';
 import { useEffect, useState } from 'react';
 import Loader from 'react-loader-spinner';
 import { Base } from 'state';
@@ -254,10 +254,15 @@ function Settings() {
                     name=""
                     id=""
                     className="p-2 dark:bg-gray-750 rounded-md border border-gray-300 dark:border-gray-500"
-                    value={network}
-                    onChange={(e) => updateNetwork(e.target.value as Networks)}
+                    value={network.name}
+                    onChange={(e) => {
+                      const network = networks.find(
+                        (n) => n.name === e.target.value
+                      );
+                      updateNetwork(network);
+                    }}
                   >
-                    {Object.values(Networks).map((n) => (
+                    {Object.values(NetworkNames).map((n) => (
                       <option value={n}>{n}</option>
                     ))}
                   </select>

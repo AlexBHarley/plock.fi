@@ -1,20 +1,18 @@
-import { CURRENCY_ENUM } from '@celo/utils';
+import { useContractKit } from '@celo-tools/use-contractkit';
+import BigNumber from 'bignumber.js';
 import {
   Balances,
   Input,
-  Panel,
   PanelWithButton,
   toast,
   WithLayout,
 } from 'components';
-import { tokens, TokenTicker } from '../constants';
 import { useEffect, useState } from 'react';
-import { useContractKit } from '@celo-tools/use-contractkit';
-import { quote, swap } from '../utils/uniswap';
-import { Base } from 'state';
 import Loader from 'react-loader-spinner';
+import { Base } from 'state';
 import Web3 from 'web3';
-import BigNumber from 'bignumber.js';
+import { tokens, TokenTicker } from '../constants';
+import { quote, swap } from '../utils/uniswap';
 
 enum States {
   Loading = 'Loading',
@@ -41,8 +39,8 @@ function Swap() {
       await swap(
         // @ts-ignore
         kit,
-        fromToken.networks[network],
-        toToken.networks[network],
+        fromToken.networks[network.name],
+        toToken.networks[network.name],
         Web3.utils.toWei(fromAmount)
       );
       fetchBalances();
@@ -73,9 +71,9 @@ function Swap() {
         const [one, two] = await quote(
           // @ts-ignore
           kit,
-          fromToken.networks[network],
+          fromToken.networks[network.name],
           10000, // just to get some more decimal places
-          [toToken.networks[network]]
+          [toToken.networks[network.name]]
         );
 
         setExchangeRateCache((c) => ({
@@ -137,7 +135,7 @@ function Swap() {
                   }
                 >
                   {tokens
-                    .filter((t) => !!t.networks[network])
+                    .filter((t) => !!t.networks[network.name])
                     .map((t) => (
                       <option value={t.ticker}>
                         {t.ticker} ({t.name})
@@ -179,7 +177,7 @@ function Swap() {
                   }}
                 >
                   {tokens
-                    .filter((t) => !!t.networks[network])
+                    .filter((t) => !!t.networks[network.name])
                     .map((t) => (
                       <option
                         value={t.ticker}

@@ -1,7 +1,9 @@
 import { ApolloProvider } from '@apollo/client';
 import {
   ContractKitProvider,
-  Networks,
+  Alfajores,
+  Mainnet,
+  Baklava,
   useContractKit,
 } from '@celo-tools/use-contractkit';
 import Image from 'next/image';
@@ -216,10 +218,10 @@ const tabs = [
 
 export function WithAppLayout({ children }) {
   const menuRef = useRef(null);
-  const { network, settings } = Base.useContainer();
+  const { settings } = Base.useContainer();
   const {
+    network,
     updateNetwork,
-    fornoUrl,
     openModal,
     address,
     destroy,
@@ -255,7 +257,9 @@ export function WithAppLayout({ children }) {
 
   useEffect(() => {
     async function healthCheck() {
-      const result = await fetch(fornoUrl).catch((e) => ({ status: 500 }));
+      const result = await fetch(network.rpcUrl).catch((e) => ({
+        status: 500,
+      }));
       if (result.status === 200) {
         setHealthy(true);
       } else {
@@ -266,7 +270,7 @@ export function WithAppLayout({ children }) {
     healthCheck();
     const intervalId = setInterval(healthCheck, 10000);
     return () => clearInterval(intervalId);
-  }, [fornoUrl]);
+  }, [network]);
 
   return (
     <div
@@ -513,7 +517,10 @@ function WithSidebar({ children }: any) {
 
 export const WithLayout = (Component: any) => {
   return () => (
-    <ContractKitProvider dappName="Plock">
+    <ContractKitProvider
+      dappName="Plock"
+      networks={[Mainnet, Alfajores, Baklava]}
+    >
       <Base.Provider>
         <WithApollo>
           <WithSidebar>

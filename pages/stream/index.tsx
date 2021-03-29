@@ -1,11 +1,9 @@
 import { useContractKit } from '@celo-tools/use-contractkit';
+import { eqAddress } from '@celo/base/lib/address';
 import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold';
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold';
-import { CURRENCIES } from '@celo/utils';
-import { eqAddress } from '@celo/base/lib/address';
 import BigNumber from 'bignumber.js';
 import {
-  CopyText,
   Input,
   Panel,
   PanelWithButton,
@@ -13,18 +11,13 @@ import {
   TokenIcons,
   WithLayout,
 } from 'components';
-import { format, differenceInDays, differenceInSeconds } from 'date-fns';
-import { useCallback, useEffect, useState } from 'react';
-import {
-  buildStyles,
-  CircularProgressbar,
-  CircularProgressbarWithChildren,
-} from 'react-circular-progressbar';
+import { format } from 'date-fns';
+import React, { useCallback, useEffect, useState } from 'react';
+import { CircularProgressbarWithChildren } from 'react-circular-progressbar';
 import Loader from 'react-loader-spinner';
 import { Base } from 'state';
-import { formatAmount, toWei, truncateAddress } from 'utils';
+import { formatAmount } from 'utils';
 import { deployReleaseCelo } from '../../utils/deploy-release-celo';
-import React from 'react';
 
 class GradientSVG extends React.Component {
   render() {
@@ -46,25 +39,27 @@ class GradientSVG extends React.Component {
   }
 }
 
+enum States {
+  None = 'None',
+  Deploying = 'Deploying',
+  Connecting = 'Connecting',
+}
+
+const defaultConfig = {
+  beneficiary: '',
+  start: new Date(),
+  end: new Date(),
+  amount: '0',
+};
+
 function Stream() {
   const { address, kit, network, send } = useContractKit();
   const { balances, fetchBalances } = Base.useContainer();
-  const [showTiny, setShowTiny] = useState(false);
 
-  const [releaseCeloWrapper, setReleaseCeloWrapper] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [state, setState] = useState(States.None);
   const [streamAddress, setStreamAddress] = useState('');
 
-  const [amount, setAmount] = useState('0');
-  const [toAddress, setToAddress] = useState('');
-
-  const [error, setError] = useState('');
-  const [config, setConfig] = useState({
-    beneficiary: '',
-    start: new Date(),
-    end: new Date(),
-    amount: '0',
-  });
+  const [config, setConfig] = useState(defaultConfig);
 
   const update = (property: string, value: any) =>
     setConfig((c) => ({ ...c, [property]: value }));
@@ -81,48 +76,56 @@ function Stream() {
 
   const connect = useCallback(
     async (rgAddress: string) => {
-      const rgw = new ReleaseGoldWrapper(
-        // @ts-ignore
-        kit,
-        // @ts-ignore
-        newReleaseGold(kit.connection.web3, rgAddress)
-      );
-      const accounts = await kit.contracts.getAccounts();
-      const [
-        total,
-        withdrawn,
-        released,
-        locked,
-        unlocked,
-        beneficiary,
-      ] = await Promise.all([
-        rgw.getTotalBalance(),
-        rgw.getTotalWithdrawn(),
-        rgw.getCurrentReleasedTotalAmount(),
-        rgw.getRemainingLockedBalance(),
-        rgw.getRemainingUnlockedBalance(),
-        rgw.getBeneficiary(),
-      ]);
+      setState(States.Connecting);
 
-      let withdrawable = false;
       try {
+        const rgw = new ReleaseGoldWrapper(
+          // @ts-ignore
+          kit,
+          // @ts-ignore
+          newReleaseGold(kit.connection.web3, rgAddress)
+        );
+        const accounts = await kit.contracts.getAccounts();
+        const [
+          total,
+          withdrawn,
+          released,
+          locked,
+          unlocked,
+          beneficiary,
+        ] = await Promise.all([
+          rgw.getTotalBalance(),
+          rgw.getTotalWithdrawn(),
+          rgw.getCurrentReleasedTotalAmount(),
+          rgw.getRemainingLockedBalance(),
+          rgw.getRemainingUnlockedBalance(),
+          rgw.getBeneficiary(),
+        ]);
+
+        let withdrawable = false;
         if (eqAddress(beneficiary, address)) {
           withdrawable = true;
         }
-        if (eqAddress(await accounts.signerToAccount(beneficiary), address)) {
-          withdrawable = true;
-        }
-      } catch (e) {}
+        try {
+          if (eqAddress(await accounts.signerToAccount(beneficiary), address)) {
+            withdrawable = true;
+          }
+        } catch (e) {}
 
-      setStream({
-        total,
-        withdrawn,
-        released,
-        locked,
-        unlocked,
-        address: rgAddress,
-        withdrawable,
-      });
+        setStream({
+          total,
+          withdrawn,
+          released,
+          locked,
+          unlocked,
+          address: rgAddress,
+          withdrawable,
+        });
+      } catch (e) {
+        toast.error(e.message);
+      } finally {
+        setState(States.None);
+      }
     },
     [kit]
   );
@@ -138,12 +141,14 @@ function Stream() {
       return;
     }
 
+    setState(States.Deploying);
+
     try {
       const rgAddress = await deployReleaseCelo(
         {
           from: address,
           to: config.beneficiary,
-          amount: amount,
+          amount: config.amount,
           start: config.start,
           end: config.end,
         },
@@ -152,7 +157,12 @@ function Stream() {
       );
       toast.success('Release succeeded');
       connect(rgAddress);
-    } catch (e) {}
+      setConfig(defaultConfig);
+    } catch (e) {
+      toast.error('Deployment failed');
+    }
+
+    setState(States.None);
   }, [kit, address, config, connect]);
 
   const withdraw = useCallback(async () => {
@@ -292,10 +302,10 @@ function Stream() {
 
         <button
           onClick={deploy}
-          disabled={loading}
+          disabled={state === States.Deploying}
           className="ml-auto primary-button"
         >
-          {loading ? (
+          {state === States.Deploying ? (
             <Loader type="TailSpin" height={24} width={24} color="white" />
           ) : (
             'Submit'
@@ -333,10 +343,10 @@ function Stream() {
               </div>
               <button
                 onClick={() => connect(streamAddress)}
-                disabled={loading}
+                disabled={state === States.Connecting}
                 className="ml-auto primary-button"
               >
-                {loading ? (
+                {state === States.Connecting ? (
                   <Loader
                     type="TailSpin"
                     height={24}

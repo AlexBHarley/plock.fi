@@ -1,3 +1,6 @@
+import { TokenTicker } from '../constants';
+import Image from 'next/image';
+
 export function Favicon({ url }) {
   return (
     <img
@@ -9,7 +12,7 @@ export function Favicon({ url }) {
 }
 
 export const TokenIcons = {
-  CELO: (props: any) => (
+  [TokenTicker.CELO]: (props: any) => (
     <>
       <svg
         version="1.1"
@@ -54,7 +57,7 @@ export const TokenIcons = {
       </svg>
     </>
   ),
-  cUSD: (props: any) => (
+  [TokenTicker.cUSD]: (props: any) => (
     <>
       <svg
         width={100}
@@ -78,7 +81,7 @@ export const TokenIcons = {
       </svg>
     </>
   ),
-  cEUR: (props: any) => (
+  [TokenTicker.cEUR]: (props: any) => (
     <>
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -100,4 +103,14 @@ export const TokenIcons = {
       </svg>
     </>
   ),
+  [TokenTicker.KeyKoin]: (props: any) => (
+    <Image src="/keykoin.jpg" {...props} />
+  ),
+  [TokenTicker.PesabaseDollar]: (props: any) => (
+    <Image src="/pesabase.jpg" {...props} />
+  ),
+  [TokenTicker.Ubeswap]: (props: any) => (
+    <Image src="/ubeswap.png" {...props} />
+  ),
+  [TokenTicker.Unifty]: (props: any) => <Image src="/unifty.jpg" {...props} />,
 };

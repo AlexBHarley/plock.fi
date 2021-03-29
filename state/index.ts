@@ -1,8 +1,8 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { useCallback, useEffect, useState } from 'react';
 import { createContainer } from 'unstated-next';
-import { FiatCurrency, getGraphQlUrl } from '../constants';
-import { Networks, useContractKit } from '@celo-tools/use-contractkit';
+import { FiatCurrency, tokens } from '../constants';
+import { useContractKit, Network } from '@celo-tools/use-contractkit';
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts';
 import { Accounts } from '@celo/contractkit/lib/generated/Accounts';
 import { formatAmount } from 'utils';
@@ -10,10 +10,11 @@ import BigNumber from 'bignumber.js';
 import { AddressUtils } from '@celo/utils';
 import { Address } from '@celo/base';
 import { PendingWithdrawal } from '@celo/contractkit/lib/wrappers/LockedGold';
+import ERC20 from '../utils/abis/ERC20.json';
 
-function getApolloClient(n: Networks) {
+function getApolloClient(n: Network) {
   return new ApolloClient({
-    uri: getGraphQlUrl(n),
+    uri: n.graphQl,
     cache: new InMemoryCache(),
   });
 }
@@ -52,11 +53,13 @@ const defaultAccountSummary = {
   dataEncryptionKey: AddressUtils.NULL_ADDRESS,
 };
 
-const defaultBalances = {
-  CELO: new BigNumber(0),
-  cUSD: new BigNumber(0),
-  cEUR: new BigNumber(0),
-};
+const defaultBalances = tokens.reduce(
+  (accum, cur) => ({
+    ...accum,
+    [cur.ticker]: new BigNumber(0),
+  }),
+  {}
+);
 const defaultLockedSummary = {
   lockedGold: {
     total: new BigNumber(0),
@@ -92,18 +95,11 @@ function State() {
     defaultLockedSummary
   );
   const [balances, setBalances] = useState<{
-    CELO: BigNumber;
-    cUSD: BigNumber;
-    cEUR: BigNumber;
+    [x: string]: BigNumber;
   }>(defaultBalances);
 
   useEffect(() => {
-    setGraphql(
-      new ApolloClient({
-        uri: getGraphQlUrl(network),
-        cache: new InMemoryCache(),
-      })
-    );
+    setGraphql(getApolloClient(network));
   }, [network]);
 
   const fetchBalances = useCallback(async () => {
@@ -111,19 +107,35 @@ function State() {
       return;
     }
 
-    const [celoContract, cusdContract] = await Promise.all([
-      kit.contracts.getGoldToken(),
-      kit.contracts.getStableToken(),
-    ]);
+    const erc20s = await Promise.all(
+      tokens
+        .filter((t) => t.networks[network.name])
+        .map(async (t) => {
+          const erc20 = new kit.web3.eth.Contract(
+            ERC20 as any,
+            t.networks[network.name]
+          );
 
-    const [CELO, cUSD] = await Promise.all([
-      celoContract.balanceOf(address),
-      cusdContract.balanceOf(address),
-    ]);
+          // @ts-ignore
+          const balance = await erc20.methods.balanceOf(address).call();
+
+          return {
+            ...t,
+            balance,
+          };
+        })
+    );
+    const balances = erc20s.reduce(async (accum, t) => {
+      const token = await t;
+      return {
+        ...accum,
+        [t.ticker]: token.balance,
+      };
+    }, {});
+
     setBalances({
       ...defaultBalances,
-      CELO,
-      cUSD,
+      ...balances,
     });
   }, [address]);
 
@@ -185,7 +197,6 @@ function State() {
   }, [fetchAccountSummary, fetchBalances, fetchLockedSummary]);
 
   return {
-    network,
     graphql,
     accountSummary,
     fetchAccountSummary,

@@ -44,7 +44,6 @@ export async function deployReleaseCelo(
   }
   // Reflect any rounding changes from the division above
   const totalValue = amountPerSecond.multipliedBy(secondsDiff);
-  console.log('Total Value', totalValue.toString());
 
   const releaseStartTime = config.start.getTime() / 1000;
   const contractInitializationArgs = [

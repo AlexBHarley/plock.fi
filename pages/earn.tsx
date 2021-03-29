@@ -1,5 +1,6 @@
+import { useContractKit } from '@celo-tools/use-contractkit';
+import { ContractKit } from '@celo/contractkit';
 import { GroupVote } from '@celo/contractkit/lib/wrappers/Election';
-import { PendingWithdrawal } from '@celo/contractkit/lib/wrappers/LockedGold';
 import { ValidatorGroup } from '@celo/contractkit/lib/wrappers/Validators';
 import { BigNumber } from 'bignumber.js';
 import {
@@ -11,13 +12,11 @@ import {
   toast,
   WithLayout,
 } from 'components';
-import { useCallback, useEffect, useState, Validator } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Loader from 'react-loader-spinner';
-import { useContractKit } from '@celo-tools/use-contractkit';
+import { Base } from 'state';
 import { formatAmount, toWei, truncate, truncateAddress } from 'utils';
 import Web3 from 'web3';
-import { Base } from 'state';
-import { ContractKit } from '@celo/contractkit';
 
 enum States {
   None,

@@ -1,19 +1,26 @@
-import { Networks } from '@celo-tools/use-contractkit';
+import {
+  NetworkNames,
+  Alfajores,
+  Baklava,
+  Mainnet,
+} from '@celo-tools/use-contractkit';
 import { newKit } from '@celo/contractkit';
+import { eqAddress } from '@celo/utils/lib/address';
 import { AbiItem } from 'web3-utils';
-import { getFornoUrl, tokens, ubeswap } from '../constants';
+import { tokens, ubeswap } from '../constants';
 import FactoryAbi from '../utils/abis/uniswap/Factory.json';
 
-const network = process.env.NETWORK;
+const networks = [Mainnet, Baklava, Alfajores];
+
+const network = networks.find((n) => n.name === process.env.NETWORK);
 const privateKey = process.env.PRIVATE_KEY;
-const fornoUrl = getFornoUrl(network as Networks);
-if (!network || !privateKey || !fornoUrl) {
+if (!network || !privateKey) {
   console.log('Missing or invalid environment variables');
   process.exit(1);
 }
 
 export async function main() {
-  const kit = newKit(fornoUrl);
+  const kit = newKit(network.rpcUrl);
   kit.addAccount(privateKey);
   const [from] = kit.getWallet().getAccounts();
 
@@ -24,7 +31,14 @@ export async function main() {
 
   for (const token0 of tokens) {
     for (const token1 of tokens) {
-      if (!token0.networks[network] || !token1.networks[network]) {
+      const token0Address = token0.networks[network.name];
+      const token1Address = token1.networks[network.name];
+
+      if (eqAddress(token0Address, token1Address)) {
+        continue;
+      }
+
+      if (!token0Address || !token1Address) {
         console.log(`Skipping ${token0.ticker} <> ${token1.ticker} pair`);
         continue;
       }
@@ -32,7 +46,10 @@ export async function main() {
       try {
         console.log(`Creating ${token0.ticker} <> ${token1.ticker} pair`);
         await factory.methods
-          .createPair(token0.networks[network], token1.networks[network])
+          .createPair(
+            token0.networks[network.name],
+            token1.networks[network.name]
+          )
           .send({ from });
         console.log('Created!');
       } catch (e) {
