@@ -17,6 +17,7 @@ import { Aave } from '../utils/aave';
 import { formatAmount } from 'utils';
 import BigNumber from 'bignumber.js';
 import Web3 from 'web3';
+import Loader from 'react-loader-spinner';
 
 const defaultAccountSummary = {
   TotalLiquidity: '0',
@@ -45,6 +46,38 @@ function Lend() {
   const [depositAmount, setDepositAmount] = useState('');
   const [depositToken, setDepositToken] = useState(TokenTicker.CELO);
 
+  const fetchAccountSummary = useCallback(async () => {
+    const c = await Aave(kit as any, network.name, address);
+    if (address) {
+      setAccountSummary(await c.getUserAccountData(address));
+    }
+
+    const rsvs = await c.getReserves();
+    const reserveData = await Promise.all(
+      rsvs.map(async (r) => {
+        const [token] = (
+          await Promise.all(
+            tokens.map(async (t) => {
+              if ((await c.getReserveAddress(t.networks[network.name])) === r) {
+                return t;
+              }
+              return null;
+            })
+          )
+        ).filter(Boolean);
+
+        const data = await c.getReserveData(r);
+        return {
+          ...token,
+          ...data,
+        };
+      })
+    );
+
+    setReserves(reserveData);
+    setClient(c);
+  }, [network, kit, address]);
+
   const deposit = async () => {
     if (!kit.defaultAccount) {
       openModal();
@@ -64,6 +97,7 @@ function Lend() {
     try {
       setState(States.Depositing);
       await client.deposit(token.networks[network.name], wei);
+      fetchAccountSummary();
       toast.success(`${depositToken} deposited`);
     } catch (e) {
       toast.error(e.message);
@@ -73,42 +107,8 @@ function Lend() {
   };
 
   useEffect(() => {
-    async function f() {
-      // @ts-ignore
-      const c = await Aave(kit, network.name, address);
-      if (address) {
-        setAccountSummary(await c.getUserAccountData(address));
-      }
-
-      const rsvs = await c.getReserves();
-      const reserveData = await Promise.all(
-        rsvs.map(async (r) => {
-          const [token] = (
-            await Promise.all(
-              tokens.map(async (t) => {
-                if (
-                  (await c.getReserveAddress(t.networks[network.name])) === r
-                ) {
-                  return t;
-                }
-                return null;
-              })
-            )
-          ).filter(Boolean);
-
-          const data = await c.getReserveData(r);
-          return {
-            ...token,
-            ...data,
-          };
-        })
-      );
-
-      setReserves(reserveData);
-      setClient(c);
-    }
-    f();
-  }, [network, kit, address]);
+    fetchAccountSummary();
+  }, [fetchAccountSummary]);
 
   return (
     <>
@@ -233,8 +233,16 @@ function Lend() {
           </div>
         </PanelGrid>
 
-        <button className="primary-button" onClick={deposit}>
-          Deposit
+        <button
+          className="primary-button"
+          onClick={deposit}
+          disabled={state === States.Depositing}
+        >
+          {state === States.Depositing ? (
+            <Loader type="TailSpin" height={24} width={24} color="white" />
+          ) : (
+            'Deposit'
+          )}
         </button>
       </PanelWithButton>
 

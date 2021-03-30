@@ -19,11 +19,7 @@ function fromRay(n: string) {
   return new BigNumber(n).dividedBy(ray).multipliedBy(100);
 }
 
-export async function Aave(
-  kit: ContractKit,
-  network: NetworkNames,
-  from: string
-) {
+export async function Aave(kit: ContractKit, network: string, from: string) {
   const addressProvider = new kit.web3.eth.Contract(
     LendingPoolAddressesProvider as AbiItem[],
     addresses[network].lendingPoolAddresses
