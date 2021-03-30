@@ -183,7 +183,7 @@ function Transfer() {
           <div className="flex-col md:flex md:space-x-2 items-center">
             <Input disabled readOnly value={address} />
 
-            <div className="flex items-center space-around md:space-x-2 mt-2 md:mt-0">
+            <div className="flex items-center justify-around md:justify-center md:space-x-2 mt-3 md:mt-0">
               <CopyText text={address} />
 
               <button onClick={() => setModal(true)}>
