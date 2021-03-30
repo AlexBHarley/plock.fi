@@ -21,7 +21,7 @@ enum States {
 }
 
 function Swap() {
-  const { network, kit } = useContractKit();
+  const { network, kit, openModal } = useContractKit();
   const { fetchBalances } = Base.useContainer();
   const [state, setState] = useState(States.None);
   const [fromToken, setFromToken] = useState(
@@ -34,6 +34,11 @@ function Swap() {
   const [exchangeRateCache, setExchangeRateCache] = useState({});
 
   const handleSwap = async () => {
+    if (!kit.defaultAccount) {
+      openModal();
+      return;
+    }
+
     try {
       setState(States.Swapping);
       await swap(
