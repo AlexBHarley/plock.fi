@@ -8,7 +8,7 @@ import { Accounts } from '@celo/contractkit/lib/generated/Accounts';
 import { formatAmount } from 'utils';
 import BigNumber from 'bignumber.js';
 import { AddressUtils } from '@celo/utils';
-import { Address } from '@celo/base';
+import { Address, consoleLogger, eqAddress } from '@celo/base';
 import { PendingWithdrawal } from '@celo/contractkit/lib/wrappers/LockedGold';
 import ERC20 from '../utils/abis/ERC20.json';
 
@@ -107,17 +107,21 @@ function State() {
       return;
     }
 
+    const goldToken = await kit.contracts.getGoldToken();
     const erc20s = await Promise.all(
       tokens
-        .filter((t) => t.networks[network.name])
+        .filter((t) => !!t.networks[network.name])
         .map(async (t) => {
-          const erc20 = new kit.web3.eth.Contract(
-            ERC20 as any,
-            t.networks[network.name]
-          );
-
-          // @ts-ignore
-          const balance = await erc20.methods.balanceOf(address).call();
+          const tokenAddress = t.networks[network.name];
+          let balance;
+          // this is due to a bug where erc20.balanceOf on native asset
+          // is way off.
+          if (eqAddress(tokenAddress, goldToken.address)) {
+            balance = await goldToken.balanceOf(address);
+          } else {
+            const erc20 = new kit.web3.eth.Contract(ERC20 as any, tokenAddress);
+            balance = await erc20.methods.balanceOf(address).call();
+          }
 
           return {
             ...t,
@@ -125,11 +129,11 @@ function State() {
           };
         })
     );
-    const balances = erc20s.reduce(async (accum, t) => {
-      const token = await t;
+
+    const balances = erc20s.reduce((accum, t) => {
       return {
         ...accum,
-        [t.ticker]: token.balance,
+        [t.ticker]: t.balance,
       };
     }, {});
 
@@ -137,7 +141,7 @@ function State() {
       ...defaultBalances,
       ...balances,
     });
-  }, [address]);
+  }, [address, network, kit]);
 
   const fetchAccountSummary = useCallback(async () => {
     if (!address) {
