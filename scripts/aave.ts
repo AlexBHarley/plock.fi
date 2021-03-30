@@ -25,7 +25,7 @@ export async function main() {
     formatAmount(await stableToken.balanceOf(account))
   );
 
-  const aave = await Aave(kit, NetworkNames.Alfajores);
+  const aave = await Aave(kit, NetworkNames.Alfajores, account);
   const goldReserve = await aave.getReserveAddress(goldToken.address);
   const stableReserve = await aave.getReserveAddress(stableToken.address);
   console.table(await aave.getUserReserveData(goldReserve, account));
