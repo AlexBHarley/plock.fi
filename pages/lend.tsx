@@ -36,7 +36,7 @@ enum States {
 }
 
 function Lend() {
-  const { network, kit, address } = useContractKit();
+  const { network, kit, address, openModal } = useContractKit();
   const [client, setClient] = useState(null);
 
   const [state, setState] = useState(States.None);
@@ -46,6 +46,11 @@ function Lend() {
   const [depositToken, setDepositToken] = useState(TokenTicker.CELO);
 
   const deposit = async () => {
+    if (!kit.defaultAccount) {
+      openModal();
+      return;
+    }
+
     if (!depositAmount || state === States.Depositing) {
       return;
     }

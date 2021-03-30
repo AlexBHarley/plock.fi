@@ -19,7 +19,11 @@ function fromRay(n: string) {
   return new BigNumber(n).dividedBy(ray).multipliedBy(100);
 }
 
-export async function Aave(kit: ContractKit, network: NetworkNames) {
+export async function Aave(
+  kit: ContractKit,
+  network: NetworkNames,
+  from: string
+) {
   const addressProvider = new kit.web3.eth.Contract(
     LendingPoolAddressesProvider as AbiItem[],
     addresses[network].lendingPoolAddresses
@@ -31,9 +35,6 @@ export async function Aave(kit: ContractKit, network: NetworkNames) {
   );
 
   const reserves = await lendingPool.methods.getReserves().call();
-  for (const addr of reserves) {
-    console.table(await lendingPool.methods.getReserveData(addr).call());
-  }
 
   const lendingPoolCore = new kit.web3.eth.Contract(
     LendingPoolCore as AbiItem[],
@@ -46,7 +47,7 @@ export async function Aave(kit: ContractKit, network: NetworkNames) {
 
   async function getReserveData(address: Address) {
     const data = await lendingPool.methods.getReserveData(address).call();
-    console.log(data.liquidityRate, fromRay(data.liquidityRate).toFixed(2));
+
     const parsedData = {
       TotalLiquidity: new BigNumber(data.totalLiquidity),
       AvailableLiquidity: new BigNumber(data.availableLiquidity),
@@ -102,11 +103,9 @@ export async function Aave(kit: ContractKit, network: NetworkNames) {
     let data;
     try {
       data = await lendingPool.methods.getUserAccountData(user).call();
-      console.log(data);
       data = await lendingPoolDataProvider.methods
         .calculateUserGlobalData(user)
         .call();
-      console.log(data);
       data.availableBorrowsETH = 0;
     } catch (err) {}
 
@@ -151,10 +150,10 @@ export async function Aave(kit: ContractKit, network: NetworkNames) {
     if (!native) {
       await erc20.methods
         .approve(lendingPoolCore.options.address, amount)
-        .send({ from: kit.defaultAccount, gas: 2000000 });
+        .send({ from, gas: 2000000 });
     }
     await lendingPool.methods.deposit(reserve, amount, 0).send({
-      from: kit.defaultAccount,
+      from,
       gas: 2000000,
       value: native ? amount : undefined,
     });
@@ -168,7 +167,7 @@ export async function Aave(kit: ContractKit, network: NetworkNames) {
     const rate = INTEREST_RATE[interestRate.toUpperCase()];
     await lendingPool.methods
       .borrow(reserve, amount, rate, 0)
-      .send({ from: kit.defaultAccount, gas: 2000000 });
+      .send({ from, gas: 2000000 });
   }
 
   return {
