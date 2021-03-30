@@ -75,8 +75,7 @@ function Lend() {
   useEffect(() => {
     async function f() {
       // @ts-ignore
-      const c = await Aave(kit, network.name);
-
+      const c = await Aave(kit, network.name, address);
       if (address) {
         setAccountSummary(await c.getUserAccountData(address));
       }
