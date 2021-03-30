@@ -66,9 +66,9 @@
     to-fast-properties "^2.0.0"
 
 "@celo-tools/use-contractkit@*":
-  version "0.0.30"
-  resolved "https://registry.yarnpkg.com/@celo-tools/use-contractkit/-/use-contractkit-0.0.30.tgz#95435a68b9dc1ae9ac8cd00a141a85f6e575f5c3"
-  integrity sha512-5N//HXZ58EH0cMave+muyVYSvd34fBJtz4a1Mhdbautf9QwItasKOMPw3S5/iMyv8blcJZDMqw9EtDCpup/ybQ==
+  version "0.0.31"
+  resolved "https://registry.yarnpkg.com/@celo-tools/use-contractkit/-/use-contractkit-0.0.31.tgz#cb176a035f486d2929b589f39fcabb4ca9e21737"
+  integrity sha512-eSxgPj4whZQDyKeaCSSKXwkmJNePpFL//69yr0mzcHWw5gJkV75ksauY8QYTjLONM1i/XE58w8stieq86qc71g==
   dependencies:
     "@celo/contractkit" "1.1.0-beta.1"
     "@celo/wallet-ledger" "1.1.0-beta.1"
@@ -1188,10 +1188,10 @@
     relay-provider "^1.2.1"
     safe-json-utils "^1.1.1"
 
-"@walletconnect/types@^2.0.0-alpha.26", "@walletconnect/types@^2.0.0-alpha.27", "@walletconnect/types@^2.0.0-alpha.33":
-  version "2.0.0-alpha.33"
-  resolved "https://registry.yarnpkg.com/@walletconnect/types/-/types-2.0.0-alpha.33.tgz#7e281bdec853c5cf4a9e40f7953533014038feb7"
-  integrity sha512-CE6GFeti72JL21c6yoVXaLB8b3doFXaQwOehM92+2TMld+NU/Gw5GmlYRFBPmSllA9Xf7lLPv3n/Hlqf08dY8w==
+"@walletconnect/types@^2.0.0-alpha.26", "@walletconnect/types@^2.0.0-alpha.27", "@walletconnect/types@^2.0.0-alpha.34":
+  version "2.0.0-alpha.34"
+  resolved "https://registry.yarnpkg.com/@walletconnect/types/-/types-2.0.0-alpha.34.tgz#1efd7ded1206983efa7258e67530746a9c0851aa"
+  integrity sha512-JppjJXT520fAZWMfCpsDUYmy+jIWC93uI9ZTEY2EXIviSdDASI40wQOw7SLJjeDw0TUoEwXBfLGsXl8GtzujKA==
   dependencies:
     "@json-rpc-tools/types" "^1.6.4"
     keyvaluestorage "^0.7.1"
@@ -1199,12 +1199,12 @@
     pino-pretty "^4.3.0"
 
 "@walletconnect/utils@^2.0.0-alpha.26", "@walletconnect/utils@^2.0.0-alpha.27":
-  version "2.0.0-alpha.33"
-  resolved "https://registry.yarnpkg.com/@walletconnect/utils/-/utils-2.0.0-alpha.33.tgz#928bf6ae7841b04235236095ff798e54632f4c41"
-  integrity sha512-33ZGcWP2omL32/HYXIpkBf2ShKuxucO+73HLdZI7qeAUlAUgQeQJ7AkxwJG9ZHz8jmuCcaL3zSRFQohTALBytw==
+  version "2.0.0-alpha.34"
+  resolved "https://registry.yarnpkg.com/@walletconnect/utils/-/utils-2.0.0-alpha.34.tgz#dcbbc687f12f5fb6d6da535d70496b9d5eee0730"
+  integrity sha512-4Qv8p9nRXakcZ13KgnIKe/spsDyHeJ6yNN9HdKzG5L6ZspdtREl28v1CZmK4X3ZsHPG9PHwXpxBvbzAJHcEPNQ==
   dependencies:
     "@json-rpc-tools/utils" "^1.6.4"
-    "@walletconnect/types" "^2.0.0-alpha.33"
+    "@walletconnect/types" "^2.0.0-alpha.34"
     ecies-25519 "^1.3.0"
     enc-utils "^3.0.0"
     query-string "^6.13.5"

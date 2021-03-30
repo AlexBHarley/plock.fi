@@ -1,7 +1,18 @@
 export function Panel({ children }: any) {
   return (
-    <div className="bg-white dark:bg-gray-850 shadow rounded-lg px-5 py-4 space-y-6 flex flex-col">
+    <div className="bg-white dark:bg-gray-850 shadow rounded-lg px-5 py-4 space-y-6 flex flex-col overflow-hidden">
       {children}
+    </div>
+  );
+}
+
+export function PanelGrid({ children }: any) {
+  return (
+    <div className="md:grid md:grid-cols-3 md:gap-6">
+      <div className="md:col-span-1">{children[0]}</div>
+      <div className="mt-5 md:mt-0 md:col-span-2">
+        <div className="space-y-6">{children[1]}</div>
+      </div>
     </div>
   );
 }
@@ -14,5 +25,13 @@ export function PanelWithButton({ children }: any) {
         {children[1]}
       </div>
     </div>
+  );
+}
+
+export function PanelHeader({ children }: any) {
+  return (
+    <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
+      {children}
+    </h3>
   );
 }

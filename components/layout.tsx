@@ -16,18 +16,15 @@ import { truncateAddress } from 'utils';
 import { DropButton } from './dropdown';
 import { PulsatingDot } from './pulsating-dot';
 
-export function Sidebar({
-  items,
-}: {
-  items: {
-    name: string;
-    icon: any;
-    disabled?: boolean;
-    badge?: any;
-    link: string;
-    strict?: boolean;
-  }[];
-}) {
+interface SidebarOption {
+  name: string;
+  icon: any;
+  disabled?: boolean;
+  badge?: any;
+  link: string;
+  strict?: boolean;
+}
+export function Sidebar({ items }: { items: SidebarOption[] }) {
   const router = useRouter();
 
   return (
@@ -50,12 +47,15 @@ export function Sidebar({
               <span className="truncate">
                 {item.name}
 
-                {item.disabled && (
+                {item.disabled ? (
                   <span className="text-xs font-medium ml-2 text-purple-500">
                     SOON
                   </span>
-                )}
-                {item.badge}
+                ) : item.badge ? (
+                  <span className="text-xs font-medium ml-2 text-purple-500">
+                    {item.badge}
+                  </span>
+                ) : null}
               </span>
             </a>
           </Link>
@@ -65,7 +65,7 @@ export function Sidebar({
   );
 }
 
-const tabs = [
+const tabs: SidebarOption[] = [
   {
     name: 'Transfer',
     icon: (
@@ -105,6 +105,27 @@ const tabs = [
       </svg>
     ),
     link: '/swap',
+  },
+  {
+    name: 'Lend',
+    icon: (
+      <svg
+        className="h-4"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+        />
+      </svg>
+    ),
+    link: '/lend',
+    badge: 'BETA',
   },
   {
     name: 'Earn',
@@ -171,6 +192,7 @@ const tabs = [
       </svg>
     ),
     link: '/stream',
+    badge: 'BETA',
   },
   {
     name: 'Settings',
@@ -192,27 +214,6 @@ const tabs = [
     ),
     link: '/settings',
     strict: true,
-  },
-  {
-    name: 'Lend',
-    icon: (
-      <svg
-        className="h-4"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-        />
-      </svg>
-    ),
-    link: '/lend',
-    disabled: true,
   },
 ];
 
@@ -340,11 +341,15 @@ export function WithAppLayout({ children }) {
                     >
                       <span>{t.icon}</span>
                       <span>{t.name}</span>
-                      {t.disabled && (
+                      {t.disabled ? (
                         <span className="font-medium text-xs text-indigo-500">
                           COMING SOON
                         </span>
-                      )}
+                      ) : t.badge ? (
+                        <span className="font-medium text-xs text-indigo-500">
+                          {t.badge}
+                        </span>
+                      ) : null}
                     </a>
                   </Link>
                 ))}
