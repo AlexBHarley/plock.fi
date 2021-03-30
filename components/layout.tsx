@@ -32,7 +32,7 @@ export function Sidebar({ items }: { items: SidebarOption[] }) {
       <nav className="hidden md:block space-y-1">
         {items.map((item, i) => (
           <Link href={item.disabled ? router.asPath : item.link}>
-            <a
+            <span
               className={`${
                 (item.strict && router.asPath === item.link) ||
                 (!item.strict && router.asPath.startsWith(item.link))
@@ -57,7 +57,7 @@ export function Sidebar({ items }: { items: SidebarOption[] }) {
                   </span>
                 ) : null}
               </span>
-            </a>
+            </span>
           </Link>
         ))}
       </nav>
@@ -222,7 +222,6 @@ export function WithAppLayout({ children }) {
   const { settings } = Base.useContainer();
   const {
     network,
-    updateNetwork,
     openModal,
     address,
     destroy,
@@ -331,7 +330,7 @@ export function WithAppLayout({ children }) {
               <div className="px-4 py-4">
                 {tabs.map((t) => (
                   <Link href={t.link}>
-                    <a
+                    <span
                       className={`flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium ${
                         (t.strict && router.asPath === t.link) ||
                         (!t.strict && router.asPath.startsWith(t.link))
@@ -350,7 +349,7 @@ export function WithAppLayout({ children }) {
                           {t.badge}
                         </span>
                       ) : null}
-                    </a>
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -376,9 +375,9 @@ export function WithAppLayout({ children }) {
             <div className="relative z-10 px-2 flex lg:px-0">
               <div className="flex-shrink-0 flex items-center">
                 <Link href="/">
-                  <a className="inline-flex">
+                  <span className="inline-flex">
                     <Image src="/logo.png" height={'24px'} width={'24px'} />
-                  </a>
+                  </span>
                 </Link>
               </div>
             </div>
