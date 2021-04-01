@@ -14,7 +14,7 @@ import Loader from 'react-loader-spinner';
 import { Base } from 'state';
 
 function Settings() {
-  const { kit, address, send, updateNetwork, network } = useContractKit();
+  const { address, updateNetwork, network, performActions } = useContractKit();
   const {
     accountSummary,
     fetchAccountSummary,
@@ -48,26 +48,40 @@ function Settings() {
 
     setSaving(true);
 
-    const accounts = await kit.contracts.getAccounts();
-    if (!(await accounts.isAccount(address))) {
-      await send(accounts.createAccount());
-    }
-
     try {
-      if (accountSummary.name !== state.name) {
-        await send(accounts.setName(state.name));
-      }
-      if (accountSummary.metadataURL !== state.metadataURL) {
-        await send(accounts.setMetadataURL(state.metadataURL));
-      }
+      await performActions(async (k) => {
+        const accounts = await k.contracts.getAccounts();
+        if (!(await accounts.isAccount(address))) {
+          await accounts
+            .createAccount()
+            .sendAndWaitForReceipt({ from: address });
+        }
 
-      toast.success('Account data updated');
+        try {
+          if (accountSummary.name !== state.name) {
+            await accounts
+              .setName(state.name)
+              .sendAndWaitForReceipt({ from: address });
+          }
+          if (accountSummary.metadataURL !== state.metadataURL) {
+            await accounts
+              .setMetadataURL(state.metadataURL)
+              .sendAndWaitForReceipt({ from: address });
+          }
+
+          toast.success('Account data updated');
+        } catch (e) {
+          console.warn(e);
+          toast.error('Unable to update data');
+        }
+
+        toast.success('Account updated');
+        fetchAccountSummary();
+      });
     } catch (e) {
-      console.warn(e);
-      toast.error('Unable to update data');
+      toast.error(e.message);
     }
 
-    fetchAccountSummary();
     setSaving(false);
   }
 

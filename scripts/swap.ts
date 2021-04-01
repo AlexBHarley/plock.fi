@@ -50,9 +50,12 @@ export async function main() {
   );
 
   const amount = '1';
-  const quoteAmount = await quote(kit, goldToken.address, amount, [
-    stableToken.address,
-  ]);
+  const quoteAmount = await quote(
+    kit,
+    goldToken.address,
+    amount,
+    stableToken.address
+  );
   console.log('Quoted', quoteAmount);
   await swap(kit, goldToken.address, stableToken.address, amount);
 

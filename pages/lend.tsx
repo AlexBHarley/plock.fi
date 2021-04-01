@@ -48,15 +48,13 @@ function Lend() {
   const fetchAccountSummary = useCallback(async () => {
     setState(States.Loading);
     try {
-      console.log('hier');
       const client = await Aave(kit as any, network.name, address);
       if (address) {
+        console.log(await client.getUserAccountData(address));
         setAccountSummary(await client.getUserAccountData(address));
       }
-      console.log('hier 2');
 
       const rsvs = await client.getReserves();
-      console.log('hier 3');
       const reserveData = await Promise.all(
         rsvs.map(async (r) => {
           const [token] = (
@@ -83,7 +81,6 @@ function Lend() {
           };
         })
       );
-      console.log('hier 4');
 
       setReserves(reserveData);
     } catch (e) {
