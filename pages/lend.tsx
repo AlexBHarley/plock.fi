@@ -151,18 +151,18 @@ function Lend() {
   };
 
   const borrow = async () => {
-    if (!depositAmount || state === States.Depositing) {
+    if (!borrowAmount || state === States.Borrowing) {
       return;
     }
 
-    const wei = Web3.utils.toWei(depositAmount);
+    const wei = Web3.utils.toWei(borrowAmount);
     const token = tokens.find((t) => t.ticker === depositToken);
     if (!token) {
       return;
     }
 
     try {
-      setState(States.Depositing);
+      setState(States.Borrowing);
       await performActions(async (k) => {
         const client = await Aave(k as any, network.name, address);
         await client.borrow(token.networks[network.name], wei, interestRate);
@@ -177,21 +177,21 @@ function Lend() {
   };
 
   const repay = async () => {
-    if (!depositAmount || state === States.Depositing) {
+    if (!borrowAmount || state === States.Borrowing) {
       return;
     }
 
-    const wei = Web3.utils.toWei(depositAmount);
+    const wei = Web3.utils.toWei(borrowAmount);
     const token = tokens.find((t) => t.ticker === depositToken);
     if (!token) {
       return;
     }
 
     try {
-      setState(States.Depositing);
+      setState(States.Borrowing);
       await performActions(async (k) => {
         const client = await Aave(k as any, network.name, address);
-        await client.borrow(token.networks[network.name], wei, interestRate);
+        await client.repay(token.networks[network.name], wei);
       });
       fetchAccountSummary();
       toast.success(`${depositToken} deposited`);
@@ -378,10 +378,10 @@ function Lend() {
           <div className="">
             <div className="space-y-4">
               <InputWithToken
-                value={depositAmount}
-                onChange={(e) => setDepositAmount(e.target.value)}
-                token={depositToken}
-                onTokenChange={setDepositToken}
+                value={borrowAmount}
+                onChange={(e) => setBorrowAmount(e.target.value)}
+                token={borrowToken}
+                onTokenChange={setBorrowToken}
                 tokens={[Celo, cUSD]}
               />
               <div className="md:flex md:items-center md:justify-between">
@@ -401,9 +401,9 @@ function Lend() {
                 <button
                   className="secondary-button"
                   onClick={repay}
-                  disabled={state === States.Depositing}
+                  disabled={state === States.Borrowing}
                 >
-                  {state === States.Depositing ? (
+                  {state === States.Borrowing ? (
                     <Loader
                       type="TailSpin"
                       height={24}
@@ -418,9 +418,9 @@ function Lend() {
                 <button
                   className="secondary-button"
                   onClick={borrow}
-                  disabled={state === States.Depositing}
+                  disabled={state === States.Borrowing}
                 >
-                  {state === States.Depositing ? (
+                  {state === States.Borrowing ? (
                     <Loader
                       type="TailSpin"
                       height={24}
