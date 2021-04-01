@@ -16,36 +16,44 @@ enum States {
 }
 
 export function LockCelo() {
-  const { address, kit, send } = useContractKit();
+  const { address, kit, performActions } = useContractKit();
   const { accountSummary, lockedSummary, balances } = Base.useContainer();
   const [lockAmount, setLockAmount] = useState('');
   const [state, setState] = useState(States.None);
 
-  const lock = useCallback(async () => {
+  const lock = async () => {
     setState(States.Locking);
     try {
-      const lockedCelo = await kit.contracts.getLockedGold();
-      await send(lockedCelo.lock(), { value: toWei(lockAmount) });
+      await performActions(async (k) => {
+        const lockedCelo = await k.contracts.getLockedGold();
+        return lockedCelo
+          .lock()
+          .sendAndWaitForReceipt({ value: toWei(lockAmount), from: address });
+      });
       toast.success('CELO locked');
-      setLockAmount('0');
+      setLockAmount('');
     } catch (e) {
       toast.error(e.message);
     }
     setState(States.None);
-  }, [kit, send, lockAmount]);
+  };
 
-  const unlock = useCallback(async () => {
+  const unlock = async () => {
     setState(States.Unlocking);
     try {
-      const lockedCelo = await kit.contracts.getLockedGold();
-      await send(lockedCelo.unlock(toWei(lockAmount)));
+      await performActions(async (k) => {
+        const lockedCelo = await k.contracts.getLockedGold();
+        await lockedCelo
+          .unlock(toWei(lockAmount))
+          .sendAndWaitForReceipt({ from: address });
+      });
       toast.success('CELO unlocked');
       setLockAmount('');
     } catch (e) {
       toast.error(e.message);
     }
     setState(States.None);
-  }, [kit, send, lockAmount]);
+  };
 
   const total = lockedSummary.lockedGold.total.plus(balances.CELO);
   const lockedPct = lockedSummary.lockedGold.total

@@ -25,20 +25,28 @@ export async function Aave(kit: ContractKit, network: string, from: string) {
     addresses[network].lendingPoolAddresses
   );
 
+  const [
+    lendingPoolAddress,
+    lendingPoolCoreAddress,
+    lendingPoolDataProviderAddress,
+  ] = await Promise.all([
+    addressProvider.methods.getLendingPool().call(),
+    addressProvider.methods.getLendingPoolCore().call(),
+    addressProvider.methods.getLendingPoolDataProvider().call(),
+  ]);
+
   const lendingPool = new kit.web3.eth.Contract(
     LendingPool as AbiItem[],
-    await addressProvider.methods.getLendingPool().call()
+    lendingPoolAddress
   );
-
-  const reserves = await lendingPool.methods.getReserves().call();
 
   const lendingPoolCore = new kit.web3.eth.Contract(
     LendingPoolCore as AbiItem[],
-    await addressProvider.methods.getLendingPoolCore().call()
+    lendingPoolCoreAddress
   );
   const lendingPoolDataProvider = new kit.web3.eth.Contract(
     LendingPoolDataProvider as AbiItem[],
-    await addressProvider.methods.getLendingPoolDataProvider().call()
+    lendingPoolDataProviderAddress
   );
 
   async function getReserveData(address: Address) {

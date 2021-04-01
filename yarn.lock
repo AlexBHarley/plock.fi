@@ -65,10 +65,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo-tools/use-contractkit@*":
-  version "0.0.31"
-  resolved "https://registry.yarnpkg.com/@celo-tools/use-contractkit/-/use-contractkit-0.0.31.tgz#cb176a035f486d2929b589f39fcabb4ca9e21737"
-  integrity sha512-eSxgPj4whZQDyKeaCSSKXwkmJNePpFL//69yr0mzcHWw5gJkV75ksauY8QYTjLONM1i/XE58w8stieq86qc71g==
+"@celo-tools/use-contractkit@1.0.0-beta.1":
+  version "1.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@celo-tools/use-contractkit/-/use-contractkit-1.0.0-beta.1.tgz#8d9fe1c0afe98888cb5c3ebfdf2036c0c6f63f81"
+  integrity sha512-sJY3Os6yyGK54/HH7rXXGIFWqkENgFyl+paupCkvXcj2LUWoi2MZweRGPKJGfkSbWsvYkWRzGxjf5l2yfCk98A==
   dependencies:
     "@celo/contractkit" "1.1.0-beta.1"
     "@celo/wallet-ledger" "1.1.0-beta.1"

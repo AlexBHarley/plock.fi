@@ -6,18 +6,25 @@ import BigNumber from 'bignumber.js';
 import {
   Input,
   Panel,
+  PanelDescription,
+  PanelGrid,
+  PanelHeader,
   PanelWithButton,
   toast,
   TokenIcons,
   WithLayout,
 } from 'components';
-import { format } from 'date-fns';
+import { add, format } from 'date-fns';
 import React, { useCallback, useEffect, useState } from 'react';
-import { CircularProgressbarWithChildren } from 'react-circular-progressbar';
+import {
+  CircularProgressbarWithChildren,
+  buildStyles,
+} from 'react-circular-progressbar';
 import Loader from 'react-loader-spinner';
 import { Base } from 'state';
 import { formatAmount } from 'utils';
-import { deployReleaseCelo } from '../../utils/deploy-release-celo';
+import Web3 from 'web3';
+import { deployReleaseCelo } from '../utils/deploy-release-celo';
 
 class GradientSVG extends React.Component {
   render() {
@@ -43,18 +50,18 @@ enum States {
   None = 'None',
   Deploying = 'Deploying',
   Connecting = 'Connecting',
+  Withdrawing = 'Withdrawing',
 }
 
 const defaultConfig = {
   beneficiary: '',
   start: new Date(),
-  end: new Date(),
-  amount: '0',
+  end: add(new Date(), { days: 7 }),
+  amount: '',
 };
 
 function Stream() {
-  const { address, kit, network, send } = useContractKit();
-  const { balances, fetchBalances } = Base.useContainer();
+  const { address, kit, performActions } = useContractKit();
 
   const [state, setState] = useState(States.None);
   const [streamAddress, setStreamAddress] = useState('');
@@ -80,10 +87,8 @@ function Stream() {
 
       try {
         const rgw = new ReleaseGoldWrapper(
-          // @ts-ignore
-          kit,
-          // @ts-ignore
-          newReleaseGold(kit.connection.web3, rgAddress)
+          kit as any,
+          newReleaseGold(kit.connection.web3 as any, rgAddress)
         );
         const accounts = await kit.contracts.getAccounts();
         const [
@@ -144,49 +149,49 @@ function Stream() {
     setState(States.Deploying);
 
     try {
-      const rgAddress = await deployReleaseCelo(
-        {
-          from: address,
-          to: config.beneficiary,
-          amount: config.amount,
-          start: config.start,
-          end: config.end,
-        },
-        // @ts-ignore
-        kit
-      );
+      await performActions(async (k) => {
+        const rgAddress = await deployReleaseCelo(
+          {
+            from: address,
+            to: config.beneficiary,
+            amount: config.amount,
+            start: config.start,
+            end: config.end,
+          },
+          k as any
+        );
+        setStreamAddress(rgAddress);
+        connect(rgAddress);
+      });
       toast.success('Release succeeded');
-      connect(rgAddress);
       setConfig(defaultConfig);
     } catch (e) {
-      toast.error('Deployment failed');
+      toast.error(e.message);
+    } finally {
+      setState(States.None);
     }
-
-    setState(States.None);
   }, [kit, address, config, connect]);
 
   const withdraw = useCallback(async () => {
-    const rgw = new ReleaseGoldWrapper(
-      // @ts-ignore
-      kit,
-      // @ts-ignore
-      newReleaseGold(kit.connection.web3, stream.address)
-    );
-
+    setState(States.Withdrawing);
     try {
-      await rgw
-        .withdraw(stream.released.minus(stream.withdrawn))
-        .sendAndWaitForReceipt({ from: address });
+      await performActions(async (k) => {
+        const rgw = new ReleaseGoldWrapper(
+          k as any,
+          newReleaseGold(kit.connection.web3 as any, stream.address)
+        );
+        await rgw
+          .withdraw(stream.released.minus(stream.withdrawn))
+          .sendAndWaitForReceipt({ from: address });
+      });
       connect(stream.address);
       toast.success('Withdrawn');
     } catch (e) {
       toast.error(e.message);
+    } finally {
+      setState(States.None);
     }
   }, [stream, address, connect]);
-
-  useEffect(() => {
-    fetchBalances();
-  }, [fetchBalances]);
 
   const innerRingValue = stream
     ? (stream.withdrawn.toNumber() / stream.total.toNumber()) * 100
@@ -293,6 +298,7 @@ function Stream() {
                     type="text"
                     value={config.amount}
                     onChange={(e) => update('amount', e.target.value)}
+                    placeholder="0"
                   />
                 </div>
               </div>
@@ -314,109 +320,112 @@ function Stream() {
       </PanelWithButton>
 
       <Panel>
-        <div className="md:grid md:grid-cols-3 md:gap-6">
-          <div className="md:col-span-1">
-            <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
-              View
-            </h3>
-            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-              Enter the address of a stream to get an overview and withdraw
-              funds.
-            </p>
+        <PanelGrid>
+          <div>
+            <PanelHeader>View</PanelHeader>
+            <PanelDescription>
+              Enter the address of a stream to get an overview of it and
+              withdraw funds.
+            </PanelDescription>
           </div>
-          <div className="mt-5 md:mt-0 md:col-span-2">
-            <div className="flex flex-col space-y-4">
-              <div>
-                <label
-                  htmlFor="company_website"
-                  className="block text-sm font-medium "
-                >
-                  Stream address
-                </label>
-                <div className="mt-1 flex rounded-md shadow-sm">
-                  <Input
-                    type="text"
-                    value={streamAddress}
-                    onChange={(e) => setStreamAddress(e.target.value)}
-                  />
-                </div>
+
+          <div className="flex flex-col space-y-4">
+            <div>
+              <label
+                htmlFor="company_website"
+                className="block text-sm font-medium "
+              >
+                Stream address
+              </label>
+              <div className="mt-1 flex rounded-md shadow-sm">
+                <Input
+                  type="text"
+                  value={streamAddress}
+                  onChange={(e) => setStreamAddress(e.target.value)}
+                />
               </div>
-              <button
-                onClick={() => connect(streamAddress)}
-                disabled={state === States.Connecting}
-                className="ml-auto primary-button"
-              >
-                {state === States.Connecting ? (
-                  <Loader
-                    type="TailSpin"
-                    height={24}
-                    width={24}
-                    color="white"
-                  />
-                ) : (
-                  'View'
-                )}
-              </button>
             </div>
-          </div>
-        </div>
+            <button
+              onClick={() => connect(streamAddress)}
+              disabled={state === States.Connecting}
+              className="ml-auto primary-button"
+            >
+              {state === States.Connecting ? (
+                <Loader type="TailSpin" height={24} width={24} color="white" />
+              ) : (
+                'View'
+              )}
+            </button>
+            {stream && (
+              <div className="flex flex-col my-2">
+                <GradientSVG
+                  // @ts-ignore
+                  startColor="#60A5FA"
+                  endColor="#1E40AF"
+                  rotation="90"
+                  idCSS="outer"
+                />
 
-        {stream && (
-          <div className="flex flex-col my-2">
-            <GradientSVG
-              // @ts-ignore
-              startColor="#60A5FA"
-              endColor="#1E40AF"
-              rotation="90"
-              idCSS="outer"
-            />
+                <GradientSVG
+                  // @ts-ignore
+                  startColor="#B45309"
+                  endColor="#FCD34D"
+                  rotation="90"
+                  idCSS="inner"
+                />
 
-            <GradientSVG
-              // @ts-ignore
-              startColor="#B45309"
-              endColor="#FCD34D"
-              rotation="90"
-              idCSS="inner"
-            />
-
-            <div className="md:px-24">
-              <CircularProgressbarWithChildren
-                value={outerRingValue}
-                strokeWidth={5}
-                className="OuterCircularProgressbar"
-              >
-                <div style={{ width: '84%' }}>
+                <div className="md:px-24">
                   <CircularProgressbarWithChildren
+                    value={outerRingValue}
                     strokeWidth={5}
-                    value={innerRingValue}
-                    className="InnerCircularProgressbar"
+                    className="OuterCircularProgressbar"
+                    styles={buildStyles({
+                      trailColor: '#D1D5DB',
+                    })}
                   >
-                    <div className="flex flex-col items-center justify-center">
-                      <span className="mb-4">
-                        <TokenIcons.CELO height="40px" width="40px" />
-                      </span>
+                    <div style={{ width: '84%' }}>
+                      <CircularProgressbarWithChildren
+                        strokeWidth={5}
+                        value={innerRingValue}
+                        className="InnerCircularProgressbar"
+                        styles={buildStyles({
+                          trailColor: '#D1D5DB',
+                        })}
+                      >
+                        <div className="flex flex-col items-center justify-center">
+                          <span className="mb-4">
+                            <TokenIcons.CELO height="40px" width="40px" />
+                          </span>
 
-                      <div className="text-2xl md:text-5xl font-medium text-gray-900 dark:text-gray-200 mb-2">
-                        {formatAmount(stream.released)}
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className=" md:text-2xl">
-                          / {formatAmount(stream.total)} CELO total
-                        </span>
-                      </div>
+                          <div className="text-2xl md:text-4xl font-medium text-gray-900 dark:text-gray-200 mb-2">
+                            {formatAmount(stream.released)}
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className=" md:text-xl">
+                              / {formatAmount(stream.total)} CELO total
+                            </span>
+                          </div>
+                        </div>
+                      </CircularProgressbarWithChildren>
                     </div>
                   </CircularProgressbarWithChildren>
                 </div>
-              </CircularProgressbarWithChildren>
-            </div>
 
-            {stream.withdrawable && (
-              <button onClick={withdraw} className="ml-auto primary-button">
-                Withdraw Remaining
-              </button>
+                {stream.withdrawable &&
+                  stream.released
+                    .minus(stream.withdrawn)
+                    .gt(Web3.utils.toWei('1', 'ether')) && (
+                    <button
+                      onClick={withdraw}
+                      className="mt-2 ml-auto secondary-button"
+                    >
+                      Withdraw Remaining
+                    </button>
+                  )}
+              </div>
             )}
           </div>
-        )}
+        </PanelGrid>
       </Panel>
     </>
   );

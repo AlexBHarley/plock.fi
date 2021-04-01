@@ -8,7 +8,7 @@ import { quote, swap } from '../utils/uniswap';
 import Web3 from 'web3';
 import { formatAmount } from '../utils';
 
-const ONE = Web3.utils.toWei('1');
+const ONE = Web3.utils.toWei('10');
 
 export async function main() {
   const kit = newKit('https://alfajores-forno.celo-testnet.org');
@@ -28,19 +28,15 @@ export async function main() {
   const aave = await Aave(kit, NetworkNames.Alfajores, account);
   const goldReserve = await aave.getReserveAddress(goldToken.address);
   const stableReserve = await aave.getReserveAddress(stableToken.address);
-  console.table(await aave.getUserReserveData(goldReserve, account));
-  console.table(await aave.getUserReserveData(stableReserve, account));
+  // console.table(await aave.getUserReserveData(goldReserve, account));
+  // console.table(await aave.getUserReserveData(stableReserve, account));
 
   // await aave.deposit(stableToken.address, ONE);
   // await aave.deposit(goldToken.address, ONE);
-  console.table(await aave.getUserAccountData(kit.defaultAccount));
+  // console.table(await aave.getUserAccountData(kit.defaultAccount));
 
-  // await aave.deposit(stableToken.address, ONE);
-  // await aave.deposit(goldToken.address, ONE);
-  // console.table(await aave.getUserAccountData(account));
-
-  // await aave.borrow(stableToken.address, ONE, 'stable');
-  // console.table(await aave.getUserAccountData(account));
+  await aave.borrow(stableToken.address, ONE, 'variable');
+  console.table(await aave.getUserAccountData(account));
 }
 
 main()

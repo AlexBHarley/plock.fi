@@ -10,6 +10,7 @@ export enum TokenTicker {
   DexfairGovernanceToken = 'XGP',
   Unifty = 'NIF',
   Ubeswap = 'ULP',
+  cMC02 = 'cMC02',
 }
 
 export interface Token {
@@ -91,6 +92,13 @@ export const Ubeswap: Token = {
     [NetworkNames.Mainnet]: '0x1e593f1fe7b61c53874b54ec0c59fd0d5eb8621e',
   },
 };
+export const cMC02: Token = {
+  ticker: TokenTicker.cMC02,
+  name: 'MCO2 Token',
+  networks: {
+    [NetworkNames.Mainnet]: '0x32a9fe697a32135bfd313a6ac28792dae4d9979d',
+  },
+};
 
 export const tokens: Token[] = [
   Celo,
@@ -102,6 +110,7 @@ export const tokens: Token[] = [
   DexfairGovernanceToken,
   Unifty,
   Ubeswap,
+  cMC02,
 ];
 
 export enum FiatCurrency {

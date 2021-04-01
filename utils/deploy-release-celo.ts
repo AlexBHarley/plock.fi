@@ -8,22 +8,6 @@ import { retry } from './web3-utils';
 
 const celoRegistryAddress = '0x000000000000000000000000000000000000ce10';
 
-interface ReleaseGoldConfig {
-  releaseStartTime: string;
-  releaseCliffTime: number;
-  numReleasePeriods: number;
-  releasePeriod: number;
-  amountReleasedPerPeriod: BigNumber;
-  revocable: boolean;
-  beneficiary: Address;
-  releaseOwner: Address;
-  refundAddress: Address;
-  subjectToLiquidityProvision: boolean;
-  initialDistributionRatio: number;
-  canValidate: boolean;
-  canVote: boolean;
-}
-
 export async function deployReleaseCelo(
   config: {
     start: Date;
@@ -72,14 +56,16 @@ export async function deployReleaseCelo(
     from: config.from,
   });
 
-  await retry(() =>
-    kit.web3.eth.sendTransaction({
+  const g = await kit.contracts.getGoldToken();
+  const gas = await kit.contracts.getGasPriceMinimum();
+  await g
+    // @ts-ignore
+    .transfer(releaseGoldInstance._address, totalValue.toFixed())
+    .sendAndWaitForReceipt({
       from: config.from,
-      // @ts-ignore
-      to: releaseGoldInstance._address,
-      value: totalValue.toFixed(),
-    })
-  );
+      //@ts-ignore
+      gasPrice: await gas.getGasPriceMinimum(g.address),
+    });
 
   console.log(
     'Funded with',
@@ -87,10 +73,12 @@ export async function deployReleaseCelo(
     await kit.web3.eth.getBalance(releaseGoldInstance._address)
   );
 
-  await retry(() =>
-    releaseGoldInstance.methods
-      .initialize(...contractInitializationArgs)
-      .send({ from: config.from })
+  await retry(
+    () =>
+      releaseGoldInstance.methods
+        .initialize(...contractInitializationArgs)
+        .send({ from: config.from }),
+    10
   );
   console.log('Done');
 

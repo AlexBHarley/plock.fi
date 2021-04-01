@@ -1,4 +1,5 @@
 import { gql, useLazyQuery } from '@apollo/client';
+import { useContractKit } from '@celo-tools/use-contractkit';
 import {
   Balances,
   CopyText,
@@ -12,18 +13,16 @@ import {
   WithLayout,
 } from 'components';
 import { Toggle } from 'components/toggle';
-import { useCallback, useEffect, useState } from 'react';
-import { IoMdRefresh } from 'react-icons/io';
+import QRCode from 'qrcode.react';
+import { useEffect, useState } from 'react';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import { useContractKit } from '@celo-tools/use-contractkit';
+import { IoMdRefresh } from 'react-icons/io';
+import { Base } from 'state';
 import { formatAmount, toWei, truncateAddress } from 'utils';
 import Web3 from 'web3';
-import { Base } from 'state';
+import { Modal } from '../components/modals';
 import { Celo, tokens } from '../constants';
-import QRCode from 'qrcode.react';
-
 import ERC20 from '../utils/abis/ERC20.json';
-import { Modal } from 'components/modals';
 
 const transferQuery = gql`
   query Transfers($address: String) {
@@ -43,7 +42,7 @@ const transferQuery = gql`
 `;
 
 function Transfer() {
-  const { address, kit, network, send } = useContractKit();
+  const { address, kit, network, performActions } = useContractKit();
   const { balances, fetchBalances } = Base.useContainer();
   const [showTiny, setShowTiny] = useState(false);
   const [loadTransfers, { loading, data, refetch }] = useLazyQuery(
@@ -59,20 +58,26 @@ function Transfer() {
   const [currency, setCurrency] = useState(Celo);
   const [toAddress, setToAddress] = useState('');
 
-  const transfer = useCallback(async () => {
+  const transfer = async () => {
     const contractAddress = currency.networks[network.name];
     if (!contractAddress) {
       toast.error(`${currency.name} not deployed on ${network.name}`);
       return;
     }
 
-    const erc20 = new kit.web3.eth.Contract(ERC20 as any, contractAddress);
-    await send(
-      erc20.methods.transfer(toAddress, Web3.utils.toWei(amount, 'ether'))
-    );
-    toast.success(`${amount} ${currency} sent`);
-    fetchBalances();
-  }, [amount, currency, kit, fetchBalances, send, network]);
+    try {
+      await performActions(async (k) => {
+        const erc20 = new kit.web3.eth.Contract(ERC20 as any, contractAddress);
+        await erc20.methods
+          .transfer(toAddress, Web3.utils.toWei(amount, 'ether'))
+          .send({ from: address });
+      });
+      toast.success(`${amount} ${currency} sent`);
+      fetchBalances();
+    } catch (e) {
+      toast.error(e.message);
+    }
+  };
 
   useEffect(() => {
     fetchBalances();
@@ -180,10 +185,10 @@ function Transfer() {
         <PanelGrid>
           <PanelHeader>Receive</PanelHeader>
 
-          <div className="flex-col md:flex md:space-x-2 items-center">
+          <div className="flex flex-col sm:flex-row sm:space-x-4 items-center">
             <Input disabled readOnly value={address} />
 
-            <div className="flex items-center justify-around md:justify-center md:space-x-2 mt-3 md:mt-0">
+            <div className="flex items-center justify-around sm:justify-center sm:space-x-2 mt-3 sm:mt-0">
               <CopyText text={address} />
 
               <button onClick={() => setModal(true)}>

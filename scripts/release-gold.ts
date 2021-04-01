@@ -19,7 +19,7 @@ export async function main() {
       end,
       from: account,
       to: account,
-      amount: '0.1',
+      amount: '100',
     },
     kit
   );

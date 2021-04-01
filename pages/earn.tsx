@@ -54,7 +54,7 @@ export async function getValidatorGroupScore(
 }
 
 function Earn() {
-  const { kit, send, address } = useContractKit();
+  const { kit, performActions, address } = useContractKit();
   const { lockedSummary, fetchLockedSummary, balances } = Base.useContainer();
 
   const [groupVotes, setGroupVotes] = useState<GroupVote[]>([]);
@@ -92,63 +92,70 @@ function Earn() {
     [sort]
   );
 
-  const activate = useCallback(async () => {
+  const activate = async () => {
     setState(States.Activating);
     try {
-      const election = await kit.contracts.getElection();
-      await send(await election.activate(address));
+      await performActions(async (k) => {
+        console.log(k);
+        const election = await k.contracts.getElection();
+        await Promise.all(
+          (await election.activate(address)).map((tx) =>
+            tx.sendAndWaitForReceipt({ from: address })
+          )
+        );
+      });
       toast.success('Votes activated');
     } catch (e) {
       toast.error(`Unable to activate votes ${e.message}`);
     }
     fetchVotingSummary();
     setState(States.None);
-  }, [kit, send, fetchLockedSummary, address]);
+  };
 
-  const vote = useCallback(
-    async (address: string, value: string) => {
-      setState(States.Voting);
-      try {
-        const election = await kit.contracts.getElection();
-        await send(
+  const vote = async (address: string, value: string) => {
+    setState(States.Voting);
+    try {
+      await performActions(async (k) => {
+        const election = await k.contracts.getElection();
+        await (
           await election.vote(address, new BigNumber(Web3.utils.toWei(value)))
-        );
-        toast.success('Vote cast');
+        ).sendAndWaitForReceipt({ from: address });
+      });
+      toast.success('Vote cast');
 
-        setVoteAmount('');
-        setVotingAddress('');
-      } catch (e) {
-        toast.error(`Unable to vote ${e.message}`);
-      } finally {
-        setState(States.None);
-        fetchVotingSummary();
-      }
-    },
-    [kit, send, fetchLockedSummary]
-  );
+      setVoteAmount('');
+      setVotingAddress('');
+    } catch (e) {
+      toast.error(`Unable to vote ${e.message}`);
+    } finally {
+      setState(States.None);
+      fetchVotingSummary();
+    }
+  };
 
-  const revoke = useCallback(
-    async (address: string, value: string) => {
-      setState(States.Revoking);
-      try {
-        const election = await kit.contracts.getElection();
-        await send(
-          await election.revoke(
-            kit.defaultAccount,
-            address,
-            new BigNumber(value)
-          )
+  const revoke = async (address: string, value: string) => {
+    setState(States.Revoking);
+    try {
+      await performActions(async (k) => {
+        const election = await k.contracts.getElection();
+        await Promise.all(
+          (
+            await election.revoke(
+              k.defaultAccount,
+              address,
+              new BigNumber(value)
+            )
+          ).map((tx) => tx.sendAndWaitForReceipt({ from: address }))
         );
-        toast.success('Vote cast');
-      } catch (e) {
-        toast.error(`Unable to vote ${e.message}`);
-      } finally {
-        setState(States.None);
-        fetchVotingSummary();
-      }
-    },
-    [kit, send, fetchLockedSummary]
-  );
+      });
+      toast.success('Vote cast');
+    } catch (e) {
+      toast.error(`Unable to vote ${e.message}`);
+    } finally {
+      setState(States.None);
+      fetchVotingSummary();
+    }
+  };
 
   const fetchVotingSummary = useCallback(async () => {
     if (!address) {

@@ -37,8 +37,7 @@ enum States {
 }
 
 function Lend() {
-  const { network, kit, address, openModal } = useContractKit();
-  const [client, setClient] = useState(null);
+  const { network, kit, address, performActions } = useContractKit();
 
   const [state, setState] = useState(States.None);
   const [reserves, setReserves] = useState([]);
@@ -47,43 +46,54 @@ function Lend() {
   const [depositToken, setDepositToken] = useState(TokenTicker.CELO);
 
   const fetchAccountSummary = useCallback(async () => {
-    const c = await Aave(kit as any, network.name, address);
-    if (address) {
-      setAccountSummary(await c.getUserAccountData(address));
+    setState(States.Loading);
+    try {
+      console.log('hier');
+      const client = await Aave(kit as any, network.name, address);
+      if (address) {
+        setAccountSummary(await client.getUserAccountData(address));
+      }
+      console.log('hier 2');
+
+      const rsvs = await client.getReserves();
+      console.log('hier 3');
+      const reserveData = await Promise.all(
+        rsvs.map(async (r) => {
+          const [token] = (
+            await Promise.all(
+              tokens
+                .filter((t) => !!t.networks[network.name])
+                .map(async (t) => {
+                  if (
+                    (await client.getReserveAddress(
+                      t.networks[network.name]
+                    )) === r
+                  ) {
+                    return t;
+                  }
+                  return null;
+                })
+            )
+          ).filter(Boolean);
+
+          const data = await client.getReserveData(r);
+          return {
+            ...token,
+            ...data,
+          };
+        })
+      );
+      console.log('hier 4');
+
+      setReserves(reserveData);
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      setState(States.None);
     }
-
-    const rsvs = await c.getReserves();
-    const reserveData = await Promise.all(
-      rsvs.map(async (r) => {
-        const [token] = (
-          await Promise.all(
-            tokens.map(async (t) => {
-              if ((await c.getReserveAddress(t.networks[network.name])) === r) {
-                return t;
-              }
-              return null;
-            })
-          )
-        ).filter(Boolean);
-
-        const data = await c.getReserveData(r);
-        return {
-          ...token,
-          ...data,
-        };
-      })
-    );
-
-    setReserves(reserveData);
-    setClient(c);
   }, [network, kit, address]);
 
   const deposit = async () => {
-    if (!kit.defaultAccount) {
-      openModal();
-      return;
-    }
-
     if (!depositAmount || state === States.Depositing) {
       return;
     }
@@ -96,7 +106,10 @@ function Lend() {
 
     try {
       setState(States.Depositing);
-      await client.deposit(token.networks[network.name], wei);
+      await performActions(async (k) => {
+        const client = await Aave(k as any, network.name, address);
+        await client.deposit(token.networks[network.name], wei);
+      });
       fetchAccountSummary();
       toast.success(`${depositToken} deposited`);
     } catch (e) {
@@ -190,7 +203,7 @@ function Lend() {
               </dt>
               <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
                 <div className="flex items-baseline text-2xl font-semibold text-indigo-600">
-                  SAFE
+                  {accountSummary.healthFactor}
                 </div>
                 <div className="inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800 md:mt-2 lg:mt-0">
                   <svg
@@ -207,7 +220,7 @@ function Lend() {
                       d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  75%
+                  {accountSummary.LoanToValue}
                 </div>
               </dd>
             </div>
@@ -247,9 +260,7 @@ function Lend() {
       </PanelWithButton>
 
       <Panel>
-        <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
-          Markets
-        </h3>
+        <PanelHeader>Markets</PanelHeader>
 
         <div className="-mx-5">
           <Table
@@ -261,8 +272,8 @@ function Lend() {
               'Borrow APY (variable)',
               'Borrow APY (stable)',
             ]}
-            loading={false}
-            noDataMessage={'Hi'}
+            loading={state === States.Loading}
+            noDataMessage={'No reserve data found'}
             rows={reserves.map((r) => {
               const Icon = TokenIcons[r.ticker];
               return [

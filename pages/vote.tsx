@@ -10,10 +10,9 @@ import {
 
 import Countdown from 'react-countdown';
 import BigNumber from 'bignumber.js';
-import next from 'next';
 
 function Vote() {
-  const { kit, openModal, send } = useContractKit();
+  const { kit, performActions, address } = useContractKit();
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -100,34 +99,44 @@ function Vote() {
   }, [fetchProposals]);
 
   const approve = async (id: string) => {
-    if (!kit.defaultAccount) {
-      openModal();
-      return;
+    try {
+      await performActions(async (k) => {
+        const governance = await k.contracts.getGovernance();
+        await (await governance.upvote(id, address)).sendAndWaitForReceipt({
+          from: address,
+        });
+      });
+      toast.success('Approved');
+      fetchProposals();
+    } catch (e) {
+      toast.error(e.message);
     }
-
-    const governance = await kit.contracts.getGovernance();
-    await send(governance.upvote(id, kit.defaultAccount));
-    fetchProposals();
   };
 
   const vote = async (id: string, value: VoteValue) => {
-    if (!kit.defaultAccount) {
-      openModal();
-      return;
+    try {
+      await performActions(async (k) => {
+        const governance = await k.contracts.getGovernance();
+        const voteRecord = await governance.getVoteRecord(
+          kit.defaultAccount,
+          id
+        );
+
+        let safeValue = value;
+        if (voteRecord.value === value) {
+          safeValue = VoteValue.Abstain;
+        }
+
+        await (
+          await governance.vote(id, safeValue as any)
+        ).sendAndWaitForReceipt();
+      });
+
+      toast.success('Vote cast');
+      fetchProposals();
+    } catch (e) {
+      toast.error(e.message);
     }
-
-    const governance = await kit.contracts.getGovernance();
-    const voteRecord = await governance.getVoteRecord(kit.defaultAccount, id);
-
-    let safeValue = value;
-    if (voteRecord.value === value) {
-      safeValue = VoteValue.Abstain;
-    }
-
-    // @ts-ignore
-    await (await governance.vote(id, safeValue)).sendAndWaitForReceipt();
-    toast.success('Vote cast');
-    fetchProposals();
   };
 
   return (

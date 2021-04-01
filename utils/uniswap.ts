@@ -6,16 +6,19 @@ import RouterAbi from './abis/uniswap/Router.json';
 
 export async function quote(
   kit: ContractKit,
-  from: Address,
+  fromTokenAddress: Address,
   amount: string,
-  addresses: string[]
+  toTokenAddress: string
 ) {
   const router = new kit.web3.eth.Contract(
     RouterAbi as any,
     ubeswap.routerAddress
   );
 
-  return router.methods.getAmountsOut(amount, [from, ...addresses]).call();
+  const [, result] = await router.methods
+    .getAmountsOut(amount, [fromTokenAddress, toTokenAddress])
+    .call();
+  return result;
 }
 
 export async function swap(

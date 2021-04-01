@@ -113,4 +113,5 @@ export const TokenIcons = {
     <Image src="/ubeswap.png" {...props} />
   ),
   [TokenTicker.Unifty]: (props: any) => <Image src="/unifty.jpg" {...props} />,
+  [TokenTicker.cMC02]: (props: any) => <Image src="/moss.png" {...props} />,
 };

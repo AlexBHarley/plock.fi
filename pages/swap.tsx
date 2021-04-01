@@ -21,7 +21,7 @@ enum States {
 }
 
 function Swap() {
-  const { network, kit, openModal } = useContractKit();
+  const { network, kit, performActions } = useContractKit();
   const { fetchBalances } = Base.useContainer();
   const [state, setState] = useState(States.None);
   const [fromToken, setFromToken] = useState(
@@ -34,27 +34,23 @@ function Swap() {
   const [exchangeRateCache, setExchangeRateCache] = useState({});
 
   const handleSwap = async () => {
-    if (!kit.defaultAccount) {
-      openModal();
-      return;
-    }
-
-    try {
-      setState(States.Swapping);
-      await swap(
-        // @ts-ignore
-        kit,
-        fromToken.networks[network.name],
-        toToken.networks[network.name],
-        Web3.utils.toWei(fromAmount)
-      );
-      fetchBalances();
-      toast.success('Swap successful');
-    } catch (e) {
-      toast.error(e.message);
-    } finally {
-      setState(States.None);
-    }
+    await performActions(async (k) => {
+      try {
+        setState(States.Swapping);
+        await swap(
+          k as any,
+          fromToken.networks[network.name],
+          toToken.networks[network.name],
+          Web3.utils.toWei(fromAmount)
+        );
+        fetchBalances();
+        toast.success('Swap successful');
+      } catch (e) {
+        toast.error(e.message);
+      } finally {
+        setState(States.None);
+      }
+    });
   };
 
   useEffect(() => {
@@ -74,11 +70,10 @@ function Swap() {
     async function f() {
       if (!exchangeRateCache[key]) {
         const [one, two] = await quote(
-          // @ts-ignore
-          kit,
+          kit as any,
           fromToken.networks[network.name],
-          10000, // just to get some more decimal places
-          [toToken.networks[network.name]]
+          '10000', // just to get some more decimal places
+          toToken.networks[network.name]
         );
 
         setExchangeRateCache((c) => ({

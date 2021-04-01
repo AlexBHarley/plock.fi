@@ -39,8 +39,8 @@ export function Sidebar({ items }: { items: SidebarOption[] }) {
                   ? 'bg-gray-300 dark:bg-gray-600'
                   : item.disabled
                   ? ''
-                  : 'hover:bg-gray-200 dark:hover:bg-gray-900 transition'
-              } w-full group rounded-md px-3 py-2 flex items-center text-sm font-medium focus:outline-none`}
+                  : 'hover:bg-gray-200 dark:hover:bg-gray-900 transition cursor-pointer'
+              } w-full group rounded-md px-3 py-2 flex items-center text-sm font-medium focus:outline-none `}
             >
               <span className="mr-4">{item.icon}</span>
 
@@ -222,10 +222,10 @@ export function WithAppLayout({ children }) {
   const { settings } = Base.useContainer();
   const {
     network,
-    openModal,
     address,
     destroy,
-    modalIsOpen,
+    connect,
+    connectionCallback,
   } = useContractKit();
   const [healthy, setHealthy] = useState(true);
   const [menu, setMenu] = useState(false);
@@ -288,9 +288,9 @@ export function WithAppLayout({ children }) {
         }}
       />
 
-      {!address && !modalIsOpen && (
+      {!address && !connectionCallback && (
         <div className="md:hidden rounded-full fixed right-6 bottom-6 z-50 overflow-hidden">
-          <button className="primary-button" onClick={openModal}>
+          <button className="primary-button" onClick={connect}>
             Connect
           </button>
         </div>
@@ -417,7 +417,7 @@ export function WithAppLayout({ children }) {
 
               {!address && (
                 <button
-                  onClick={openModal}
+                  onClick={connect}
                   className="hidden md:inline-block primary-button"
                 >
                   Connect

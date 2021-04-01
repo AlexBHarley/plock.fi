@@ -35,3 +35,9 @@ export function PanelHeader({ children }: any) {
     </h3>
   );
 }
+
+export function PanelDescription({ children }: any) {
+  return (
+    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{children}</p>
+  );
+}
