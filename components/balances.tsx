@@ -16,10 +16,7 @@ enum States {
 }
 
 export function Balances() {
-  const { address, kit, send } = useContractKit();
-  const { accountSummary, lockedSummary, balances } = Base.useContainer();
-  const [lockAmount, setLockAmount] = useState('');
-  const [state, setState] = useState(States.None);
+  const { balances, fetchingBalances } = Base.useContainer();
 
   return (
     <Panel>
@@ -30,8 +27,8 @@ export function Balances() {
       <div className="-mx-5">
         <Table
           headers={['Token', 'Balance', 'Value']}
-          loading={false}
-          noDataMessage={''}
+          loading={fetchingBalances}
+          noDataMessage={'No tokens deployed'}
           rows={Object.keys(balances).map((ticker) => {
             const Icon = TokenIcons[ticker];
             const token = tokens.find((t) => t.ticker === ticker);

@@ -11,6 +11,7 @@ import { AddressUtils } from '@celo/utils';
 import { Address, consoleLogger, eqAddress } from '@celo/base';
 import { PendingWithdrawal } from '@celo/contractkit/lib/wrappers/LockedGold';
 import ERC20 from '../utils/abis/ERC20.json';
+import toast from 'react-hot-toast';
 
 function getApolloClient(n: Network) {
   return new ApolloClient({
@@ -97,6 +98,7 @@ function State() {
   const [balances, setBalances] = useState<{
     [x: string]: BigNumber;
   }>(defaultBalances);
+  const [fetchingBalances, setFetchingBalances] = useState(false);
 
   useEffect(() => {
     setGraphql(getApolloClient(network));
@@ -107,40 +109,51 @@ function State() {
       return;
     }
 
-    const goldToken = await kit.contracts.getGoldToken();
-    const erc20s = await Promise.all(
-      tokens
-        .filter((t) => !!t.networks[network.name])
-        .map(async (t) => {
-          const tokenAddress = t.networks[network.name];
-          let balance;
-          // this is due to a bug where erc20.balanceOf on native asset
-          // is way off.
-          if (eqAddress(tokenAddress, goldToken.address)) {
-            balance = await goldToken.balanceOf(address);
-          } else {
-            const erc20 = new kit.web3.eth.Contract(ERC20 as any, tokenAddress);
-            balance = await erc20.methods.balanceOf(address).call();
-          }
+    setFetchingBalances(true);
 
-          return {
-            ...t,
-            balance,
-          };
-        })
-    );
+    try {
+      const goldToken = await kit.contracts.getGoldToken();
+      const erc20s = await Promise.all(
+        tokens
+          .filter((t) => !!t.networks[network.name])
+          .map(async (t) => {
+            const tokenAddress = t.networks[network.name];
+            let balance;
+            // this is due to a bug where erc20.balanceOf on native asset
+            // is way off.
+            if (eqAddress(tokenAddress, goldToken.address)) {
+              balance = await goldToken.balanceOf(address);
+            } else {
+              const erc20 = new kit.web3.eth.Contract(
+                ERC20 as any,
+                tokenAddress
+              );
+              balance = await erc20.methods.balanceOf(address).call();
+            }
 
-    const balances = erc20s.reduce((accum, t) => {
-      return {
-        ...accum,
-        [t.ticker]: t.balance,
-      };
-    }, {});
+            return {
+              ...t,
+              balance,
+            };
+          })
+      );
 
-    setBalances({
-      ...defaultBalances,
-      ...balances,
-    });
+      const balances = erc20s.reduce((accum, t) => {
+        return {
+          ...accum,
+          [t.ticker]: t.balance,
+        };
+      }, {});
+
+      setBalances({
+        ...defaultBalances,
+        ...balances,
+      });
+    } catch (e) {
+      toast.error(e.message);
+    }
+
+    setFetchingBalances(false);
   }, [address, network, kit]);
 
   const fetchAccountSummary = useCallback(async () => {
@@ -204,8 +217,11 @@ function State() {
     graphql,
     accountSummary,
     fetchAccountSummary,
+
     fetchBalances,
     balances,
+    fetchingBalances,
+
     lockedSummary,
     fetchLockedSummary,
 
