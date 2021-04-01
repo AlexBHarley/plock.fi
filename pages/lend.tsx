@@ -11,7 +11,7 @@ import {
   TokenIcons,
   WithLayout,
 } from 'components';
-import { tokens, TokenTicker } from '../constants';
+import { Celo, cUSD, tokens, TokenTicker } from '../constants';
 import { useCallback, useEffect, useState } from 'react';
 import { Aave } from '../utils/aave';
 import { formatAmount } from 'utils';
@@ -242,6 +242,7 @@ function Lend() {
               onChange={(e) => setDepositAmount(e.target.value)}
               token={depositToken}
               onTokenChange={setDepositToken}
+              tokens={[Celo, cUSD]}
             />
           </div>
         </PanelGrid>

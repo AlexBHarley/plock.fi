@@ -1,5 +1,5 @@
 import { useContractKit } from '@celo-tools/use-contractkit';
-import { tokens, TokenTicker } from '../constants';
+import { Token, tokens, TokenTicker } from '../constants';
 import { InputHTMLAttributes } from 'react';
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
@@ -15,6 +15,7 @@ export function InputWithToken(
   props: InputHTMLAttributes<HTMLInputElement> & {
     token: TokenTicker;
     onTokenChange: (t: TokenTicker) => void;
+    tokens?: Token[];
   }
 ) {
   const { network } = useContractKit();
@@ -39,7 +40,7 @@ export function InputWithToken(
           value={props.token}
           onChange={(e) => props.onTokenChange(e.target.value as TokenTicker)}
         >
-          {tokens
+          {(props.tokens || tokens)
             .filter((t) => !!t.networks[network.name])
             .map((t) => (
               <option value={t.ticker}>

@@ -107,11 +107,12 @@ export async function Aave(kit: ContractKit, network: string, from: string) {
     let data;
     try {
       data = await lendingPool.methods.getUserAccountData(user).call();
+    } catch (err) {
       data = await lendingPoolDataProvider.methods
         .calculateUserGlobalData(user)
         .call();
       data.availableBorrowsETH = 0;
-    } catch (err) {}
+    }
 
     const parsedData = {
       TotalLiquidity: data.totalLiquidityETH || data.totalLiquidityBalanceETH,
