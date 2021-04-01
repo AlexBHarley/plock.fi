@@ -3,11 +3,13 @@ import {
   Balances,
   InputWithToken,
   Panel,
+  PanelDescription,
   PanelGrid,
   PanelHeader,
   PanelWithButton,
   Table,
   toast,
+  Toggle,
   TokenIcons,
   WithLayout,
 } from 'components';
@@ -33,6 +35,7 @@ const defaultAccountSummary = {
 enum States {
   None = 'None',
   Depositing = 'Depositing',
+  Borrowing = 'Borrowing',
   Loading = 'Loading',
 }
 
@@ -44,6 +47,11 @@ function Lend() {
   const [accountSummary, setAccountSummary] = useState(defaultAccountSummary);
   const [depositAmount, setDepositAmount] = useState('');
   const [depositToken, setDepositToken] = useState(TokenTicker.CELO);
+  const [interestRate, setInterestRate] = useState<'stable' | 'variable'>(
+    'stable'
+  );
+  const [borrowAmount, setBorrowAmount] = useState('');
+  const [borrowToken, setBorrowToken] = useState(TokenTicker.CELO);
 
   const fetchAccountSummary = useCallback(async () => {
     setState(States.Loading);
@@ -90,6 +98,32 @@ function Lend() {
     }
   }, [network, kit, address]);
 
+  const withdraw = async () => {
+    if (!depositAmount || state === States.Depositing) {
+      return;
+    }
+
+    const wei = Web3.utils.toWei(depositAmount);
+    const token = tokens.find((t) => t.ticker === depositToken);
+    if (!token) {
+      return;
+    }
+
+    try {
+      setState(States.Depositing);
+      await performActions(async (k) => {
+        const client = await Aave(k as any, network.name, address);
+        await client.withdraw(token.networks[network.name], wei);
+      });
+      fetchAccountSummary();
+      toast.success(`${depositToken} deposited`);
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      setState(States.None);
+    }
+  };
+
   const deposit = async () => {
     if (!depositAmount || state === States.Depositing) {
       return;
@@ -106,6 +140,58 @@ function Lend() {
       await performActions(async (k) => {
         const client = await Aave(k as any, network.name, address);
         await client.deposit(token.networks[network.name], wei);
+      });
+      fetchAccountSummary();
+      toast.success(`${depositToken} deposited`);
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      setState(States.None);
+    }
+  };
+
+  const borrow = async () => {
+    if (!depositAmount || state === States.Depositing) {
+      return;
+    }
+
+    const wei = Web3.utils.toWei(depositAmount);
+    const token = tokens.find((t) => t.ticker === depositToken);
+    if (!token) {
+      return;
+    }
+
+    try {
+      setState(States.Depositing);
+      await performActions(async (k) => {
+        const client = await Aave(k as any, network.name, address);
+        await client.borrow(token.networks[network.name], wei, interestRate);
+      });
+      fetchAccountSummary();
+      toast.success(`${depositToken} deposited`);
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      setState(States.None);
+    }
+  };
+
+  const repay = async () => {
+    if (!depositAmount || state === States.Depositing) {
+      return;
+    }
+
+    const wei = Web3.utils.toWei(depositAmount);
+    const token = tokens.find((t) => t.ticker === depositToken);
+    if (!token) {
+      return;
+    }
+
+    try {
+      setState(States.Depositing);
+      await performActions(async (k) => {
+        const client = await Aave(k as any, network.name, address);
+        await client.borrow(token.networks[network.name], wei, interestRate);
       });
       fetchAccountSummary();
       toast.success(`${depositToken} deposited`);
@@ -225,15 +311,15 @@ function Lend() {
         </div>
       </Panel>
 
-      <PanelWithButton>
+      <Panel>
         <PanelGrid>
           <div>
             <PanelHeader>Deposit</PanelHeader>
-          </div>
-          <div>
-            <p className="text-gray-600 dark:text-gray-400 mb-2 text-sm">
+            <PanelDescription>
               Deposit funds to provide liquidity and collatoral to the market.
-            </p>
+            </PanelDescription>
+          </div>
+          <div className="">
             <InputWithToken
               value={depositAmount}
               onChange={(e) => setDepositAmount(e.target.value)}
@@ -241,21 +327,115 @@ function Lend() {
               onTokenChange={setDepositToken}
               tokens={[Celo, cUSD]}
             />
+            <div className="flex justify-around items-center">
+              <button
+                className="secondary-button"
+                onClick={withdraw}
+                disabled={state === States.Depositing}
+              >
+                {state === States.Depositing ? (
+                  <Loader
+                    type="TailSpin"
+                    height={24}
+                    width={24}
+                    color="white"
+                  />
+                ) : (
+                  'Withdraw'
+                )}
+              </button>
+
+              <button
+                className="secondary-button"
+                onClick={deposit}
+                disabled={state === States.Depositing}
+              >
+                {state === States.Depositing ? (
+                  <Loader
+                    type="TailSpin"
+                    height={24}
+                    width={24}
+                    color="white"
+                  />
+                ) : (
+                  'Deposit'
+                )}
+              </button>
+            </div>
           </div>
         </PanelGrid>
+      </Panel>
 
-        <button
-          className="primary-button"
-          onClick={deposit}
-          disabled={state === States.Depositing}
-        >
-          {state === States.Depositing ? (
-            <Loader type="TailSpin" height={24} width={24} color="white" />
-          ) : (
-            'Deposit'
-          )}
-        </button>
-      </PanelWithButton>
+      <Panel>
+        <PanelGrid>
+          <div>
+            <PanelHeader>Borrow</PanelHeader>
+            <PanelDescription>
+              By borrowing you are able to obtain liquidity (working capital)
+              without selling your assets.
+            </PanelDescription>
+          </div>
+          <div className="">
+            <div className="space-y-4">
+              <InputWithToken
+                value={depositAmount}
+                onChange={(e) => setDepositAmount(e.target.value)}
+                token={depositToken}
+                onTokenChange={setDepositToken}
+                tokens={[Celo, cUSD]}
+              />
+              <div className="md:flex md:items-center md:justify-between">
+                <div className="text-gray-500">Interest Rate</div>
+                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                  <div>Stable</div>
+                  <Toggle
+                    active={interestRate === 'stable'}
+                    onChange={(bool) =>
+                      setInterestRate(bool ? 'stable' : 'variable')
+                    }
+                  />
+                  <div>Variable</div>
+                </div>
+              </div>
+              <div className="flex justify-around items-center">
+                <button
+                  className="secondary-button"
+                  onClick={repay}
+                  disabled={state === States.Depositing}
+                >
+                  {state === States.Depositing ? (
+                    <Loader
+                      type="TailSpin"
+                      height={24}
+                      width={24}
+                      color="white"
+                    />
+                  ) : (
+                    'Repay'
+                  )}
+                </button>
+
+                <button
+                  className="secondary-button"
+                  onClick={borrow}
+                  disabled={state === States.Depositing}
+                >
+                  {state === States.Depositing ? (
+                    <Loader
+                      type="TailSpin"
+                      height={24}
+                      width={24}
+                      color="white"
+                    />
+                  ) : (
+                    'Borrow'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </PanelGrid>
+      </Panel>
 
       <Panel>
         <PanelHeader>Markets</PanelHeader>

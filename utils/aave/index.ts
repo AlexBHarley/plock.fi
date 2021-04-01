@@ -7,6 +7,7 @@ import LendingPoolAddressesProvider from '../abis/aave/LendingPoolAddressesProvi
 import LendingPool from '../abis/aave/LendingPool.json';
 import LendingPoolCore from '../abis/aave/LendingPoolCore.json';
 import LendingPoolDataProvider from '../abis/aave/LendingPoolDataProvider.json';
+import AToken from '../abis/aave/AToken.json';
 import ERC20 from '../abis/ERC20.json';
 import BigNumber from 'bignumber.js';
 import { eqAddress } from '@celo/utils/lib/address';
@@ -164,6 +165,47 @@ export async function Aave(kit: ContractKit, network: string, from: string) {
     });
   }
 
+  async function withdraw(tokenAddress: string, amount: string) {
+    const reserve = await getReserveAddress(tokenAddress);
+    const mtoken = new kit.web3.eth.Contract(
+      AToken as any,
+      (await lendingPool.methods.getReserveData(reserve).call()).aTokenAddress
+    );
+
+    await mtoken.methods
+      .redeem(amount)
+      .send({ from: kit.defaultAccount, gas: 2000000 });
+  }
+
+  async function repay(tokenAddress: string, amount: string) {
+    const reserve = await getReserveAddress(tokenAddress);
+
+    let native = false;
+    let value = '0';
+    if (await isNative(tokenAddress)) {
+      native = true;
+      const reserveData = await lendingPool.methods
+        .getUserReserveData(reserve, kit.defaultAccount)
+        .call();
+      value = new BigNumber(reserveData.currentBorrowBalance)
+        .multipliedBy('1.001')
+        .plus(reserveData.originationFee)
+        .toFixed(0);
+    }
+
+    if (!native) {
+      const erc20 = new kit.web3.eth.Contract(ERC20 as AbiItem[], reserve);
+
+      await erc20.methods
+        .approve(lendingPoolCore.options.address, amount)
+        .send({ from: kit.defaultAccount, gas: 2000000 });
+    }
+
+    await lendingPool.methods
+      .repay(reserve, amount, kit.defaultAccount)
+      .send({ from: kit.defaultAccount, gas: 2000000, value });
+  }
+
   async function borrow(
     reserve: string,
     amount: string,
@@ -182,6 +224,8 @@ export async function Aave(kit: ContractKit, network: string, from: string) {
 
     deposit,
     borrow,
+    withdraw,
+    repay,
 
     getReserveAddress,
 
