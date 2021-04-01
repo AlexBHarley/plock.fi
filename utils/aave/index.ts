@@ -15,9 +15,13 @@ import { eqAddress } from '@celo/utils/lib/address';
 import { addresses } from './constants';
 
 const ray = '1000000000000000000000000000';
+const ether = '1000000000000000000';
 
 function fromRay(n: string) {
   return new BigNumber(n).dividedBy(ray).multipliedBy(100);
+}
+function fromEth(n: string) {
+  return new BigNumber(n).dividedBy(ether);
 }
 
 export async function Aave(kit: ContractKit, network: string, from: string) {
@@ -124,7 +128,7 @@ export async function Aave(kit: ContractKit, network: string, from: string) {
       AvailableBorrow: data.availableBorrowsETH,
       LiquidationThreshold: `${data.currentLiquidationThreshold}%`,
       LoanToValue: `${data.ltv || data.currentLtv}%`,
-      healthFactor: data.healthFactor.length > 30 ? 'SAFE' : data.healthFactor,
+      healthFactor: fromEth(data.healthFactor),
     };
 
     return parsedData;

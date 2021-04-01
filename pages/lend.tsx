@@ -29,7 +29,7 @@ const defaultAccountSummary = {
   AvailableBorrow: '0',
   LiquidationThreshold: '0',
   LoanToValue: '0',
-  healthFactor: '0',
+  healthFactor: new BigNumber(0),
 };
 
 enum States {
@@ -206,6 +206,8 @@ function Lend() {
     fetchAccountSummary();
   }, [fetchAccountSummary]);
 
+  const isSafe = accountSummary.healthFactor.gt(100);
+
   return (
     <>
       <Panel>
@@ -286,24 +288,47 @@ function Lend() {
               </dt>
               <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
                 <div className="flex items-baseline text-2xl font-semibold text-indigo-600">
-                  {accountSummary.healthFactor}
+                  {isSafe ? 'Safe' : 'Not Safe'}
                 </div>
-                <div className="inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800 md:mt-2 lg:mt-0">
-                  <svg
-                    className="-ml-1 mr-0.5 flex-shrink-0 self-center h-5 w-5 text-green-500"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  {accountSummary.LoanToValue}
+                <div
+                  className={`inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium ${
+                    isSafe
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                  } md:mt-2 lg:mt-0`}
+                >
+                  {isSafe ? (
+                    <svg
+                      className="-ml-1 mr-0.5 flex-shrink-0 self-center h-5 w-5 text-green-500"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="-ml-1 mr-0.5 flex-shrink-0 self-center h-5 w-5 text-red-500"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  )}
+                  {accountSummary.healthFactor.toFixed(0)}%
                 </div>
               </dd>
             </div>
