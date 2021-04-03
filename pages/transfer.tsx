@@ -1,6 +1,7 @@
 import { gql, useLazyQuery } from '@apollo/client';
 import { useContractKit } from '@celo-tools/use-contractkit';
 import {
+  AddressInput,
   Balances,
   CopyText,
   Input,
@@ -10,17 +11,16 @@ import {
   PanelWithButton,
   Table,
   toast,
+  TokenInput,
   WithLayout,
 } from 'components';
 import { Toggle } from 'components/toggle';
-import QRCode from 'qrcode.react';
 import { useEffect, useState } from 'react';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { IoMdRefresh } from 'react-icons/io';
 import { Base } from 'state';
-import { formatAmount, toWei, truncateAddress } from 'utils';
+import { formatAmount, truncateAddress } from 'utils';
 import Web3 from 'web3';
-import { Modal } from '../components/modals';
 import { Celo, tokens } from '../constants';
 import ERC20 from '../utils/abis/ERC20.json';
 
@@ -53,7 +53,6 @@ function Transfer() {
       },
     }
   );
-  const [modal, setModal] = useState(false);
   const [amount, setAmount] = useState('0');
   const [currency, setCurrency] = useState(Celo);
   const [toAddress, setToAddress] = useState('');
@@ -101,77 +100,34 @@ function Transfer() {
 
   return (
     <>
-      {modal && (
-        <Modal onDismiss={() => setModal(false)}>
-          <QRCode
-            className="w-48 w-48 md:h-96 md:w-96"
-            style={{ height: undefined, width: undefined }}
-            value={address}
-          />
-        </Modal>
-      )}
-
       <PanelWithButton>
         <div>
-          <h3 className="text-gray-900 dark:text-gray-900 dark:text-gray-200">
-            New Transfer
-          </h3>
+          <PanelHeader>Transfer</PanelHeader>
           <div>
             <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row items-center md:space-x-2">
-              <div className="mt-1 relative rounded-md shadow-sm w-full">
-                <Input
-                  type="text"
-                  name="price"
-                  id="price"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder={'0'}
-                />
-                <div className="absolute inset-y-0 right-0 flex items-center">
-                  <label htmlFor="currency" className="sr-only">
-                    Currency
-                  </label>
-                  <select
-                    id="currency"
-                    name="currency"
-                    className="focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-10 border-transparent bg-transparent  sm:text-sm rounded-md"
-                    value={currency.name}
-                    onChange={(e) => {
-                      const token = tokens.find(
-                        (t) => t.name === e.target.value
-                      );
-                      setCurrency(token);
-                    }}
-                  >
-                    {tokens
-                      .filter((t) => t.networks[network.name])
-                      .map((t) => (
-                        <option>{t.ticker}</option>
-                      ))}
-                  </select>
-                </div>
-              </div>
+              <TokenInput
+                type="text"
+                name="price"
+                id="price"
+                value={amount}
+                onChange={(e) => setAmount(e)}
+                placeholder={'0'}
+                tokens={tokens}
+                token={currency.ticker}
+                onTokenChange={(tokenTicker) => {
+                  const token = tokens.find((t) => t.ticker === tokenTicker);
+                  setCurrency(token);
+                }}
+                max={formatAmount(balances[currency.ticker])}
+              />
 
               <div className="text-gray-900 dark:text-gray-200">to</div>
 
-              <Input
-                type="text"
-                placeholder="0x7d21685c17607338b313a7174bab6620bad0aab7"
+              <AddressInput
                 value={toAddress}
+                copyable={false}
                 onChange={(e) => setToAddress(e.target.value)}
               />
-            </div>
-
-            <div className="text-gray-600 dark:text-gray-400 text-xs mt-2">
-              Sending{' '}
-              <span className="text-gray-900 dark:text-white">
-                {toWei(amount)}{' '}
-              </span>
-              <span className="text-gray-900 dark:text-white">
-                {currency.name}{' '}
-              </span>
-              to{' '}
-              <span className="text-gray-900 dark:text-white">{toAddress}</span>
             </div>
           </div>
         </div>
@@ -185,30 +141,7 @@ function Transfer() {
         <PanelGrid>
           <PanelHeader>Receive</PanelHeader>
 
-          <div className="flex flex-col sm:flex-row sm:space-x-4 items-center">
-            <Input disabled readOnly value={address} />
-
-            <div className="flex items-center justify-around sm:justify-center sm:space-x-2 mt-3 sm:mt-0">
-              <CopyText text={address} />
-
-              <button onClick={() => setModal(true)}>
-                <svg
-                  className="h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
+          <AddressInput copyable disabled readOnly value={address} />
         </PanelGrid>
       </Panel>
 

@@ -1,7 +1,7 @@
 import { useContractKit } from '@celo-tools/use-contractkit';
 import {
   Balances,
-  InputWithToken,
+  TokenInput,
   Panel,
   PanelDescription,
   PanelGrid,
@@ -13,13 +13,15 @@ import {
   TokenIcons,
   WithLayout,
 } from 'components';
-import { Celo, cUSD, tokens, TokenTicker } from '../constants';
+import { Celo, cUSD, tokens, TokenTicker } from '../../constants';
 import { useCallback, useEffect, useState } from 'react';
-import { Aave } from '../utils/aave';
+import { Aave } from '../../utils/aave';
 import { formatAmount } from 'utils';
 import BigNumber from 'bignumber.js';
 import Web3 from 'web3';
 import Loader from 'react-loader-spinner';
+import { Base } from 'state';
+import Link from 'next/link';
 
 const defaultAccountSummary = {
   TotalLiquidity: '0',
@@ -41,10 +43,13 @@ enum States {
 
 function Lend() {
   const { network, kit, address, performActions } = useContractKit();
+  const { balances } = Base.useContainer();
 
   const [state, setState] = useState(States.None);
-  const [reserves, setReserves] = useState([]);
+  const [markets, setMarkets] = useState([]);
+  const [userReserves, setUserReserves] = useState([]);
   const [accountSummary, setAccountSummary] = useState(defaultAccountSummary);
+
   const [depositAmount, setDepositAmount] = useState('');
   const [depositToken, setDepositToken] = useState(TokenTicker.CELO);
   const [interestRate, setInterestRate] = useState<'stable' | 'variable'>(
@@ -54,14 +59,16 @@ function Lend() {
   const [borrowToken, setBorrowToken] = useState(TokenTicker.CELO);
 
   const fetchAccountSummary = useCallback(async () => {
+    const client = await Aave(kit as any, network.name, address);
+    if (address) {
+      setAccountSummary(await client.getUserAccountData(address));
+    }
+  }, []);
+
+  const fetchMarkets = useCallback(async () => {
     setState(States.Loading);
     try {
       const client = await Aave(kit as any, network.name, address);
-      if (address) {
-        console.log(await client.getUserAccountData(address));
-        setAccountSummary(await client.getUserAccountData(address));
-      }
-
       const rsvs = await client.getReserves();
       const reserveData = await Promise.all(
         rsvs.map(async (r) => {
@@ -90,7 +97,7 @@ function Lend() {
         })
       );
 
-      setReserves(reserveData);
+      setMarkets(reserveData);
     } catch (e) {
       toast.error(e.message);
     } finally {
@@ -115,7 +122,7 @@ function Lend() {
         const client = await Aave(k as any, network.name, address);
         await client.withdraw(token.networks[network.name], wei);
       });
-      fetchAccountSummary();
+      fetchMarkets();
       toast.success(`${depositToken} deposited`);
     } catch (e) {
       toast.error(e.message);
@@ -141,7 +148,7 @@ function Lend() {
         const client = await Aave(k as any, network.name, address);
         await client.deposit(token.networks[network.name], wei);
       });
-      fetchAccountSummary();
+      fetchMarkets();
       toast.success(`${depositToken} deposited`);
     } catch (e) {
       toast.error(e.message);
@@ -167,7 +174,7 @@ function Lend() {
         const client = await Aave(k as any, network.name, address);
         await client.borrow(token.networks[network.name], wei, interestRate);
       });
-      fetchAccountSummary();
+      fetchMarkets();
       toast.success(`${depositToken} deposited`);
     } catch (e) {
       toast.error(e.message);
@@ -193,7 +200,7 @@ function Lend() {
         const client = await Aave(k as any, network.name, address);
         await client.repay(token.networks[network.name], wei);
       });
-      fetchAccountSummary();
+      fetchMarkets();
       toast.success(`${depositToken} deposited`);
     } catch (e) {
       toast.error(e.message);
@@ -203,8 +210,8 @@ function Lend() {
   };
 
   useEffect(() => {
-    fetchAccountSummary();
-  }, [fetchAccountSummary]);
+    fetchMarkets();
+  }, [fetchMarkets]);
 
   const isSafe = accountSummary.healthFactor.gt(100);
 
@@ -228,36 +235,17 @@ function Lend() {
         <div>
           <dl className="grid grid-cols-1 rounded-lg bg-white overflow-hidden shadow divide-y divide-gray-200 md:grid-cols-3 md:divide-y-0 md:divide-x">
             <div className="px-4 py-5 sm:p-6">
-              <dt className="text-base font-normal text-gray-900">
+              <dt className="text-base font-medium text-gray-600">
                 Total Liquidity
               </dt>
               <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
                 <div className="flex items-baseline text-2xl font-semibold text-indigo-600">
                   {formatAmount(accountSummary.TotalLiquidity)}
-                  {/* <span className="ml-2 text-sm font-medium text-gray-500">
-                      from 70,946
-                    </span> */}
                 </div>
-                {/* <div className="inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800 md:mt-2 lg:mt-0">
-                  <svg
-                    className="-ml-1 mr-0.5 flex-shrink-0 self-center h-5 w-5 text-green-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span className="sr-only">Increased by</span>
-                  12%
-                </div> */}
               </dd>
             </div>
             <div className="px-4 py-5 sm:p-6">
-              <dt className="text-base font-normal text-gray-900">
+              <dt className="text-base font-medium text-gray-600">
                 Available To Borrow
               </dt>
               <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
@@ -283,7 +271,7 @@ function Lend() {
               </dd>
             </div>
             <div className="px-4 py-5 sm:p-6">
-              <dt className="text-base font-normal text-gray-900">
+              <dt className="text-base font-medium text-gray-600">
                 Health Factor
               </dt>
               <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
@@ -337,137 +325,12 @@ function Lend() {
       </Panel>
 
       <Panel>
-        <PanelGrid>
-          <div>
-            <PanelHeader>Deposit</PanelHeader>
-            <PanelDescription>
-              Deposit funds to provide liquidity and collatoral to the market.
-            </PanelDescription>
-          </div>
-          <div className="">
-            <InputWithToken
-              value={depositAmount}
-              onChange={(e) => setDepositAmount(e.target.value)}
-              token={depositToken}
-              onTokenChange={setDepositToken}
-              tokens={[Celo, cUSD]}
-            />
-            <div className="flex justify-around items-center">
-              <button
-                className="secondary-button"
-                onClick={withdraw}
-                disabled={state === States.Depositing}
-              >
-                {state === States.Depositing ? (
-                  <Loader
-                    type="TailSpin"
-                    height={24}
-                    width={24}
-                    color="white"
-                  />
-                ) : (
-                  'Withdraw'
-                )}
-              </button>
-
-              <button
-                className="secondary-button"
-                onClick={deposit}
-                disabled={state === States.Depositing}
-              >
-                {state === States.Depositing ? (
-                  <Loader
-                    type="TailSpin"
-                    height={24}
-                    width={24}
-                    color="white"
-                  />
-                ) : (
-                  'Deposit'
-                )}
-              </button>
-            </div>
-          </div>
-        </PanelGrid>
-      </Panel>
-
-      <Panel>
-        <PanelGrid>
-          <div>
-            <PanelHeader>Borrow</PanelHeader>
-            <PanelDescription>
-              By borrowing you are able to obtain liquidity (working capital)
-              without selling your assets.
-            </PanelDescription>
-          </div>
-          <div className="">
-            <div className="space-y-4">
-              <InputWithToken
-                value={borrowAmount}
-                onChange={(e) => setBorrowAmount(e.target.value)}
-                token={borrowToken}
-                onTokenChange={setBorrowToken}
-                tokens={[Celo, cUSD]}
-              />
-              <div className="md:flex md:items-center md:justify-between">
-                <div className="text-gray-500">Interest Rate</div>
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
-                  <div>Stable</div>
-                  <Toggle
-                    active={interestRate === 'stable'}
-                    onChange={(bool) =>
-                      setInterestRate(bool ? 'stable' : 'variable')
-                    }
-                  />
-                  <div>Variable</div>
-                </div>
-              </div>
-              <div className="flex justify-around items-center">
-                <button
-                  className="secondary-button"
-                  onClick={repay}
-                  disabled={state === States.Borrowing}
-                >
-                  {state === States.Borrowing ? (
-                    <Loader
-                      type="TailSpin"
-                      height={24}
-                      width={24}
-                      color="white"
-                    />
-                  ) : (
-                    'Repay'
-                  )}
-                </button>
-
-                <button
-                  className="secondary-button"
-                  onClick={borrow}
-                  disabled={state === States.Borrowing}
-                >
-                  {state === States.Borrowing ? (
-                    <Loader
-                      type="TailSpin"
-                      height={24}
-                      width={24}
-                      color="white"
-                    />
-                  ) : (
-                    'Borrow'
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </PanelGrid>
-      </Panel>
-
-      <Panel>
         <PanelHeader>Markets</PanelHeader>
 
         <div className="-mx-5">
           <Table
             headers={[
+              '',
               'Ticker',
               'Market Size',
               'Total Borrowed',
@@ -477,9 +340,16 @@ function Lend() {
             ]}
             loading={state === States.Loading}
             noDataMessage={'No reserve data found'}
-            rows={reserves.map((r) => {
+            rows={markets.map((r) => {
               const Icon = TokenIcons[r.ticker];
               return [
+                <div>
+                  <Link href={`/lend/${r.ticker}`}>
+                    <button className="px-4 py-2 bg-gray-800 hover:bg-gray-900 transition text-white rounded">
+                      Trade
+                    </button>
+                  </Link>
+                </div>,
                 <div className="flex items-center space-x-2">
                   <Icon className="h-4 w-4" />
                   <div>{r.ticker}</div>

@@ -54,7 +54,7 @@ export async function Aave(kit: ContractKit, network: string, from: string) {
     lendingPoolDataProviderAddress
   );
 
-  async function getReserveData(address: Address) {
+  async function getReserveData(address: string) {
     const data = await lendingPool.methods.getReserveData(address).call();
 
     const parsedData = {
@@ -92,9 +92,9 @@ export async function Aave(kit: ContractKit, network: string, from: string) {
       .getUserReserveData(reserve, user)
       .call();
     const parsedData = {
-      Deposited: data.currentATokenBalance,
-      Borrowed: data.principalBorrowBalance,
-      Debt: data.currentBorrowBalance,
+      Deposited: new BigNumber(data.currentATokenBalance),
+      Borrowed: new BigNumber(data.principalBorrowBalance),
+      Debt: new BigNumber(data.currentBorrowBalance),
       RateMode: INTEREST_RATE[data.borrowRateMode],
       BorrowRate: fromRay(data.borrowRate),
       LiquidityRate: fromRay(data.liquidityRate),
