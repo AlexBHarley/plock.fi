@@ -1,4 +1,4 @@
-import { formatAmount, toWei, truncateAddress } from '../utils';
+import { formatAmount, plausible, toWei, truncateAddress } from '../utils';
 import { Panel, PanelGrid, PanelHeader } from './panel';
 import { useContractKit } from '@celo-tools/use-contractkit';
 import { Base } from '../state';
@@ -23,6 +23,7 @@ export function LockCelo() {
   const [state, setState] = useState(States.None);
 
   const lock = async () => {
+    plausible('lock', { amount: toWei(lockAmount) });
     setState(States.Locking);
     try {
       await performActions(async (k) => {
@@ -40,6 +41,8 @@ export function LockCelo() {
   };
 
   const unlock = async () => {
+    plausible('unlock', { amount: toWei(lockAmount) });
+
     setState(States.Unlocking);
     try {
       await performActions(async (k) => {

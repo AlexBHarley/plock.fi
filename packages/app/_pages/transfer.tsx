@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { IoMdRefresh } from 'react-icons/io';
 import { Base } from '../state';
-import { formatAmount, truncateAddress } from '../utils';
+import { formatAmount, plausible, truncateAddress } from '../utils';
 import Web3 from 'web3';
 import { Celo, tokens } from '../constants';
 import ERC20 from '../utils/abis/ERC20.json';
@@ -63,6 +63,8 @@ export function Transfer() {
       toast.error(`${currency.name} not deployed on ${network.name}`);
       return;
     }
+
+    plausible('transfer');
 
     try {
       await performActions(async (k) => {

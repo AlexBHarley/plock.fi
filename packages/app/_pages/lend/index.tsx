@@ -35,14 +35,6 @@ export function LendOverview() {
   const [userReserves, setUserReserves] = useState([]);
   const [accountSummary, setAccountSummary] = useState(defaultAccountSummary);
 
-  const [depositAmount, setDepositAmount] = useState('');
-  const [depositToken, setDepositToken] = useState(TokenTicker.CELO);
-  const [interestRate, setInterestRate] = useState<'stable' | 'variable'>(
-    'stable'
-  );
-  const [borrowAmount, setBorrowAmount] = useState('');
-  const [borrowToken, setBorrowToken] = useState(TokenTicker.CELO);
-
   const fetchAccountSummary = useCallback(async () => {
     const client = await Aave(kit as any, network.name, address);
     if (address) {

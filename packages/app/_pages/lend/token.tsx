@@ -16,7 +16,7 @@ import {
 import { Celo, cUSD, tokens, TokenTicker } from '../../constants';
 import { useCallback, useEffect, useState } from 'react';
 import { Aave } from '../../utils/aave';
-import { formatAmount } from '../../utils';
+import { formatAmount, plausible } from '../../utils';
 import BigNumber from 'bignumber.js';
 import Web3 from 'web3';
 import Loader from 'react-loader-spinner';
@@ -116,6 +116,8 @@ export function LendToken() {
     }
 
     const wei = Web3.utils.toWei(depositAmount);
+    plausible('withdraw', { amount: wei });
+
     try {
       setState(States.Depositing);
       await performActions(async (k) => {
@@ -136,6 +138,7 @@ export function LendToken() {
     }
 
     const wei = Web3.utils.toWei(depositAmount);
+    plausible('deposit', { amount: wei });
 
     try {
       setState(States.Depositing);
@@ -157,6 +160,8 @@ export function LendToken() {
     }
 
     const wei = Web3.utils.toWei(borrowAmount);
+    plausible('borrow', { amount: wei });
+
     try {
       setState(States.Borrowing);
       await performActions(async (k) => {
@@ -177,6 +182,7 @@ export function LendToken() {
     }
 
     const wei = Web3.utils.toWei(borrowAmount);
+    plausible('repay', { amount: wei });
 
     try {
       setState(States.Borrowing);

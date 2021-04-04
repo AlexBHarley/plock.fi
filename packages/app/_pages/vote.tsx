@@ -10,6 +10,7 @@ import {
 
 import Countdown from 'react-countdown';
 import BigNumber from 'bignumber.js';
+import { plausible } from '../utils';
 
 export function Vote() {
   const { kit, performActions, address } = useContractKit();
@@ -98,7 +99,8 @@ export function Vote() {
     fetchProposals();
   }, [fetchProposals]);
 
-  const approve = async (id: string) => {
+  const upvote = async (id: string) => {
+    plausible('upvote', { id });
     try {
       await performActions(async (k) => {
         const governance = await k.contracts.getGovernance();
@@ -114,6 +116,7 @@ export function Vote() {
   };
 
   const vote = async (id: string, value: VoteValue) => {
+    plausible('vote', { id, value });
     try {
       await performActions(async (k) => {
         const governance = await k.contracts.getGovernance();
@@ -230,7 +233,7 @@ export function Vote() {
                   {p.proposal.stage === 'Proposal' && (
                     <button
                       className={upvoteClass}
-                      onClick={() => approve(p.id)}
+                      onClick={() => upvote(p.id)}
                     >
                       <ImArrowUp />
                     </button>

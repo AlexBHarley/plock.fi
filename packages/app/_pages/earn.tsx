@@ -3,6 +3,9 @@ import { ContractKit } from '@celo/contractkit';
 import { GroupVote } from '@celo/contractkit/lib/wrappers/Election';
 import { ValidatorGroup } from '@celo/contractkit/lib/wrappers/Validators';
 import { BigNumber } from 'bignumber.js';
+import { useCallback, useEffect, useState } from 'react';
+import Loader from 'react-loader-spinner';
+import Web3 from 'web3';
 import {
   CopyText,
   CustomSelectSearch,
@@ -11,13 +14,15 @@ import {
   Panel,
   Table,
   toast,
-  WithLayout,
 } from '../components';
-import { useCallback, useEffect, useState } from 'react';
-import Loader from 'react-loader-spinner';
 import { Base } from '../state';
-import { formatAmount, toWei, truncate, truncateAddress } from '../utils';
-import Web3 from 'web3';
+import {
+  formatAmount,
+  plausible,
+  toWei,
+  truncate,
+  truncateAddress,
+} from '../utils';
 
 enum States {
   None,
@@ -93,6 +98,7 @@ export function Earn() {
   );
 
   const activate = async () => {
+    plausible('activate');
     setState(States.Activating);
     try {
       await performActions(async (k) => {
@@ -113,6 +119,7 @@ export function Earn() {
   };
 
   const vote = async (address: string, value: string) => {
+    plausible('vote', { address, value });
     setState(States.Voting);
     try {
       await performActions(async (k) => {
@@ -134,6 +141,7 @@ export function Earn() {
   };
 
   const revoke = async (address: string, value: string) => {
+    plausible('revoke', { address, value });
     setState(States.Revoking);
     try {
       await performActions(async (k) => {

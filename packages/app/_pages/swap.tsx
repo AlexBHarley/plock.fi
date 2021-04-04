@@ -14,6 +14,7 @@ import { Base } from '../state';
 import Web3 from 'web3';
 import { Celo, cUSD, Token, tokens, TokenTicker } from '../constants';
 import { quote, swap } from '../utils/uniswap';
+import { plausible } from '../utils';
 
 enum States {
   Loading = 'Loading',
@@ -33,6 +34,7 @@ export function Swap() {
   const [exchangeRateCache, setExchangeRateCache] = useState({});
 
   const handleSwap = async () => {
+    plausible('swap', { from: fromToken.ticker, to: toToken.ticker });
     await performActions(async (k) => {
       try {
         setState(States.Swapping);

@@ -22,7 +22,7 @@ import {
 } from 'react-circular-progressbar';
 import Loader from 'react-loader-spinner';
 import { Base } from '../state';
-import { formatAmount } from '../utils';
+import { formatAmount, plausible } from '../utils';
 import Web3 from 'web3';
 import { deployReleaseCelo } from '../utils/deploy-release-celo';
 
@@ -83,6 +83,7 @@ export function Stream() {
 
   const connect = useCallback(
     async (rgAddress: string) => {
+      plausible('view-stream');
       setState(States.Connecting);
 
       try {
@@ -145,6 +146,8 @@ export function Stream() {
       toast.error('Missing parameters');
       return;
     }
+
+    plausible('deploy-stream');
 
     setState(States.Deploying);
 
