@@ -1,4 +1,3 @@
-import '@celo-tools/use-contractkit/lib/styles.css';
 import Head from 'next/head';
 import '../styles/globals.css';
 
