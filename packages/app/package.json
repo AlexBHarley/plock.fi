@@ -37,6 +37,7 @@
     "react-loader-spinner": "^4.0.0",
     "react-modal": "^3.12.1",
     "react-move": "^6.4.0",
+    "react-qr-reader": "^2.2.1",
     "react-router-dom": "^5.2.0",
     "react-select-search": "^3.0.2",
     "unstated-next": "^1.1.0",
