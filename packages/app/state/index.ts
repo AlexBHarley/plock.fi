@@ -1,17 +1,14 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { Network, useContractKit } from '@celo-tools/use-contractkit';
+import { Address, eqAddress } from '@celo/base';
+import { PendingWithdrawal } from '@celo/contractkit/lib/wrappers/LockedGold';
+import { AddressUtils } from '@celo/utils';
+import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { createContainer } from 'unstated-next';
 import { FiatCurrency, tokens } from '../constants';
-import { useContractKit, Network } from '@celo-tools/use-contractkit';
-import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts';
-import { Accounts } from '@celo/contractkit/lib/generated/Accounts';
-import { formatAmount } from '../components/utils';
-import BigNumber from 'bignumber.js';
-import { AddressUtils } from '@celo/utils';
-import { Address, consoleLogger, eqAddress } from '@celo/base';
-import { PendingWithdrawal } from '@celo/contractkit/lib/wrappers/LockedGold';
 import ERC20 from '../utils/abis/ERC20.json';
-import toast from 'react-hot-toast';
 
 function getApolloClient(n: Network) {
   return new ApolloClient({
