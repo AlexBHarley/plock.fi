@@ -21,12 +21,11 @@ import BigNumber from 'bignumber.js';
 import Web3 from 'web3';
 import Loader from 'react-loader-spinner';
 import { Base } from '../../state';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
 import {
   buildStyles,
   CircularProgressbarWithChildren,
 } from 'react-circular-progressbar';
+import { Link, useParams } from 'react-router-dom';
 
 const defaultAccountSummary = {
   Deposited: new BigNumber(0),
@@ -66,9 +65,8 @@ enum States {
   Loading = 'Loading',
 }
 
-function Market() {
-  const router = useRouter();
-  const { token: tokenTicker } = router.query;
+export function LendToken() {
+  const { token: tokenTicker } = useParams();
 
   const { network, kit, address, performActions } = useContractKit();
   const { balances } = Base.useContainer();
@@ -78,12 +76,10 @@ function Market() {
   const [reserve, setReserve] = useState(defaultReserve);
 
   const [depositAmount, setDepositAmount] = useState('');
-  const [depositToken, setDepositToken] = useState(TokenTicker.CELO);
   const [interestRate, setInterestRate] = useState<'stable' | 'variable'>(
     'stable'
   );
   const [borrowAmount, setBorrowAmount] = useState('');
-  const [borrowToken, setBorrowToken] = useState(TokenTicker.CELO);
 
   const token = tokens.find(
     (t) =>
@@ -105,7 +101,6 @@ function Market() {
       client.getReserveData(reserveAddress),
       client.getUserReserveData(reserveAddress, address),
     ]);
-    console.log('>>>', reserve, accountSummary);
 
     setReserve(reserve);
     setAccountSummary(accountSummary);
@@ -121,18 +116,13 @@ function Market() {
     }
 
     const wei = Web3.utils.toWei(depositAmount);
-    const token = tokens.find((t) => t.ticker === depositToken);
-    if (!token) {
-      return;
-    }
-
     try {
       setState(States.Depositing);
       await performActions(async (k) => {
         const client = await Aave(k as any, network.name, address);
         await client.withdraw(token.networks[network.name], wei);
       });
-      toast.success(`${depositToken} deposited`);
+      toast.success(`${token.name} deposited`);
     } catch (e) {
       toast.error(e.message);
     } finally {
@@ -146,10 +136,6 @@ function Market() {
     }
 
     const wei = Web3.utils.toWei(depositAmount);
-    const token = tokens.find((t) => t.ticker === depositToken);
-    if (!token) {
-      return;
-    }
 
     try {
       setState(States.Depositing);
@@ -157,7 +143,7 @@ function Market() {
         const client = await Aave(k as any, network.name, address);
         await client.deposit(token.networks[network.name], wei);
       });
-      toast.success(`${depositToken} deposited`);
+      toast.success(`${token.name} deposited`);
     } catch (e) {
       toast.error(e.message);
     } finally {
@@ -171,18 +157,13 @@ function Market() {
     }
 
     const wei = Web3.utils.toWei(borrowAmount);
-    const token = tokens.find((t) => t.ticker === depositToken);
-    if (!token) {
-      return;
-    }
-
     try {
       setState(States.Borrowing);
       await performActions(async (k) => {
         const client = await Aave(k as any, network.name, address);
         await client.borrow(token.networks[network.name], wei, interestRate);
       });
-      toast.success(`${depositToken} deposited`);
+      toast.success(`${token.name} deposited`);
     } catch (e) {
       toast.error(e.message);
     } finally {
@@ -196,10 +177,6 @@ function Market() {
     }
 
     const wei = Web3.utils.toWei(borrowAmount);
-    const token = tokens.find((t) => t.ticker === depositToken);
-    if (!token) {
-      return;
-    }
 
     try {
       setState(States.Borrowing);
@@ -207,7 +184,7 @@ function Market() {
         const client = await Aave(k as any, network.name, address);
         await client.repay(token.networks[network.name], wei);
       });
-      toast.success(`${depositToken} deposited`);
+      toast.success(`${token.name} deposited`);
     } catch (e) {
       toast.error(e.message);
     } finally {
@@ -270,7 +247,7 @@ function Market() {
                 )}{' '}
                 <span className="text-base">{token.ticker}</span>
               </div>
-              <div className="text-sm text-gray-600 whitespace-nowrap">
+              <div className="text-xs text-gray-600 whitespace-nowrap">
                 <div>
                   {formatAmount(reserve.AverageStableRate)}% stable borrow APY{' '}
                 </div>
@@ -306,7 +283,7 @@ function Market() {
               {formatAmount(reserve.AvailableLiquidity)}{' '}
               <span className="text-base">{token.ticker}</span>
             </div>
-            <div className="text-sm text-gray-600 whitespace-nowrap">
+            <div className="text-xs text-gray-600 whitespace-nowrap">
               {formatAmount(reserve.LiquidityRate)}% deposit APY
             </div>
           </div>
@@ -377,8 +354,8 @@ function Market() {
             <TokenInput
               value={depositAmount}
               onChange={(e) => setDepositAmount(e)}
-              placeholder={formatAmount(balances[depositToken])}
-              max={formatAmount(balances[depositToken])}
+              max={balances[token.ticker].toString()}
+              token={token}
             />
             <div className="flex justify-around items-center">
               <button
@@ -433,8 +410,8 @@ function Market() {
               <TokenInput
                 value={borrowAmount}
                 onChange={(e) => setBorrowAmount(e)}
-                max={formatAmount(balances[borrowToken]) ?? '0'}
-                placeholder={formatAmount(balances[borrowToken]) ?? '0'}
+                max={balances[token.ticker].toString()}
+                token={token}
               />
               <div className="md:flex md:items-center md:justify-between">
                 <div className="text-gray-500">Interest Rate</div>
@@ -491,5 +468,3 @@ function Market() {
     </>
   );
 }
-
-export default WithLayout(Market);

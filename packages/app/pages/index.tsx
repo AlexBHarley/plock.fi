@@ -6,7 +6,8 @@ import {
   Transfer,
   Earn,
   Vote,
-  Lend,
+  LendOverview,
+  LendToken,
   Settings,
   Stream,
   Swap,
@@ -22,7 +23,8 @@ export default function App() {
           <Route path="/transfer" component={Transfer} />
           <Route path="/earn" component={Earn} />
           <Route path="/vote" component={Vote} />
-          <Route path="/lend" component={Lend} />
+          <Route exact path="/lend" component={LendOverview} />
+          <Route path="/lend/:token" component={LendToken} />
           <Route path="/settings" component={Settings} />
           <Route path="/stream" component={Stream} />
           <Route path="/swap" component={Swap} />

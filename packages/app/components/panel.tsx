@@ -30,14 +30,12 @@ export function PanelWithButton({ children }: any) {
 
 export function PanelHeader({ children }: any) {
   return (
-    <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
+    <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200 mb-2">
       {children}
     </h3>
   );
 }
 
 export function PanelDescription({ children }: any) {
-  return (
-    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{children}</p>
-  );
+  return <p className="text-sm text-gray-600 dark:text-gray-400">{children}</p>;
 }

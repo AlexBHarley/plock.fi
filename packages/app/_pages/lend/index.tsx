@@ -1,27 +1,12 @@
 import { useContractKit } from '@celo-tools/use-contractkit';
-import {
-  Balances,
-  TokenInput,
-  Panel,
-  PanelDescription,
-  PanelGrid,
-  PanelHeader,
-  PanelWithButton,
-  Table,
-  toast,
-  Toggle,
-  TokenIcons,
-  WithLayout,
-} from '../../components';
-import { Celo, cUSD, tokens, TokenTicker } from '../../constants';
-import { useCallback, useEffect, useState } from 'react';
-import { Aave } from '../../utils/aave';
-import { formatAmount } from '../../utils';
 import BigNumber from 'bignumber.js';
-import Web3 from 'web3';
-import Loader from 'react-loader-spinner';
+import { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Panel, PanelHeader, Table, toast, TokenIcons } from '../../components';
+import { tokens, TokenTicker } from '../../constants';
 import { Base } from '../../state';
-import Link from 'next/link';
+import { formatAmount } from '../../utils';
+import { Aave } from '../../utils/aave';
 
 const defaultAccountSummary = {
   TotalLiquidity: '0',
@@ -41,7 +26,7 @@ enum States {
   Loading = 'Loading',
 }
 
-export function Lend() {
+export function LendOverview() {
   const { network, kit, address, performActions } = useContractKit();
   const { balances } = Base.useContainer();
 
@@ -104,110 +89,6 @@ export function Lend() {
       setState(States.None);
     }
   }, [network, kit, address]);
-
-  const withdraw = async () => {
-    if (!depositAmount || state === States.Depositing) {
-      return;
-    }
-
-    const wei = Web3.utils.toWei(depositAmount);
-    const token = tokens.find((t) => t.ticker === depositToken);
-    if (!token) {
-      return;
-    }
-
-    try {
-      setState(States.Depositing);
-      await performActions(async (k) => {
-        const client = await Aave(k as any, network.name, address);
-        await client.withdraw(token.networks[network.name], wei);
-      });
-      fetchMarkets();
-      toast.success(`${depositToken} deposited`);
-    } catch (e) {
-      toast.error(e.message);
-    } finally {
-      setState(States.None);
-    }
-  };
-
-  const deposit = async () => {
-    if (!depositAmount || state === States.Depositing) {
-      return;
-    }
-
-    const wei = Web3.utils.toWei(depositAmount);
-    const token = tokens.find((t) => t.ticker === depositToken);
-    if (!token) {
-      return;
-    }
-
-    try {
-      setState(States.Depositing);
-      await performActions(async (k) => {
-        const client = await Aave(k as any, network.name, address);
-        await client.deposit(token.networks[network.name], wei);
-      });
-      fetchMarkets();
-      toast.success(`${depositToken} deposited`);
-    } catch (e) {
-      toast.error(e.message);
-    } finally {
-      setState(States.None);
-    }
-  };
-
-  const borrow = async () => {
-    if (!borrowAmount || state === States.Borrowing) {
-      return;
-    }
-
-    const wei = Web3.utils.toWei(borrowAmount);
-    const token = tokens.find((t) => t.ticker === depositToken);
-    if (!token) {
-      return;
-    }
-
-    try {
-      setState(States.Borrowing);
-      await performActions(async (k) => {
-        const client = await Aave(k as any, network.name, address);
-        await client.borrow(token.networks[network.name], wei, interestRate);
-      });
-      fetchMarkets();
-      toast.success(`${depositToken} deposited`);
-    } catch (e) {
-      toast.error(e.message);
-    } finally {
-      setState(States.None);
-    }
-  };
-
-  const repay = async () => {
-    if (!borrowAmount || state === States.Borrowing) {
-      return;
-    }
-
-    const wei = Web3.utils.toWei(borrowAmount);
-    const token = tokens.find((t) => t.ticker === depositToken);
-    if (!token) {
-      return;
-    }
-
-    try {
-      setState(States.Borrowing);
-      await performActions(async (k) => {
-        const client = await Aave(k as any, network.name, address);
-        await client.repay(token.networks[network.name], wei);
-      });
-      fetchMarkets();
-      toast.success(`${depositToken} deposited`);
-    } catch (e) {
-      toast.error(e.message);
-    } finally {
-      setState(States.None);
-    }
-  };
 
   useEffect(() => {
     fetchMarkets();
@@ -343,13 +224,11 @@ export function Lend() {
             rows={markets.map((r) => {
               const Icon = TokenIcons[r.ticker];
               return [
-                <div>
-                  <Link href={`/lend/${r.ticker}`}>
-                    <button className="px-4 py-2 bg-gray-800 hover:bg-gray-900 transition text-white rounded">
-                      Trade
-                    </button>
-                  </Link>
-                </div>,
+                <Link to={`/lend/${r.ticker}`}>
+                  <span className="px-4 py-2 bg-gray-800 hover:bg-gray-900 transition text-white rounded">
+                    Trade
+                  </span>
+                </Link>,
                 <div className="flex items-center space-x-2">
                   <Icon className="h-4 w-4" />
                   <div>{r.ticker}</div>

@@ -132,7 +132,9 @@ export function TokenInput(
               ))}
           </select>
         ) : (
-          <></>
+          <>
+            <div className="w-12 text-sm">{props.token.ticker}</div>
+          </>
         )}
       </div>
     </div>

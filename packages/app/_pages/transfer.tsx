@@ -53,7 +53,7 @@ export function Transfer() {
       },
     }
   );
-  const [amount, setAmount] = useState('0');
+  const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState(Celo);
   const [toAddress, setToAddress] = useState('');
 
@@ -104,26 +104,28 @@ export function Transfer() {
         <div>
           <PanelHeader>Transfer</PanelHeader>
           <div>
-            <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row items-center md:space-x-2">
-              <TokenInput
-                type="text"
-                name="price"
-                id="price"
-                value={amount}
-                onChange={(e) => setAmount(e)}
-                placeholder={'0'}
-                token={currency}
-                onTokenChange={(token) => setCurrency(token)}
-                max={formatAmount(balances[currency.ticker])}
-              />
+            <div className="flex flex-col sm:flex-row">
+              <div className="sm:w-5/12">
+                <TokenInput
+                  value={amount}
+                  onChange={(e) => setAmount(e)}
+                  token={currency}
+                  onTokenChange={(token) => setCurrency(token)}
+                  max={balances[currency.ticker].toString()}
+                />
+              </div>
 
-              <div className="text-gray-900 dark:text-gray-200">to</div>
+              <div className="text-gray-900 dark:text-gray-200 w-2/12 flex justify-center items-center">
+                to
+              </div>
 
-              <AddressInput
-                value={toAddress}
-                copyable={false}
-                onChange={(e) => setToAddress(e.target.value)}
-              />
+              <div className="w-5/12">
+                <AddressInput
+                  value={toAddress}
+                  copyable={false}
+                  onChange={(e) => setToAddress(e.target.value)}
+                />
+              </div>
             </div>
           </div>
         </div>
