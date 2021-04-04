@@ -135,13 +135,15 @@ export function Transfer() {
         </button>
       </PanelWithButton>
 
-      <Panel>
-        <PanelGrid>
-          <PanelHeader>Receive</PanelHeader>
+      {address && (
+        <Panel>
+          <PanelGrid>
+            <PanelHeader>Receive</PanelHeader>
 
-          <AddressInput copyable scanToCopy disabled readOnly value={address} />
-        </PanelGrid>
-      </Panel>
+            <AddressInput copyable scanToCopy value={address} />
+          </PanelGrid>
+        </Panel>
+      )}
 
       <Balances />
 

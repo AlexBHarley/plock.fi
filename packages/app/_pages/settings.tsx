@@ -249,7 +249,7 @@ export function Settings() {
               <select
                 name=""
                 id=""
-                className="p-2 dark:bg-gray-750 rounded-md border border-gray-300 dark:border-gray-500"
+                className="py-2 dark:bg-gray-750 rounded-md border border-gray-300 dark:border-gray-500"
                 value={network.name}
                 onChange={(e) => {
                   const network = networks.find(
@@ -272,7 +272,7 @@ export function Settings() {
               <select
                 name=""
                 id=""
-                className="p-2 dark:bg-gray-750 rounded-md border border-gray-300 dark:border-gray-500"
+                className="py-2 dark:bg-gray-750 rounded-md border border-gray-300 dark:border-gray-500"
                 value={settings.currency}
                 onChange={(e) =>
                   updateDefaultFiatCurrency(e.target.value as FiatCurrency)

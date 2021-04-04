@@ -18,7 +18,7 @@ export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...clean}
-      className={`w-full appearance-none block px-3 py-2 border border-gray-300 dark:border-gray-700  rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-600 w-64 ${className}`}
+      className={`w-full appearance-none block px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-600 w-64 ${className}`}
     />
   );
 }
@@ -149,7 +149,7 @@ export function TokenInput(
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
         placeholder={props.placeholder ?? '0.0'}
-        className={`w-full appearance-none focus:outline-none block px-3 py-2  placeholder-gray-400  sm:text-sm dark:bg-gray-600`}
+        className={`w-full appearance-none border-0 focus:outline-none focus:ring-0 block px-3 py-2 placeholder-gray-400 sm:text-sm dark:bg-gray-600`}
       />
 
       <div className="ml-auto flex items-center space-x-3">
@@ -161,7 +161,7 @@ export function TokenInput(
               );
               props.onChange(amount.toFixed(2));
             }}
-            className="text-sm font-medium uppercase text-gray-700 hover:text-gray-800 outline-none focus:outline-none transition"
+            className="text-sm font-medium uppercase text-gray-700 hover:text-gray-800 focus:outline-none focus:ring-0 transition"
           >
             MAX
           </button>
@@ -171,7 +171,7 @@ export function TokenInput(
           <select
             id="currency"
             name="currency"
-            className="w-16 focus:outline-none border-transparent bg-transparent sm:text-sm rounded-md"
+            className="border-transparent bg-transparent border-0 sm:text-sm rounded-md focus:outline-none focus:ring-0"
             style={{ marginRight: '0.5em' }}
             value={props.token.ticker}
             onChange={(e) => {
