@@ -83,7 +83,8 @@ const tabs: SidebarOption[] = [
         />
       </svg>
     ),
-    link: '/home',
+    link: '/',
+    strict: true,
   },
   {
     name: 'Transfer',
@@ -391,7 +392,7 @@ export function WithAppLayout({ children }) {
             </div>
           </div>
         )}
-        <div className="max-w-screen-lg mx-auto px-2 sm:px-4 lg:divide-y lg:divide-gray-200 lg:px-8 ">
+        <div className="max-w-screen-lg mx-auto px-2 md:px-4 lg:divide-y lg:divide-gray-200 lg:px-8">
           <div className="relative h-16 flex justify-between">
             <div className="relative z-10 px-2 flex lg:px-0">
               <div className="flex-shrink-0 flex items-center">
@@ -466,7 +467,7 @@ export function WithAppLayout({ children }) {
         </div>
       </header>
 
-      <div className="w-full md:max-w-screen-lg mx-auto flex-grow py-6 md:py-8 px-2 md:px-4">
+      <div className="w-full md:max-w-screen-lg mx-auto flex-grow py-6 md:py-8 px-2 md:px-4 lg:px-8">
         {children}
       </div>
 
