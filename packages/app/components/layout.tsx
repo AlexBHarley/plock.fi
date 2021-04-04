@@ -7,12 +7,11 @@ import {
   useContractKit,
 } from '@celo-tools/use-contractkit';
 import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { Link, useLocation, useHistory } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { Base } from 'state';
-import { truncateAddress } from 'utils';
+import { Base } from '../state';
+import { truncateAddress } from '../utils';
 import { DropButton } from './dropdown';
 import { PulsatingDot } from './pulsating-dot';
 
@@ -25,17 +24,17 @@ interface SidebarOption {
   strict?: boolean;
 }
 export function Sidebar({ items }: { items: SidebarOption[] }) {
-  const router = useRouter();
+  const location = useLocation();
 
   return (
     <aside className="sm:px-6 md:pb-4 lg:px-0 lg:col-span-3">
       <nav className="hidden md:block space-y-1">
         {items.map((item, i) => (
-          <Link href={item.disabled ? router.asPath : item.link}>
+          <Link to={item.disabled ? location.pathname : item.link}>
             <span
               className={`${
-                (item.strict && router.asPath === item.link) ||
-                (!item.strict && router.asPath.startsWith(item.link))
+                (item.strict && location.pathname === item.link) ||
+                (!item.strict && location.pathname.startsWith(item.link))
                   ? 'bg-gray-300 dark:bg-gray-600'
                   : item.disabled
                   ? ''
@@ -249,11 +248,13 @@ export function WithAppLayout({ children }) {
   } = useContractKit();
   const [healthy, setHealthy] = useState(true);
   const [menu, setMenu] = useState(false);
-  const router = useRouter();
+
+  const location = useLocation();
+  const history = useHistory();
 
   useEffect(() => {
     setMenu(false);
-  }, [router.asPath]);
+  }, [location.pathname]);
 
   useEffect(() => {
     /**
@@ -349,11 +350,11 @@ export function WithAppLayout({ children }) {
               </button>
               <div className="px-4 py-4">
                 {tabs.map((t) => (
-                  <Link href={t.link}>
+                  <Link to={t.link}>
                     <span
                       className={`flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium ${
-                        (t.strict && router.asPath === t.link) ||
-                        (!t.strict && router.asPath.startsWith(t.link))
+                        (t.strict && location.pathname === t.link) ||
+                        (!t.strict && location.pathname.startsWith(t.link))
                           ? 'text-indigo-600'
                           : ``
                       }`}
@@ -394,7 +395,7 @@ export function WithAppLayout({ children }) {
           <div className="relative h-16 flex justify-between">
             <div className="relative z-10 px-2 flex lg:px-0">
               <div className="flex-shrink-0 flex items-center">
-                <Link href="/">
+                <Link to="/">
                   <span className="inline-flex">
                     <Image src="/logo.png" height={'24px'} width={'24px'} />
                   </span>
@@ -452,7 +453,7 @@ export function WithAppLayout({ children }) {
                       [
                         {
                           text: 'Settings',
-                          onClick: () => router.push('/settings'),
+                          onClick: () => history.push('/settings'),
                         },
                         { text: 'Logout', onClick: destroy },
                       ],
@@ -539,19 +540,15 @@ function WithSidebar({ children }: any) {
   );
 }
 
-export const WithLayout = (Component: any) => {
-  return () => (
-    <ContractKitProvider
-      dappName="Plock"
-      networks={[Mainnet, Alfajores, Baklava]}
-    >
-      <Base.Provider>
-        <WithApollo>
-          <WithSidebar>
-            <Component />
-          </WithSidebar>
-        </WithApollo>
-      </Base.Provider>
-    </ContractKitProvider>
-  );
-};
+export const WithLayout = ({ children }: any) => (
+  <ContractKitProvider
+    dappName="Plock"
+    networks={[Mainnet, Alfajores, Baklava]}
+  >
+    <Base.Provider>
+      <WithApollo>
+        <WithSidebar>{children}</WithSidebar>
+      </WithApollo>
+    </Base.Provider>
+  </ContractKitProvider>
+);

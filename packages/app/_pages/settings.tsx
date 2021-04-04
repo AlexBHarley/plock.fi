@@ -7,13 +7,13 @@ import {
   toast,
   Toggle,
   WithLayout,
-} from 'components';
+} from '../components';
 import { FiatCurrency, networks } from '../constants';
 import { useEffect, useState } from 'react';
 import Loader from 'react-loader-spinner';
-import { Base } from 'state';
+import { Base } from '../state';
 
-function Settings() {
+export function Settings() {
   const { address, updateNetwork, network, performActions } = useContractKit();
   const {
     accountSummary,
@@ -323,5 +323,3 @@ function Settings() {
     </>
   );
 }
-
-export default WithLayout(Settings);

@@ -5,7 +5,7 @@ import { FiatCurrency, tokens } from '../constants';
 import { useContractKit, Network } from '@celo-tools/use-contractkit';
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts';
 import { Accounts } from '@celo/contractkit/lib/generated/Accounts';
-import { formatAmount } from 'utils';
+import { formatAmount } from '../components/utils';
 import BigNumber from 'bignumber.js';
 import { AddressUtils } from '@celo/utils';
 import { Address, consoleLogger, eqAddress } from '@celo/base';

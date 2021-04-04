@@ -7,8 +7,8 @@ import {
 import { newKit } from '@celo/contractkit';
 import { eqAddress } from '@celo/utils/lib/address';
 import { AbiItem } from 'web3-utils';
-import { tokens, ubeswap } from '../constants';
-import FactoryAbi from '../utils/abis/uniswap/Factory.json';
+import { tokens, ubeswap } from '../packages/app/constants';
+import FactoryAbi from '../packages/app/utils/abis/uniswap/Factory.json';
 
 const networks = [Mainnet, Baklava, Alfajores];
 

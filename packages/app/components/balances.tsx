@@ -1,8 +1,8 @@
 import { useContractKit } from '@celo-tools/use-contractkit';
 import { tokens } from '../constants';
 import { useState } from 'react';
-import { Base } from 'state';
-import { formatAmount } from 'utils';
+import { Base } from '../state';
+import { formatAmount } from '../utils';
 import { TokenIcons } from './icon';
 import { Panel } from './panel';
 import { Table } from './table';

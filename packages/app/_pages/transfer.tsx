@@ -13,13 +13,13 @@ import {
   toast,
   TokenInput,
   WithLayout,
-} from 'components';
-import { Toggle } from 'components/toggle';
+} from '../components';
+import { Toggle } from '../components/toggle';
 import { useEffect, useState } from 'react';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { IoMdRefresh } from 'react-icons/io';
-import { Base } from 'state';
-import { formatAmount, truncateAddress } from 'utils';
+import { Base } from '../state';
+import { formatAmount, truncateAddress } from '../utils';
 import Web3 from 'web3';
 import { Celo, tokens } from '../constants';
 import ERC20 from '../utils/abis/ERC20.json';
@@ -41,7 +41,7 @@ const transferQuery = gql`
   }
 `;
 
-function Transfer() {
+export function Transfer() {
   const { address, kit, network, performActions } = useContractKit();
   const { balances, fetchBalances } = Base.useContainer();
   const [showTiny, setShowTiny] = useState(false);
@@ -112,12 +112,8 @@ function Transfer() {
                 value={amount}
                 onChange={(e) => setAmount(e)}
                 placeholder={'0'}
-                tokens={tokens}
-                token={currency.ticker}
-                onTokenChange={(tokenTicker) => {
-                  const token = tokens.find((t) => t.ticker === tokenTicker);
-                  setCurrency(token);
-                }}
+                token={currency}
+                onTokenChange={(token) => setCurrency(token)}
                 max={formatAmount(balances[currency.ticker])}
               />
 
@@ -216,5 +212,3 @@ function Transfer() {
     </>
   );
 }
-
-export default WithLayout(Transfer);

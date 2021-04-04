@@ -1,9 +1,9 @@
-import { formatAmount, toWei, truncateAddress } from 'utils';
+import { formatAmount, toWei, truncateAddress } from '../utils';
 import { Panel } from './panel';
 import { useContractKit } from '@celo-tools/use-contractkit';
-import { Base } from 'state';
+import { Base } from '../state';
 import { useCallback, useState } from 'react';
-import { toast } from 'components';
+import { toast } from '../components';
 import Loader from 'react-loader-spinner';
 import { Input } from './input';
 

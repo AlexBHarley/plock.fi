@@ -1,8 +1,8 @@
 import { newKit } from '@celo/contractkit';
-import { ubeswap } from '../constants';
-import FactoryAbi from '../utils/abis/uniswap/Factory.json';
-import PairAbi from '../utils/abis/uniswap/Pair.json';
-import { quote, swap } from '../utils/uniswap';
+import { ubeswap } from '../packages/app/constants';
+import FactoryAbi from '../packages/app/utils/abis/uniswap/Factory.json';
+import PairAbi from '../packages/app/utils/abis/uniswap/Pair.json';
+import { quote, swap } from '../packages/app/utils/uniswap';
 
 export async function main() {
   const kit = newKit('https://alfajores-forno.celo-testnet.org');

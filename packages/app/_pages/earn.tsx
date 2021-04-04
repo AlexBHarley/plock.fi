@@ -12,11 +12,11 @@ import {
   Table,
   toast,
   WithLayout,
-} from 'components';
+} from '../components';
 import { useCallback, useEffect, useState } from 'react';
 import Loader from 'react-loader-spinner';
-import { Base } from 'state';
-import { formatAmount, toWei, truncate, truncateAddress } from 'utils';
+import { Base } from '../state';
+import { formatAmount, toWei, truncate, truncateAddress } from '../utils';
 import Web3 from 'web3';
 
 enum States {
@@ -53,7 +53,7 @@ export async function getValidatorGroupScore(
   return { score, electedCount };
 }
 
-function Earn() {
+export function Earn() {
   const { kit, performActions, address } = useContractKit();
   const { lockedSummary, fetchLockedSummary, balances } = Base.useContainer();
 
@@ -555,5 +555,3 @@ function Earn() {
     </>
   );
 }
-
-export default WithLayout(Earn);

@@ -1,4 +1,4 @@
-import { WithMarketingLayout } from 'components';
+import { WithMarketingLayout } from '../components';
 
 function About() {
   return (

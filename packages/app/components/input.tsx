@@ -6,12 +6,15 @@ import BigNumber from 'bignumber.js';
 import { CopyText } from './copy-text';
 import { Modal } from './modals';
 import QRCode from 'qrcode.react';
+import { TokenIcons } from './icon';
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
+  const { className } = props;
+  const clean = { ...props, className: undefined };
   return (
     <input
-      className="w-full appearance-none block px-3 py-2 border border-gray-300 dark:border-gray-700  rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-600 w-64"
-      {...props}
+      {...clean}
+      className={`w-full appearance-none block px-3 py-2 border border-gray-300 dark:border-gray-700  rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-600 w-64 ${className}`}
     />
   );
 }
@@ -67,26 +70,33 @@ export function AddressInput(
 }
 
 export function TokenInput(
-  props: InputHTMLAttributes<HTMLInputElement> & {
-    token?: TokenTicker;
-    onTokenChange?: (t: TokenTicker) => void;
+  props: Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
+    token: Token;
+    onTokenChange?: (t: Token) => void;
     tokens?: Token[];
     max?: string;
     onChange: (x: string) => void;
   }
 ) {
   const { network } = useContractKit();
+  const Icon = TokenIcons[props.token.ticker];
+
   return (
-    <div className="relative rounded-md shadow-sm w-full">
-      <Input
+    <div className="group flex items-center rounded-md shadow-sm w-full border border-gray-300 dark:border-gray-700 focus-within:outline-none focus-within:ring-indigo-500 focus-within:border-indigo-500">
+      <div className="ml-2">
+        <Icon height="25px" width="25px" />
+      </div>
+      <input
         type="text"
         name="price"
         id="price"
         value={props.value}
         onChange={(e) => props.onChange(e.target.value)}
-        placeholder={props.placeholder ?? '0'}
+        placeholder={props.placeholder ?? '0.0'}
+        className={`w-full appearance-none focus:outline-none block px-3 py-2  placeholder-gray-400  sm:text-sm dark:bg-gray-600`}
       />
-      <div className="absolute inset-y-0 right-0 flex items-center">
+
+      <div className="ml-auto flex items-center space-x-3">
         {props.max && (
           <button
             onClick={() => {
@@ -95,35 +105,34 @@ export function TokenInput(
               );
               props.onChange(amount.toFixed(2));
             }}
-            className="text-sm font-semibold text-gradient bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 outline-none focus:outline-none transition pr-2"
+            className="text-sm font-medium uppercase text-gray-700 hover:text-gray-800 outline-none focus:outline-none transition"
           >
             MAX
           </button>
         )}
 
-        {props.onTokenChange && props.token && props.tokens && (
-          <>
-            <label htmlFor="currency" className="sr-only">
-              Currency
-            </label>
-            <select
-              id="currency"
-              name="currency"
-              className="w-28 focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 border-transparent bg-transparent  sm:text-sm rounded-md"
-              value={props.token}
-              onChange={(e) =>
-                props.onTokenChange(e.target.value as TokenTicker)
+        {props.onTokenChange ? (
+          <select
+            id="currency"
+            name="currency"
+            className="w-16 focus:outline-none border-transparent bg-transparent sm:text-sm rounded-md"
+            style={{ marginRight: '0.5em' }}
+            value={props.token.ticker}
+            onChange={(e) => {
+              const tok = tokens.find((t) => t.ticker === e.target.value);
+              if (tok) {
+                props.onTokenChange(tok);
               }
-            >
-              {(props.tokens || tokens)
-                .filter((t) => !!t.networks[network.name])
-                .map((t) => (
-                  <option value={t.ticker}>
-                    {t.ticker} ({t.name})
-                  </option>
-                ))}
-            </select>
-          </>
+            }}
+          >
+            {(props.tokens || tokens)
+              .filter((t) => !!t.networks[network.name])
+              .map((t) => (
+                <option value={t.ticker}>{t.ticker}</option>
+              ))}
+          </select>
+        ) : (
+          <></>
         )}
       </div>
     </div>

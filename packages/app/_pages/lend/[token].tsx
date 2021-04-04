@@ -12,15 +12,15 @@ import {
   Toggle,
   TokenIcons,
   WithLayout,
-} from 'components';
+} from '../../components';
 import { Celo, cUSD, tokens, TokenTicker } from '../../constants';
 import { useCallback, useEffect, useState } from 'react';
 import { Aave } from '../../utils/aave';
-import { formatAmount } from 'utils';
+import { formatAmount } from '../../utils';
 import BigNumber from 'bignumber.js';
 import Web3 from 'web3';
 import Loader from 'react-loader-spinner';
-import { Base } from 'state';
+import { Base } from '../../state';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {

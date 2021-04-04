@@ -19,10 +19,10 @@
     }
   },
   "include": [
-    "next-env.d.ts",
+    "packages/app/next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "components/circular-progress-bar.jsx"
+    "packages/app/components/circular-progress-bar.jsx"
   ],
   "exclude": ["node_modules"]
 }

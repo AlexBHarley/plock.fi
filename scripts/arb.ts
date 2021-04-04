@@ -1,9 +1,9 @@
 import { newKit } from '@celo/contractkit';
-import ERC20Abi from '../utils/abis/ERC20.json';
-import { ubeswap } from '../constants';
-import FactoryAbi from '../utils/abis/uniswap/Factory.json';
-import PairAbi from '../utils/abis/uniswap/Pair.json';
-import { quote, swap } from '../utils/uniswap';
+import ERC20Abi from '../packages/app/utils/abis/ERC20.json';
+import { ubeswap } from '../packages/app/constants';
+import FactoryAbi from '../packages/app/utils/abis/uniswap/Factory.json';
+import PairAbi from '../packages/app/utils/abis/uniswap/Pair.json';
+import { quote, swap } from '../packages/app/utils/uniswap';
 import Web3 from 'web3';
 
 const ONE = Web3.utils.toWei('10');

@@ -13,7 +13,7 @@ import {
   toast,
   TokenIcons,
   WithLayout,
-} from 'components';
+} from '../components';
 import { add, format } from 'date-fns';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
@@ -21,8 +21,8 @@ import {
   buildStyles,
 } from 'react-circular-progressbar';
 import Loader from 'react-loader-spinner';
-import { Base } from 'state';
-import { formatAmount } from 'utils';
+import { Base } from '../state';
+import { formatAmount } from '../utils';
 import Web3 from 'web3';
 import { deployReleaseCelo } from '../utils/deploy-release-celo';
 
@@ -60,7 +60,7 @@ const defaultConfig = {
   amount: '',
 };
 
-function Stream() {
+export function Stream() {
   const { address, kit, performActions } = useContractKit();
 
   const [state, setState] = useState(States.None);
@@ -430,5 +430,3 @@ function Stream() {
     </>
   );
 }
-
-export default WithLayout(Stream);
