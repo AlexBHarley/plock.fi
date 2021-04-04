@@ -1,7 +1,8 @@
 import { NetworkNames, useContractKit } from '@celo-tools/use-contractkit';
+import { useEffect, useState } from 'react';
+import Loader from 'react-loader-spinner';
 import {
   AddressInput,
-  CopyText,
   Input,
   Panel,
   PanelDescription,
@@ -10,11 +11,8 @@ import {
   PanelWithButton,
   toast,
   Toggle,
-  WithLayout,
 } from '../components';
 import { FiatCurrency, networks } from '../constants';
-import { useEffect, useState } from 'react';
-import Loader from 'react-loader-spinner';
 import { Base } from '../state';
 
 export function Settings() {
@@ -25,6 +23,7 @@ export function Settings() {
     settings,
     toggleDarkMode,
     updateDefaultFiatCurrency,
+    track,
   } = Base.useContainer();
 
   const [state, setState] = useState({
@@ -51,6 +50,7 @@ export function Settings() {
     }
 
     setSaving(true);
+    track('account/update');
 
     try {
       await performActions(async (k) => {

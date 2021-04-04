@@ -3,6 +3,14 @@ import { eqAddress } from '@celo/base/lib/address';
 import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold';
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold';
 import BigNumber from 'bignumber.js';
+import { add, format } from 'date-fns';
+import React, { useCallback, useState } from 'react';
+import {
+  buildStyles,
+  CircularProgressbarWithChildren,
+} from 'react-circular-progressbar';
+import Loader from 'react-loader-spinner';
+import Web3 from 'web3';
 import {
   Input,
   Panel,
@@ -12,18 +20,9 @@ import {
   PanelWithButton,
   toast,
   TokenIcons,
-  WithLayout,
 } from '../components';
-import { add, format } from 'date-fns';
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-  CircularProgressbarWithChildren,
-  buildStyles,
-} from 'react-circular-progressbar';
-import Loader from 'react-loader-spinner';
 import { Base } from '../state';
-import { formatAmount, plausible } from '../utils';
-import Web3 from 'web3';
+import { formatAmount } from '../utils';
 import { deployReleaseCelo } from '../utils/deploy-release-celo';
 
 class GradientSVG extends React.Component {
@@ -62,6 +61,7 @@ const defaultConfig = {
 
 export function Stream() {
   const { address, kit, performActions } = useContractKit();
+  const { track } = Base.useContainer();
 
   const [state, setState] = useState(States.None);
   const [streamAddress, setStreamAddress] = useState('');
@@ -83,7 +83,7 @@ export function Stream() {
 
   const connect = useCallback(
     async (rgAddress: string) => {
-      plausible('view-stream');
+      track('stream/view');
       setState(States.Connecting);
 
       try {
@@ -136,7 +136,7 @@ export function Stream() {
     [kit]
   );
 
-  const deploy = useCallback(async () => {
+  const deploy = async () => {
     if (config.end.getTime() < config.start.getTime()) {
       toast.error('End date must be after start date');
       return;
@@ -147,7 +147,7 @@ export function Stream() {
       return;
     }
 
-    plausible('deploy-stream');
+    track('stream/deploy', { amount: config.amount });
 
     setState(States.Deploying);
 
@@ -173,10 +173,12 @@ export function Stream() {
     } finally {
       setState(States.None);
     }
-  }, [kit, address, config, connect]);
+  };
 
-  const withdraw = useCallback(async () => {
+  const withdraw = async () => {
     setState(States.Withdrawing);
+    track('stream/withdraw');
+
     try {
       await performActions(async (k) => {
         const rgw = new ReleaseGoldWrapper(
@@ -194,7 +196,7 @@ export function Stream() {
     } finally {
       setState(States.None);
     }
-  }, [stream, address, connect]);
+  };
 
   const innerRingValue = stream
     ? (stream.withdrawn.toNumber() / stream.total.toNumber()) * 100

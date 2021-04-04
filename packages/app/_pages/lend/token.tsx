@@ -16,7 +16,7 @@ import {
 import { Celo, cUSD, tokens, TokenTicker } from '../../constants';
 import { useCallback, useEffect, useState } from 'react';
 import { Aave } from '../../utils/aave';
-import { formatAmount, plausible } from '../../utils';
+import { formatAmount } from '../../utils';
 import BigNumber from 'bignumber.js';
 import Web3 from 'web3';
 import Loader from 'react-loader-spinner';
@@ -69,7 +69,7 @@ export function LendToken() {
   const { token: tokenTicker } = useParams();
 
   const { network, kit, address, performActions } = useContractKit();
-  const { balances } = Base.useContainer();
+  const { balances, track } = Base.useContainer();
 
   const [state, setState] = useState(States.None);
   const [accountSummary, setAccountSummary] = useState(defaultAccountSummary);
@@ -116,7 +116,7 @@ export function LendToken() {
     }
 
     const wei = Web3.utils.toWei(depositAmount);
-    plausible('withdraw', { amount: wei });
+    track('lend/withdraw', { amount: wei, token: tokenTicker });
 
     try {
       setState(States.Depositing);
@@ -138,7 +138,7 @@ export function LendToken() {
     }
 
     const wei = Web3.utils.toWei(depositAmount);
-    plausible('deposit', { amount: wei });
+    track('lend/deposit', { amount: wei, token: tokenTicker });
 
     try {
       setState(States.Depositing);
@@ -160,7 +160,7 @@ export function LendToken() {
     }
 
     const wei = Web3.utils.toWei(borrowAmount);
-    plausible('borrow', { amount: wei });
+    track('lend/borrow', { amount: wei, token: tokenTicker });
 
     try {
       setState(States.Borrowing);
@@ -182,7 +182,7 @@ export function LendToken() {
     }
 
     const wei = Web3.utils.toWei(borrowAmount);
-    plausible('repay', { amount: wei });
+    track('lend/repay', { amount: wei, token: tokenTicker });
 
     try {
       setState(States.Borrowing);
@@ -202,10 +202,6 @@ export function LendToken() {
     return <Panel>Invalid ticker</Panel>;
   }
 
-  const stableInterestRate = '0'; // reserve?.AverageStableRate?.toFixed(2) ?? '0';
-  const variableInterestRate = '0'; // reserve?.VariableRate?.toFixed(2) ?? '0';
-
-  // const deposited =
   const marketSize = reserve.AvailableLiquidity.plus(
     reserve.TotalBorrowsStable
   ).plus(reserve.TotalBorrowsVariable);

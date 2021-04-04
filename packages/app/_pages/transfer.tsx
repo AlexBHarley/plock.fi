@@ -1,10 +1,13 @@
 import { gql, useLazyQuery } from '@apollo/client';
 import { useContractKit } from '@celo-tools/use-contractkit';
+import { useEffect, useState } from 'react';
+import { HiOutlineExternalLink } from 'react-icons/hi';
+import { IoMdRefresh } from 'react-icons/io';
+import Web3 from 'web3';
 import {
   AddressInput,
   Balances,
   CopyText,
-  Input,
   Panel,
   PanelGrid,
   PanelHeader,
@@ -12,16 +15,11 @@ import {
   Table,
   toast,
   TokenInput,
-  WithLayout,
 } from '../components';
 import { Toggle } from '../components/toggle';
-import { useEffect, useState } from 'react';
-import { HiOutlineExternalLink } from 'react-icons/hi';
-import { IoMdRefresh } from 'react-icons/io';
+import { Celo } from '../constants';
 import { Base } from '../state';
-import { formatAmount, plausible, truncateAddress } from '../utils';
-import Web3 from 'web3';
-import { Celo, tokens } from '../constants';
+import { formatAmount, truncateAddress } from '../utils';
 import ERC20 from '../utils/abis/ERC20.json';
 
 const transferQuery = gql`
@@ -43,7 +41,7 @@ const transferQuery = gql`
 
 export function Transfer() {
   const { address, kit, network, performActions } = useContractKit();
-  const { balances, fetchBalances } = Base.useContainer();
+  const { balances, fetchBalances, track } = Base.useContainer();
   const [showTiny, setShowTiny] = useState(false);
   const [loadTransfers, { loading, data, refetch }] = useLazyQuery(
     transferQuery,
@@ -64,14 +62,13 @@ export function Transfer() {
       return;
     }
 
-    plausible('transfer');
+    const wei = Web3.utils.toWei(amount, 'ether');
+    track('transfer/transfer', { amount: wei });
 
     try {
       await performActions(async (k) => {
-        const erc20 = new kit.web3.eth.Contract(ERC20 as any, contractAddress);
-        await erc20.methods
-          .transfer(toAddress, Web3.utils.toWei(amount, 'ether'))
-          .send({ from: address });
+        const erc20 = new k.web3.eth.Contract(ERC20 as any, contractAddress);
+        await erc20.methods.transfer(toAddress).send({ from: address });
       });
       toast.success(`${amount} ${currency} sent`);
       fetchBalances();

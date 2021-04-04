@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { createContainer } from 'unstated-next';
 import { FiatCurrency, tokens } from '../constants';
+import { plausible } from '../utils';
 import ERC20 from '../utils/abis/ERC20.json';
 
 function getApolloClient(n: Network) {
@@ -187,7 +188,18 @@ function State() {
     [settings]
   );
 
+  const track = useCallback(
+    (event: string, props: any = {}) => {
+      plausible(event, {
+        ...props,
+        network: network.name,
+      });
+    },
+    [network]
+  );
+
   const toggleDarkMode = useCallback(() => {
+    track('plock/change-theme');
     if (settings.darkMode) {
       document.querySelector('html').classList.remove('dark');
       updateSetting('darkMode', false);
@@ -195,10 +207,11 @@ function State() {
       document.querySelector('html').classList.add('dark');
       updateSetting('darkMode', true);
     }
-  }, [settings, updateSetting]);
+  }, [settings, updateSetting, track]);
 
   const updateDefaultFiatCurrency = useCallback(
     (c: FiatCurrency) => {
+      track('plock/change-currency');
       updateSetting('currency', c);
     },
     [updateSetting]
@@ -225,6 +238,8 @@ function State() {
     toggleDarkMode,
     updateDefaultFiatCurrency,
     settings,
+
+    track,
   };
 }
 

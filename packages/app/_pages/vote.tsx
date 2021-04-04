@@ -10,10 +10,11 @@ import {
 
 import Countdown from 'react-countdown';
 import BigNumber from 'bignumber.js';
-import { plausible } from '../utils';
+import { Base } from '../state';
 
 export function Vote() {
   const { kit, performActions, address } = useContractKit();
+  const { track } = Base.useContainer();
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -100,7 +101,7 @@ export function Vote() {
   }, [fetchProposals]);
 
   const upvote = async (id: string) => {
-    plausible('upvote', { id });
+    track('vote/upvote', { id });
     try {
       await performActions(async (k) => {
         const governance = await k.contracts.getGovernance();
@@ -116,7 +117,7 @@ export function Vote() {
   };
 
   const vote = async (id: string, value: VoteValue) => {
-    plausible('vote', { id, value });
+    track('vote/vote', { id, value });
     try {
       await performActions(async (k) => {
         const governance = await k.contracts.getGovernance();

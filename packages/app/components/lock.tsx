@@ -1,12 +1,12 @@
-import { formatAmount, plausible, toWei, truncateAddress } from '../utils';
-import { Panel, PanelGrid, PanelHeader } from './panel';
 import { useContractKit } from '@celo-tools/use-contractkit';
-import { Base } from '../state';
-import { useCallback, useState } from 'react';
-import { toast } from '../components';
+import { useState } from 'react';
 import Loader from 'react-loader-spinner';
-import { Input, TokenInput } from './input';
+import { toast } from '../components';
 import { Celo } from '../constants';
+import { Base } from '../state';
+import { formatAmount, toWei, truncateAddress } from '../utils';
+import { TokenInput } from './input';
+import { Panel, PanelGrid, PanelHeader } from './panel';
 
 enum States {
   None,
@@ -17,13 +17,13 @@ enum States {
 }
 
 export function LockCelo() {
-  const { address, kit, performActions } = useContractKit();
-  const { accountSummary, lockedSummary, balances } = Base.useContainer();
+  const { address, performActions } = useContractKit();
+  const { lockedSummary, balances, track } = Base.useContainer();
   const [lockAmount, setLockAmount] = useState('');
   const [state, setState] = useState(States.None);
 
   const lock = async () => {
-    plausible('lock', { amount: toWei(lockAmount) });
+    track('lock', { amount: toWei(lockAmount) });
     setState(States.Locking);
     try {
       await performActions(async (k) => {
@@ -41,7 +41,7 @@ export function LockCelo() {
   };
 
   const unlock = async () => {
-    plausible('unlock', { amount: toWei(lockAmount) });
+    track('unlock', { amount: toWei(lockAmount) });
 
     setState(States.Unlocking);
     try {

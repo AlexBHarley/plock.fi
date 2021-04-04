@@ -14,7 +14,6 @@ import { Base } from '../state';
 import Web3 from 'web3';
 import { Celo, cUSD, Token, tokens, TokenTicker } from '../constants';
 import { quote, swap } from '../utils/uniswap';
-import { plausible } from '../utils';
 
 enum States {
   Loading = 'Loading',
@@ -26,7 +25,7 @@ const buildCacheKey = (from: Token, to: Token) => `${from.ticker}-${to.ticker}`;
 
 export function Swap() {
   const { network, kit, performActions } = useContractKit();
-  const { fetchBalances, balances } = Base.useContainer();
+  const { fetchBalances, balances, track } = Base.useContainer();
   const [state, setState] = useState(States.None);
   const [fromToken, setFromToken] = useState(Celo);
   const [amounts, setAmounts] = useState({ from: '', to: '' });
@@ -34,7 +33,12 @@ export function Swap() {
   const [exchangeRateCache, setExchangeRateCache] = useState({});
 
   const handleSwap = async () => {
-    plausible('swap', { from: fromToken.ticker, to: toToken.ticker });
+    const amount = Web3.utils.toWei(amounts.from);
+    track('swap/swap', {
+      from: fromToken.ticker,
+      to: toToken.ticker,
+      amount,
+    });
     await performActions(async (k) => {
       try {
         setState(States.Swapping);
@@ -42,7 +46,7 @@ export function Swap() {
           k as any,
           fromToken.networks[network.name],
           toToken.networks[network.name],
-          Web3.utils.toWei(amounts.from)
+          amount
         );
         fetchBalances();
         toast.success('Swap successful');

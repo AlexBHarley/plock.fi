@@ -16,13 +16,7 @@ import {
   toast,
 } from '../components';
 import { Base } from '../state';
-import {
-  formatAmount,
-  plausible,
-  toWei,
-  truncate,
-  truncateAddress,
-} from '../utils';
+import { formatAmount, toWei, truncate, truncateAddress } from '../utils';
 
 enum States {
   None,
@@ -60,7 +54,12 @@ export async function getValidatorGroupScore(
 
 export function Earn() {
   const { kit, performActions, address } = useContractKit();
-  const { lockedSummary, fetchLockedSummary, balances } = Base.useContainer();
+  const {
+    lockedSummary,
+    fetchLockedSummary,
+    balances,
+    track,
+  } = Base.useContainer();
 
   const [groupVotes, setGroupVotes] = useState<GroupVote[]>([]);
   const [hasActivatablePendingVotes, setHasActivatablePendingVotes] = useState(
@@ -98,7 +97,7 @@ export function Earn() {
   );
 
   const activate = async () => {
-    plausible('activate');
+    track('stake/activate');
     setState(States.Activating);
     try {
       await performActions(async (k) => {
@@ -119,7 +118,7 @@ export function Earn() {
   };
 
   const vote = async (address: string, value: string) => {
-    plausible('vote', { address, value });
+    track('stake/vote', { address, value });
     setState(States.Voting);
     try {
       await performActions(async (k) => {
@@ -141,7 +140,7 @@ export function Earn() {
   };
 
   const revoke = async (address: string, value: string) => {
-    plausible('revoke', { address, value });
+    track('stake/revoke', { address, value });
     setState(States.Revoking);
     try {
       await performActions(async (k) => {
