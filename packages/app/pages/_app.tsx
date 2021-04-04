@@ -18,8 +18,8 @@ function MyApp({ Component, pageProps }: AppProps) {
           <script
             async
             defer
-            data-domain="plock.fi"
-            src="https://stats.plock.fi/js/plausible.js"
+            data-domain="app.plock.fi"
+            src="https://stats.app.plock.fi/js/index.js"
           />
         )}
       </Head>
