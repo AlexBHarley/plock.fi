@@ -63,22 +63,24 @@ export const WithMarketingLayout = (Component: any) => () => {
                 </button>
               </div>
               <nav className="hidden md:flex space-x-10">
-                <a
-                  href="/#features"
-                  className="text-base font-medium text-gray-500 hover:text-gray-900"
-                >
-                  Features
-                </a>
-                <a
-                  href="/about"
-                  className="text-base font-medium text-gray-500 hover:text-gray-900"
-                >
-                  About
-                </a>
+                <Link href="/#features">
+                  <a className="text-base font-medium text-gray-500 hover:text-gray-900">
+                    Features
+                  </a>
+                </Link>
+                <Link href="/about">
+                  <a className="text-base font-medium text-gray-500 hover:text-gray-900">
+                    About
+                  </a>
+                </Link>
               </nav>
               <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
                 <a
-                  href="/transfer"
+                  href={
+                    process.env.NODE_ENV === 'production'
+                      ? 'https://app.plock.fi'
+                      : 'http://localhost:3001'
+                  }
                   className="ml-8 whitespace-nowrap inline-flex items-center justify-center primary-button"
                 >
                   To app
