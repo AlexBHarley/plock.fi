@@ -124,6 +124,7 @@ export function Transfer() {
                   value={toAddress}
                   copyable={false}
                   onChange={(e) => setToAddress(e.target.value)}
+                  scanToInput
                 />
               </div>
             </div>
@@ -139,7 +140,7 @@ export function Transfer() {
         <PanelGrid>
           <PanelHeader>Receive</PanelHeader>
 
-          <AddressInput copyable disabled readOnly value={address} />
+          <AddressInput copyable scanToCopy disabled readOnly value={address} />
         </PanelGrid>
       </Panel>
 

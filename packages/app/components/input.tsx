@@ -1,12 +1,16 @@
 import { useContractKit } from '@celo-tools/use-contractkit';
-import { Token, tokens, TokenTicker } from '../constants';
-import { InputHTMLAttributes, useState } from 'react';
-import Web3 from 'web3';
 import BigNumber from 'bignumber.js';
-import { CopyText } from './copy-text';
-import { Modal } from './modals';
 import QRCode from 'qrcode.react';
+import { InputHTMLAttributes, useState } from 'react';
+if (typeof window != 'undefined') {
+  var QrReader = require('react-qr-reader');
+}
+import Web3 from 'web3';
+import { toast } from '.';
+import { Token, tokens } from '../constants';
+import { CopyText } from './copy-text';
 import { TokenIcons } from './icon';
+import { Modal } from './modals';
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   const { className } = props;
@@ -21,15 +25,33 @@ export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
 
 export function AddressInput(
   props: InputHTMLAttributes<HTMLInputElement> & {
-    copyable: boolean;
+    copyable?: boolean;
+    scanToInput?: boolean;
+    scanToCopy?: boolean;
   }
 ) {
-  const [qrModal, setQrModal] = useState(false);
+  const [qrScanModal, setQrScanModal] = useState(false);
+  const [qrInputModal, setQrInputModal] = useState(false);
+
+  const handleScan = (value: string) => {
+    if (value) {
+      console.log('handleScan', value);
+      // @ts-ignore
+      props.onChange({ target: { value } });
+      setQrInputModal(false);
+    }
+  };
+
+  const handleError = (err: Error) => {
+    console.log('handleError', err);
+    toast.error(err.message);
+    setQrInputModal(false);
+  };
 
   return (
     <>
-      {qrModal && (
-        <Modal onDismiss={() => setQrModal(false)}>
+      {qrScanModal && (
+        <Modal onDismiss={() => setQrScanModal(false)}>
           <QRCode
             className="w-48 w-48 md:h-96 md:w-96"
             style={{ height: undefined, width: undefined }}
@@ -37,6 +59,15 @@ export function AddressInput(
           />
         </Modal>
       )}
+
+      {qrInputModal && (
+        <Modal onDismiss={() => setQrInputModal(false)}>
+          <div className="w-48 w-48 md:h-96 md:w-96">
+            <QrReader delay={300} onError={handleError} onScan={handleScan} />
+          </div>
+        </Modal>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:space-x-4 items-center">
         <Input
           type="text"
@@ -46,23 +77,48 @@ export function AddressInput(
 
         <div className="flex items-center justify-around sm:justify-center sm:space-x-2 mt-3 sm:mt-0">
           {props.copyable && <CopyText text={props.value as string} />}
-
-          <button onClick={() => setQrModal(true)}>
-            <svg
-              className="h-4 w-4"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-              />
-            </svg>
-          </button>
+          {props.scanToCopy && (
+            <button onClick={() => setQrScanModal(true)}>
+              <svg
+                className="h-4 w-4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                />
+              </svg>
+            </button>
+          )}
+          {props.scanToInput && (
+            <button onClick={() => setQrInputModal(true)}>
+              <svg
+                className="h-4 w-4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
     </>

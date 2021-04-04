@@ -1,8 +1,12 @@
 import { NetworkNames, useContractKit } from '@celo-tools/use-contractkit';
 import {
+  AddressInput,
   CopyText,
   Input,
   Panel,
+  PanelDescription,
+  PanelGrid,
+  PanelHeader,
   PanelWithButton,
   toast,
   Toggle,
@@ -88,56 +92,50 @@ export function Settings() {
   return (
     <>
       <PanelWithButton>
-        <div>
-          <div className="md:grid md:grid-cols-3 md:gap-6">
-            <div className="md:col-span-1">
-              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
-                General
-              </h3>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                Allow people to identify you on the Celo network.
-              </p>
+        <PanelGrid>
+          <div>
+            <PanelHeader>General</PanelHeader>
+            <PanelDescription>
+              Allow people to identify you on the Celo network
+            </PanelDescription>
+          </div>
+          <div className="space-y-6">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium ">
+                Name
+              </label>
+              <div className="mt-1">
+                <Input
+                  id="name"
+                  name="name"
+                  placeholder="John Doe"
+                  value={state.name}
+                  onChange={(e) => changeProperty('name', e.target.value)}
+                />
+              </div>
             </div>
-            <div className="mt-5 md:mt-0 md:col-span-2">
-              <div className="space-y-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium ">
-                    Name
-                  </label>
-                  <div className="mt-1">
-                    <Input
-                      id="name"
-                      name="name"
-                      placeholder="John Doe"
-                      value={state.name}
-                      onChange={(e) => changeProperty('name', e.target.value)}
-                    />
-                  </div>
-                </div>
 
-                <div>
-                  <label
-                    htmlFor="metadataURL"
-                    className="block text-sm font-medium "
-                  >
-                    Metadata URL
-                  </label>
-                  <div className="mt-1">
-                    <Input
-                      id="metadataURL"
-                      name="metadataURL"
-                      placeholder="https://example.com/metadata.json"
-                      value={state.metadataURL}
-                      onChange={(e) =>
-                        changeProperty('metadataURL', e.target.value)
-                      }
-                    />
-                  </div>
-                </div>
+            <div>
+              <label
+                htmlFor="metadataURL"
+                className="block text-sm font-medium "
+              >
+                Metadata URL
+              </label>
+              <div className="mt-1">
+                <Input
+                  id="metadataURL"
+                  name="metadataURL"
+                  placeholder="https://example.com/metadata.json"
+                  value={state.metadataURL}
+                  onChange={(e) =>
+                    changeProperty('metadataURL', e.target.value)
+                  }
+                />
               </div>
             </div>
           </div>
-        </div>
+        </PanelGrid>
 
         <button
           onClick={save}
@@ -153,172 +151,151 @@ export function Settings() {
       </PanelWithButton>
 
       <Panel>
-        <div className="md:grid md:grid-cols-3 md:gap-6 py-2">
-          <div className="md:col-span-1">
-            <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
-              Account data
-            </h3>
-            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        <PanelGrid>
+          <div>
+            <PanelHeader>Account data</PanelHeader>
+            <PanelDescription>
               Addresses and signing keys associated with your account
-            </p>
+            </PanelDescription>
           </div>
-          <div className="mt-5 md:mt-0 md:col-span-2">
-            <div className="space-y-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium ">
-                  Address
-                </label>
-                <div className="mt-1 flex items-center space-x-3">
-                  <Input id="name" name="name" readOnly value={address} />
-                  <CopyText text={address} />
-                </div>
-              </div>
+          <div className="space-y-6">
+            <div className="space-y-1">
+              <label htmlFor="name" className="block text-sm font-medium ">
+                Address
+              </label>
 
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium ">
-                  Wallet address
-                </label>
-                <div className="mt-1 flex items-center space-x-3">
-                  <Input
-                    id="name"
-                    name="name"
-                    placeholder="No wallet address set"
-                    readOnly
-                    value={accountSummary.wallet}
-                  />
-                  <CopyText text={accountSummary.wallet} />
-                </div>
-              </div>
+              <AddressInput
+                value={address}
+                copyable
+                scanToCopy
+                disabled
+                readOnly
+              />
+            </div>
 
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium ">
-                  Vote signer
-                </label>
-                <div className="mt-1 flex items-center space-x-3">
-                  <Input
-                    id="name"
-                    name="name"
-                    placeholder="No vote signing key set"
-                    readOnly
-                    value={accountSummary.authorizedSigners.attestation}
-                  />
-                  <CopyText
-                    text={accountSummary.authorizedSigners.attestation}
-                  />
-                </div>
-              </div>
+            <div className="space-y-1">
+              <label htmlFor="name" className="block text-sm font-medium ">
+                Wallet address
+              </label>
+              <AddressInput
+                placeholder="No wallet address set"
+                value={accountSummary.wallet}
+                copyable
+                scanToCopy
+                disabled
+                readOnly
+              />
+            </div>
 
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium ">
-                  Attestation signer
-                </label>
-                <div className="mt-1 flex items-center space-x-3">
-                  <Input
-                    id="name"
-                    name="name"
-                    placeholder="No attestation signing key set"
-                    readOnly
-                    value={accountSummary.authorizedSigners.attestation}
-                  />
-                  <CopyText
-                    text={accountSummary.authorizedSigners.attestation}
-                  />
-                </div>
-              </div>
+            <div className="space-y-1">
+              <label htmlFor="name" className="block text-sm font-medium ">
+                Vote signer
+              </label>
+              <AddressInput
+                placeholder="No vote signing set"
+                value={accountSummary.authorizedSigners.vote}
+                copyable
+                scanToCopy
+                disabled
+                readOnly
+              />
+            </div>
 
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium ">
-                  Validator signer
-                </label>
-                <div className="mt-1 flex items-center space-x-3">
-                  <Input
-                    id="name"
-                    name="name"
-                    placeholder="No validator signing key set"
-                    readOnly
-                    value={accountSummary.authorizedSigners.validator}
-                  />
-                  <CopyText text={accountSummary.authorizedSigners.validator} />
-                </div>
-              </div>
+            <div className="space-y-1">
+              <label htmlFor="name" className="block text-sm font-medium ">
+                Attestation signer
+              </label>
+              <AddressInput
+                placeholder="No attestation signing set"
+                value={accountSummary.authorizedSigners.attestation}
+                copyable
+                scanToCopy
+                disabled
+                readOnly
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="name" className="block text-sm font-medium ">
+                Validator signer
+              </label>
+              <AddressInput
+                placeholder="No attestation signing set"
+                value={accountSummary.authorizedSigners.validator}
+                copyable
+                scanToCopy
+                disabled
+                readOnly
+              />
             </div>
           </div>
-        </div>
+        </PanelGrid>
       </Panel>
 
       <Panel>
-        <div>
-          <div className="md:grid md:grid-cols-3 md:gap-6">
-            <div className="md:col-span-1">
-              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
-                Plock
-              </h3>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                Change behaviour of Plock to suit your usage better.
-              </p>
+        <PanelGrid>
+          <div>
+            <PanelHeader>Plock</PanelHeader>
+            <PanelDescription>
+              Change behaviour of Plock to suit your usage better.
+            </PanelDescription>
+          </div>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <label htmlFor="name" className="block text-sm font-medium ">
+                Network
+              </label>
+
+              <select
+                name=""
+                id=""
+                className="p-2 dark:bg-gray-750 rounded-md border border-gray-300 dark:border-gray-500"
+                value={network.name}
+                onChange={(e) => {
+                  const network = networks.find(
+                    (n) => n.name === e.target.value
+                  );
+                  updateNetwork(network);
+                }}
+              >
+                {Object.values(NetworkNames).map((n) => (
+                  <option value={n}>{n}</option>
+                ))}
+              </select>
             </div>
-            <div className="mt-5 md:mt-0 md:col-span-2">
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <label htmlFor="name" className="block text-sm font-medium ">
-                    Network
-                  </label>
 
-                  <select
-                    name=""
-                    id=""
-                    className="p-2 dark:bg-gray-750 rounded-md border border-gray-300 dark:border-gray-500"
-                    value={network.name}
-                    onChange={(e) => {
-                      const network = networks.find(
-                        (n) => n.name === e.target.value
-                      );
-                      updateNetwork(network);
-                    }}
-                  >
-                    {Object.values(NetworkNames).map((n) => (
-                      <option value={n}>{n}</option>
-                    ))}
-                  </select>
-                </div>
+            <div className="flex items-center justify-between">
+              <label htmlFor="name" className="block text-sm font-medium ">
+                Default Currency
+              </label>
 
-                <div className="flex items-center justify-between">
-                  <label htmlFor="name" className="block text-sm font-medium ">
-                    Default Currency
-                  </label>
+              <select
+                name=""
+                id=""
+                className="p-2 dark:bg-gray-750 rounded-md border border-gray-300 dark:border-gray-500"
+                value={settings.currency}
+                onChange={(e) =>
+                  updateDefaultFiatCurrency(e.target.value as FiatCurrency)
+                }
+              >
+                {Object.values(FiatCurrency).map((n) => (
+                  <option value={n}>{n}</option>
+                ))}
+              </select>
+            </div>
 
-                  <select
-                    name=""
-                    id=""
-                    className="p-2 dark:bg-gray-750 rounded-md border border-gray-300 dark:border-gray-500"
-                    value={settings.currency}
-                    onChange={(e) =>
-                      updateDefaultFiatCurrency(e.target.value as FiatCurrency)
-                    }
-                  >
-                    {Object.values(FiatCurrency).map((n) => (
-                      <option value={n}>{n}</option>
-                    ))}
-                  </select>
-                </div>
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="metadataURL"
+                className="block text-sm font-medium "
+              >
+                Dark Mode
+              </label>
 
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="metadataURL"
-                    className="block text-sm font-medium "
-                  >
-                    Dark Mode
-                  </label>
-
-                  <Toggle
-                    active={settings.darkMode}
-                    onChange={toggleDarkMode}
-                  />
-                </div>
-              </div>
+              <Toggle active={settings.darkMode} onChange={toggleDarkMode} />
             </div>
           </div>
-        </div>
+        </PanelGrid>
       </Panel>
     </>
   );
