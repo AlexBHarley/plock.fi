@@ -415,11 +415,11 @@ export function LendToken() {
                 max={balances[token.ticker].toString()}
                 token={token}
               />
-              <div className="md:flex md:items-center md:justify-between">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div className="text-gray-500 dark:text-gray-400">
                   Interest Rate
                 </div>
-                <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex items-center justify-around md:justify-end md:space-x-4 text-sm text-gray-500 dark:text-gray-400">
                   <div>Stable ({formatAmount(reserve.AverageStableRate)}%)</div>
                   <Toggle
                     active={interestRate === 'stable'}

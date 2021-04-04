@@ -22,14 +22,17 @@ export function Dashboard() {
   return (
     <>
       <Panel>
-        <div className="relative">
-          <PanelHeader>Welcome to Plock.fi</PanelHeader>
-          <PanelDescription>
-            Plock.fi is your home for everything DeFi on Celo.
-          </PanelDescription>
-
-          <div className="absolute right-2 top-0">
-            <div className="text-lg text-gray-500 font-light">Net Worth</div>
+        <div className="flex justify-between">
+          <div>
+            <PanelHeader>Welcome to Plock.fi</PanelHeader>
+            <PanelDescription>
+              Plock.fi is your home for everything DeFi on Celo.
+            </PanelDescription>
+          </div>
+          <div className="">
+            <div className="text-lg text-gray-500 font-light whitespace-nowrap">
+              Net Worth
+            </div>
             <div className="text-3xl">$0.00</div>
           </div>
         </div>
@@ -37,7 +40,7 @@ export function Dashboard() {
         <div className="text-gray-600 dark:text-gray-400 text-sm leading-7">
           <p className="mb-1">Get started right now by:</p>
 
-          <ul className="list-inside list-disc ">
+          <ul className="list-inside list-disc mb-1">
             <li>
               Swapping tokens with <Link url="/swap">Ubeswap</Link>
             </li>
@@ -51,9 +54,15 @@ export function Dashboard() {
               <Link url="/vote">Voting</Link> on Celo governance proposals
             </li>
             <li>
-              <Link url="/stream">Streaming</Link> money in realtime
+              <Link url="/stream">Streaming</Link> money in realtime.
             </li>
           </ul>
+
+          <p>
+            For any questions hop into the{' '}
+            <Link url="https://chat.celo.org">Celo Discord</Link> and look for
+            the channel <Link url="https://chat.celo.org">#plockfi</Link>.
+          </p>
         </div>
       </Panel>
 
