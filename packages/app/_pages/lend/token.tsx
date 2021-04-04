@@ -87,7 +87,7 @@ export function LendToken() {
   );
 
   const fetchAccountSummary = useCallback(async () => {
-    if (!token) {
+    if (!token || !address) {
       return;
     }
 
@@ -240,7 +240,7 @@ export function LendToken() {
         <div className="flex flex-row items-center sm:px-20 space-x-12">
           <div className="space-y-3">
             <div>
-              <div className="text-xs text-gray-600 whitespace-nowrap">
+              <div className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
                 Borrowed
               </div>
               <div className="text-xl font-medium">
@@ -249,7 +249,7 @@ export function LendToken() {
                 )}{' '}
                 <span className="text-base">{token.ticker}</span>
               </div>
-              <div className="text-xs text-gray-600 whitespace-nowrap">
+              <div className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
                 <div>
                   {formatAmount(reserve.AverageStableRate)}% stable borrow APY{' '}
                 </div>
@@ -278,59 +278,59 @@ export function LendToken() {
           </div>
 
           <div>
-            <div className="text-xs text-gray-600 whitespace-nowrap">
+            <div className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
               Available Liquidity
             </div>
             <div className="text-xl font-medium">
               {formatAmount(reserve.AvailableLiquidity)}{' '}
               <span className="text-base">{token.ticker}</span>
             </div>
-            <div className="text-xs text-gray-600 whitespace-nowrap">
+            <div className="text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
               {formatAmount(reserve.LiquidityRate)}% deposit APY
             </div>
           </div>
         </div>
 
         <div>
-          <h3 className="text-lg leading-6 font-medium text-gray-900">
+          <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-200">
             Your position
           </h3>
-          <dl className="mt-5 grid grid-cols-1 rounded-lg bg-white overflow-hidden shadow divide-y divide-gray-200 md:grid-cols-3 md:divide-y-0 md:divide-x">
+          <dl className="mt-5 grid grid-cols-1 rounded-lg bg-white dark:bg-gray-700 overflow-hidden shadow divide-y divide-gray-200 md:grid-cols-3 md:divide-y-0 md:divide-x">
             <div className="px-4 py-5 sm:p-6">
-              <dt className="text-base font-normal text-gray-900">
+              <dt className="text-base font-normal text-gray-900 dark:text-gray-200">
                 Total Deposited
               </dt>
               <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
-                <div className="flex items-baseline text-2xl font-semibold text-indigo-600">
+                <div className="flex items-baseline text-2xl font-semibold text-indigo-600 dark:text-indigo-300">
                   {formatAmount(accountSummary.Deposited)}
-                  <span className="ml-2 text-sm font-medium text-gray-500">
+                  <span className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">
                     {formatAmount(accountSummary.LiquidityRate)}%
                   </span>
                 </div>
               </dd>
             </div>
             <div className="px-4 py-5 sm:p-6">
-              <dt className="text-base font-normal text-gray-900">
+              <dt className="text-base font-normal text-gray-900 dark:text-gray-200">
                 Total Borrowed
               </dt>
               <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
-                <div className="flex items-baseline text-2xl font-semibold text-indigo-600">
+                <div className="flex items-baseline text-2xl font-semibold text-indigo-600 dark:text-indigo-300">
                   {formatAmount(accountSummary.Borrowed)}
 
-                  <span className="ml-2 text-sm font-medium text-gray-500">
+                  <span className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">
                     {formatAmount(accountSummary.BorrowRate)}%
                   </span>
                 </div>
               </dd>
             </div>
             <div className="px-4 py-5 sm:p-6">
-              <dt className="text-base font-normal text-gray-900">
+              <dt className="text-base font-normal text-gray-900 dark:text-gray-200">
                 Avg. Click Rate
               </dt>
               <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
-                <div className="flex items-baseline text-2xl font-semibold text-indigo-600">
+                <div className="flex items-baseline text-2xl font-semibold text-indigo-600 dark:text-indigo-300">
                   24.57%
-                  <span className="ml-2 text-sm font-medium text-gray-500">
+                  <span className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-400">
                     from 28.62%
                   </span>
                 </div>
@@ -416,8 +416,10 @@ export function LendToken() {
                 token={token}
               />
               <div className="md:flex md:items-center md:justify-between">
-                <div className="text-gray-500">Interest Rate</div>
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                <div className="text-gray-500 dark:text-gray-400">
+                  Interest Rate
+                </div>
+                <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                   <div>Stable ({formatAmount(reserve.AverageStableRate)}%)</div>
                   <Toggle
                     active={interestRate === 'stable'}

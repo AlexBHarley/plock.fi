@@ -106,23 +106,23 @@ export function LendOverview() {
         </p>
 
         <div>
-          <dl className="grid grid-cols-1 rounded-lg bg-white overflow-hidden shadow divide-y divide-gray-200 md:grid-cols-3 md:divide-y-0 md:divide-x">
+          <dl className="grid grid-cols-1 rounded-lg bg-white dark:bg-gray-700 overflow-hidden shadow divide-y divide-gray-200 md:grid-cols-3 md:divide-y-0 md:divide-x">
             <div className="px-4 py-5 sm:p-6">
-              <dt className="text-base font-medium text-gray-600">
+              <dt className="text-base font-medium text-gray-600 dark:text-gray-200">
                 Total Liquidity
               </dt>
               <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
-                <div className="flex items-baseline text-2xl font-semibold text-indigo-600">
+                <div className="flex items-baseline text-2xl font-semibold text-indigo-600 dark:text-indigo-300">
                   {formatAmount(accountSummary.TotalLiquidity)}
                 </div>
               </dd>
             </div>
             <div className="px-4 py-5 sm:p-6">
-              <dt className="text-base font-medium text-gray-600">
+              <dt className="text-base font-medium text-gray-600 dark:text-gray-200">
                 Available To Borrow
               </dt>
               <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
-                <div className="flex items-baseline text-2xl font-semibold text-indigo-600">
+                <div className="flex items-baseline text-2xl font-semibold text-indigo-600 dark:text-indigo-300">
                   {formatAmount(accountSummary.AvailableBorrow)}
                 </div>
                 {/* <div className="inline-flex items-baseline px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800 md:mt-2 lg:mt-0">
@@ -144,11 +144,11 @@ export function LendOverview() {
               </dd>
             </div>
             <div className="px-4 py-5 sm:p-6">
-              <dt className="text-base font-medium text-gray-600">
+              <dt className="text-base font-medium text-gray-600 dark:text-gray-200">
                 Health Factor
               </dt>
               <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
-                <div className="flex items-baseline text-2xl font-semibold text-indigo-600">
+                <div className="flex items-baseline text-2xl font-semibold text-indigo-600 dark:text-indigo-300">
                   {isSafe ? 'Safe' : 'Not Safe'}
                 </div>
                 <div
@@ -217,7 +217,7 @@ export function LendOverview() {
               const Icon = TokenIcons[r.ticker];
               return [
                 <Link to={`/lend/${r.ticker}`}>
-                  <span className="px-4 py-2 bg-gray-800 hover:bg-gray-900 transition text-white rounded">
+                  <span className="px-4 py-2 bg-gray-800 hover:bg-gray-900 dark:bg-gray-50 dark:hover:bg-gray-300 text-white dark:text-gray-800 transition  rounded">
                     Trade
                   </span>
                 </Link>,
