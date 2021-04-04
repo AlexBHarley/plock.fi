@@ -17,6 +17,5 @@
   const preference = window.matchMedia('(prefers-color-scheme: dark)').matches;
   if (preference) {
     document.documentElement.classList.add('dark');
-    // localStorage.setItem({...settings, darkMode: true})
   }
 })();
