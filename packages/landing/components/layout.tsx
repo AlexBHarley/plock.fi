@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export const WithMarketingLayout = (Component: any) => () => {
   const [menu, setMenu] = useState(false);
@@ -133,54 +134,52 @@ export const WithMarketingLayout = (Component: any) => () => {
                     </div>
                     <div className="mt-6">
                       <nav className="grid grid-cols-1 gap-7">
-                        <a
-                          href="/about"
-                          className="-m-3 p-3 flex items-center rounded-lg hover:bg-gray-50"
-                        >
-                          <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
-                            <svg
-                              className="h-6 w-6"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                          </div>
-                          <div className="ml-4 text-base font-medium text-gray-900">
-                            About
-                          </div>
-                        </a>
-                        <a
-                          href="/team"
-                          className="-m-3 p-3 flex items-center rounded-lg hover:bg-gray-50"
-                        >
-                          <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
-                            <svg
-                              className="h-6 w-6"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                              />
-                            </svg>
-                          </div>
-                          <div className="ml-4 text-base font-medium text-gray-900">
-                            Team
-                          </div>
-                        </a>
+                        <Link href="/about">
+                          <a className="-m-3 p-3 flex items-center rounded-lg hover:bg-gray-50">
+                            <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+                              <svg
+                                className="h-6 w-6"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                            </div>
+                            <div className="ml-4 text-base font-medium text-gray-900">
+                              About
+                            </div>
+                          </a>
+                        </Link>
+                        <Link href="/team">
+                          <a className="-m-3 p-3 flex items-center rounded-lg hover:bg-gray-50">
+                            <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+                              <svg
+                                className="h-6 w-6"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                                />
+                              </svg>
+                            </div>
+                            <div className="ml-4 text-base font-medium text-gray-900">
+                              Team
+                            </div>
+                          </a>
+                        </Link>
                         <a
                           target="_blank"
                           href="https://chat.celo.org"
@@ -213,7 +212,11 @@ export const WithMarketingLayout = (Component: any) => () => {
                   <div className="py-6 px-5">
                     <div className="mt-6">
                       <a
-                        href="/transfer"
+                        href={
+                          process.env.NODE_ENV === 'production'
+                            ? 'https://app.plock.fi'
+                            : 'http://localhost:3001'
+                        }
                         className="w-full flex items-center justify-center primary-button"
                       >
                         To app
@@ -374,6 +377,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                 <a
                   href="https://github.com/alexbharley"
                   className="text-gray-600 dark:text-gray-400 hover:text-gray-500"
+                  target="_blank"
                 >
                   <span className="sr-only">GitHub</span>
                   <svg
@@ -390,7 +394,8 @@ export const WithMarketingLayout = (Component: any) => () => {
                   </svg>
                 </a>
                 <a
-                  href="#"
+                  href="https://chat.celo.org"
+                  target="_blank"
                   className="text-gray-600 dark:text-gray-400 hover:text-gray-500"
                 >
                   <span className="sr-only">Discord</span>
