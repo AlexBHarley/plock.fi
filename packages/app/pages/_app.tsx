@@ -15,12 +15,20 @@ function MyApp({ Component, pageProps }: AppProps) {
         <script async src="/dark-mode.js" />
 
         {process.browser && (
-          <script
-            async
-            defer
-            data-domain="app.plock.fi"
-            src="https://stats.app.plock.fi/js/index.js"
-          />
+          <>
+            <script
+              async
+              defer
+              data-domain="app.plock.fi"
+              src="https://stats.app.plock.fi/js/index.js"
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html:
+                  '<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>',
+              }}
+            ></script>
+          </>
         )}
       </Head>
 

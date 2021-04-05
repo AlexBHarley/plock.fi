@@ -8,7 +8,6 @@ import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { createContainer } from 'unstated-next';
 import { FiatCurrency, tokens } from '../constants';
-import { plausible } from '../utils';
 import ERC20 from '../utils/abis/ERC20.json';
 
 function getApolloClient(n: Network) {
@@ -190,7 +189,8 @@ function State() {
 
   const track = useCallback(
     (event: string, props: any = {}) => {
-      plausible(event, {
+      // @ts-ignore
+      window.plausible(event, {
         props: {
           ...props,
           network: network.name,
