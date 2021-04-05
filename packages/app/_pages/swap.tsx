@@ -74,7 +74,7 @@ export function Swap() {
 
     async function f() {
       if (!exchangeRateCache[key]) {
-        const [one, two] = await quote(
+        const rate = await quote(
           kit as any,
           fromToken.networks[network.name],
           Web3.utils.toWei('1', 'ether'), // just to get some more decimal places
@@ -83,7 +83,7 @@ export function Swap() {
 
         setExchangeRateCache((c) => ({
           ...c,
-          [key]: two / one,
+          [key]: Web3.utils.fromWei(rate),
         }));
       }
     }
@@ -127,7 +127,7 @@ export function Swap() {
                 const rate = exchangeRateCache[key] ?? 1;
 
                 const to = new BigNumber(from)
-                  .dividedBy(new BigNumber(rate))
+                  .multipliedBy(new BigNumber(rate))
                   .toFixed(2);
                 setAmounts({ from, to });
               }}
@@ -144,12 +144,16 @@ export function Swap() {
                 if (to === amounts.to) {
                   return;
                 }
+                if (!to) {
+                  setAmounts({ from: '', to: '' });
+                  return;
+                }
 
                 const key = buildCacheKey(fromToken, toToken);
                 const rate = exchangeRateCache[key] ?? 1;
 
                 const from = new BigNumber(to)
-                  .multipliedBy(new BigNumber(rate))
+                  .dividedBy(new BigNumber(rate))
                   .toFixed(2);
                 setAmounts({ from, to });
               }}

@@ -68,7 +68,7 @@ export function AddressInput(
         </Modal>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:space-x-4 items-center">
+      <div className="flex flex-row space-x-4 items-center">
         <Input
           type="text"
           placeholder="0x7d21685c17607338b313a7174bab6620bad0aab7"

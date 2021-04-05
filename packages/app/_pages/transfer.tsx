@@ -103,7 +103,7 @@ export function Transfer() {
         <div>
           <PanelHeader>Transfer</PanelHeader>
           <div>
-            <div className="flex flex-col sm:flex-row">
+            <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row">
               <div className="sm:w-5/12">
                 <TokenInput
                   value={amount}
@@ -114,11 +114,11 @@ export function Transfer() {
                 />
               </div>
 
-              <div className="text-gray-900 dark:text-gray-200 w-2/12 flex justify-center items-center">
+              <div className="text-gray-900 dark:text-gray-200 sm:w-2/12 flex justify-center items-center">
                 to
               </div>
 
-              <div className="w-5/12">
+              <div className="sm:w-5/12">
                 <AddressInput
                   value={toAddress}
                   copyable={false}
