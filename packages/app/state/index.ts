@@ -191,8 +191,10 @@ function State() {
   const track = useCallback(
     (event: string, props: any = {}) => {
       plausible(event, {
-        ...props,
-        network: network.name,
+        props: {
+          ...props,
+          network: network.name,
+        },
       });
     },
     [network]
