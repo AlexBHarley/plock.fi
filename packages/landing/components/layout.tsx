@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { appUrl } from '../constants';
 
 export const WithMarketingLayout = (Component: any) => () => {
   const [menu, setMenu] = useState(false);
@@ -76,11 +77,7 @@ export const WithMarketingLayout = (Component: any) => () => {
               </nav>
               <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
                 <a
-                  href={
-                    process.env.NODE_ENV === 'production'
-                      ? 'https://app.plock.fi'
-                      : 'http://localhost:3001'
-                  }
+                  href={appUrl}
                   className="ml-8 whitespace-nowrap inline-flex items-center justify-center primary-button"
                 >
                   To app
@@ -214,11 +211,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                   <div className="py-6 px-5">
                     <div className="mt-6">
                       <a
-                        href={
-                          process.env.NODE_ENV === 'production'
-                            ? 'https://app.plock.fi'
-                            : 'http://localhost:3001'
-                        }
+                        href={appUrl}
                         className="w-full flex items-center justify-center primary-button"
                       >
                         To app

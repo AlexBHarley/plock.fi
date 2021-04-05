@@ -22,7 +22,7 @@ export function Dashboard() {
   return (
     <>
       <Panel>
-        <div className="flex justify-between">
+        <div className="flex justify-between space-x-3">
           <div>
             <PanelHeader>Welcome to Plock.fi</PanelHeader>
             <PanelDescription>
