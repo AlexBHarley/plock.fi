@@ -1,5 +1,5 @@
 import React from 'react';
-import SelectSearch, { fuzzySearch } from 'react-select-search';
+import SelectSearch, { fuzzySearch } from 'react-select-search/dist/cjs';
 
 export const CustomSelectSearch = ({
   value,
