@@ -18,7 +18,12 @@ enum States {
 
 export function LockCelo() {
   const { address, performActions } = useContractKit();
-  const { lockedSummary, balances, track } = Base.useContainer();
+  const {
+    lockedSummary,
+    balances,
+    track,
+    fetchLockedSummary,
+  } = Base.useContainer();
   const [lockAmount, setLockAmount] = useState('');
   const [state, setState] = useState(States.None);
 
@@ -32,6 +37,7 @@ export function LockCelo() {
           .lock()
           .sendAndWaitForReceipt({ value: toWei(lockAmount), from: address });
       });
+      fetchLockedSummary();
       toast.success('CELO locked');
       setLockAmount('');
     } catch (e) {
@@ -51,6 +57,7 @@ export function LockCelo() {
           .unlock(toWei(lockAmount))
           .sendAndWaitForReceipt({ from: address });
       });
+      fetchLockedSummary();
       toast.success('CELO unlocked');
       setLockAmount('');
     } catch (e) {
