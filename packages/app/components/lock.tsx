@@ -86,7 +86,7 @@ export function LockCelo() {
             <span className="text-gray-900 dark:text-gray-200">
               {formatAmount(total)}
             </span>{' '}
-            ({parseFloat(lockedPct)}%) CELO locked for voting.
+            ({parseFloat(lockedPct) || 0}%) CELO locked for voting.
           </div>
           <div>
             <span className="flex flex-col">

@@ -14,7 +14,9 @@ import {
   Panel,
   Table,
   toast,
+  TokenInput,
 } from '../components';
+import { Celo } from '../constants';
 import { Base } from '../state';
 import { formatAmount, toWei, truncate, truncateAddress } from '../utils';
 
@@ -75,6 +77,7 @@ export function Earn() {
     })[]
   >([]);
   const [voteAmount, setVoteAmount] = useState('');
+  const [votingName, setVotingName] = useState('');
   const [votingAddress, setVotingAddress] = useState('');
 
   const [totalVotes, setTotalVotes] = useState(new BigNumber(0));
@@ -431,33 +434,46 @@ export function Earn() {
                 {adding ? (
                   <div className="mt-4">
                     <div className="flex flex-col md:flex-row md:space-x-4 items-center">
-                      <CustomSelectSearch
-                        options={groups.map((vg) => ({
-                          ...vg,
-                          value: vg.address,
-                          name: `${truncate(vg.name, 10)} (${truncateAddress(
-                            vg.address
-                          )})`,
-                        }))}
-                        placeholder="Choose a validator group"
-                        value={votingAddress}
-                        onChange={(a) => setVotingAddress(a)}
-                      />
-
-                      <div className="relative rounded-md shadow-sm mt-4 md:mt-0 w-full">
-                        <Input
-                          type="text"
-                          name="price"
-                          id="price"
-                          value={voteAmount}
-                          onChange={(e) => setVoteAmount(e.target.value)}
-                          placeholder={'0'}
+                      <div className="hidden sm:flex w-full">
+                        <CustomSelectSearch
+                          options={groups.map((vg) => ({
+                            value: vg.address,
+                            name: `${vg.name} (${truncateAddress(vg.address)})`,
+                          }))}
+                          placeholder="Choose a validator group"
+                          value={votingAddress}
+                          onChange={(a) => {
+                            setVotingAddress(a);
+                          }}
                         />
-                        <div className="absolute inset-y-0 right-0 flex items-center">
-                          <div className="flex items-center justify-center focus:ring-indigo-500 focus:border-indigo-500 h-full py-0 pl-2 pr-4 border-transparent bg-transparent  sm:text-sm rounded-md">
-                            CELO
-                          </div>
-                        </div>
+                      </div>
+                      <div className="flex sm:hidden w-full">
+                        <select
+                          className="py-2 dark:bg-gray-750 rounded-md border border-gray-300 dark:border-gray-500 w-full"
+                          value={votingName}
+                          onChange={(e) => {
+                            const address = e.target[
+                              e.target.selectedIndex
+                            ].getAttribute('data-address');
+                            setVotingName(e.target.value);
+                            setVotingAddress(address);
+                          }}
+                        >
+                          {groups.map((g) => (
+                            <option data-address={g.address}>
+                              {`${g.name} (${truncateAddress(g.address)})`}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="mt-4 md:mt-0 w-full">
+                        <TokenInput
+                          value={voteAmount}
+                          onChange={(e) => setVoteAmount(e)}
+                          max={formatAmount(lockedSummary.lockedGold.nonvoting)}
+                          token={Celo}
+                        />
                       </div>
 
                       {state === States.Voting ? (
@@ -472,21 +488,6 @@ export function Earn() {
                           Vote
                         </button>
                       )}
-                    </div>
-                    <div className="text-xs text-right text-gray-600 dark:text-gray-400 mt-2">
-                      Staking{' '}
-                      <span className="text-gray-900 dark:text-gray-200">
-                        {toWei(voteAmount)} CELO (Wei)
-                      </span>{' '}
-                      with{' '}
-                      <span className="text-gray-900 dark:text-gray-200">
-                        {truncate(
-                          groups.find((vg) => vg.address === votingAddress)
-                            ?.name || '',
-                          10
-                        )}{' '}
-                        {truncateAddress(votingAddress)}
-                      </span>
                     </div>
                   </div>
                 ) : (

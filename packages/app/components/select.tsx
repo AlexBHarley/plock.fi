@@ -1,5 +1,5 @@
 import React from 'react';
-import SelectSearch, { useSelect } from 'react-select-search/dist/cjs';
+import SelectSearch, { fuzzySearch } from 'react-select-search';
 
 export const CustomSelectSearch = ({
   value,
@@ -10,8 +10,10 @@ export const CustomSelectSearch = ({
   return (
     <>
       <SelectSearch
+        search
         options={options}
         value={value}
+        filterOptions={fuzzySearch}
         closeOnSelect
         onChange={onChange}
         placeholder={placeholder}

@@ -1,6 +1,6 @@
 export function Panel({ children }: any) {
   return (
-    <div className="bg-white dark:bg-gray-850 shadow rounded-lg px-5 py-4 space-y-6 flex flex-col overflow-hidden">
+    <div className="bg-white dark:bg-gray-850 shadow rounded-lg px-5 py-4 space-y-6 flex flex-col">
       {children}
     </div>
   );
