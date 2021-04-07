@@ -157,7 +157,7 @@ export function Earn() {
     }
   };
 
-  const revoke = async (address: string, value: string) => {
+  const revoke = async (groupAddress: string, value: string) => {
     track('stake/revoke', { address, value });
     setState(States.Revoking);
     try {
@@ -165,11 +165,7 @@ export function Earn() {
         const election = await k.contracts.getElection();
         await Promise.all(
           (
-            await election.revoke(
-              k.defaultAccount,
-              address,
-              new BigNumber(value)
-            )
+            await election.revoke(address, groupAddress, new BigNumber(value))
           ).map((tx) => tx.sendAndWaitForReceipt({ from: address }))
         );
       });
