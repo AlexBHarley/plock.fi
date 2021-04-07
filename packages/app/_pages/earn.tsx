@@ -116,6 +116,7 @@ export function Earn() {
       toast.error(`Unable to activate votes ${e.message}`);
     }
     fetchVotingSummary();
+    fetchLockedSummary();
     setState(States.None);
   };
 
@@ -151,6 +152,7 @@ export function Earn() {
       toast.error(`Unable to vote ${e.message}`);
     } finally {
       setState(States.None);
+      fetchLockedSummary();
       fetchVotingSummary();
     }
   };
@@ -177,6 +179,7 @@ export function Earn() {
     } finally {
       setState(States.None);
       fetchVotingSummary();
+      fetchLockedSummary();
     }
   };
 
