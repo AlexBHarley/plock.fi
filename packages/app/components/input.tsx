@@ -138,7 +138,7 @@ export function TokenInput(
   const Icon = TokenIcons[props.token.ticker];
 
   return (
-    <div className="group flex items-center rounded-md shadow-sm w-full border border-gray-300 dark:border-gray-700 focus-within:outline-none focus-within:ring-indigo-500 focus-within:border-indigo-500">
+    <div className="group flex items-center rounded-md shadow-sm w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-600 focus-within:outline-none focus-within:ring-indigo-500 focus-within:border-indigo-500">
       <div className="ml-2">
         <Icon height="25px" width="25px" />
       </div>
@@ -161,7 +161,7 @@ export function TokenInput(
               );
               props.onChange(amount.toFixed(2));
             }}
-            className="text-sm font-medium uppercase text-gray-700 hover:text-gray-800 focus:outline-none focus:ring-0 transition"
+            className="text-sm font-medium uppercase text-gray-700 hover:text-gray-800 dark:text-indigo-50 dark:hover:text-indigo-200 focus:outline-none focus:ring-0 transition"
           >
             MAX
           </button>

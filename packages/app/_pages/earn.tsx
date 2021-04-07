@@ -9,7 +9,6 @@ import Web3 from 'web3';
 import {
   CopyText,
   CustomSelectSearch,
-  Input,
   LockCelo,
   Panel,
   Table,
@@ -18,7 +17,7 @@ import {
 } from '../components';
 import { Celo } from '../constants';
 import { Base } from '../state';
-import { formatAmount, toWei, truncate, truncateAddress } from '../utils';
+import { formatAmount, truncate, truncateAddress } from '../utils';
 
 enum States {
   None,
@@ -120,20 +119,34 @@ export function Earn() {
     setState(States.None);
   };
 
-  const vote = async (address: string, value: string) => {
-    track('stake/vote', { address, value });
+  const vote = async () => {
+    if (!votingAddress) {
+      toast.error('Please select a validator group');
+      return;
+    }
+
+    if (!voteAmount) {
+      toast.error('Please enter an amount to stake');
+      return;
+    }
+
+    track('stake/vote', { address: votingAddress, value: voteAmount });
     setState(States.Voting);
     try {
       await performActions(async (k) => {
         const election = await k.contracts.getElection();
         await (
-          await election.vote(address, new BigNumber(Web3.utils.toWei(value)))
+          await election.vote(
+            votingAddress,
+            new BigNumber(Web3.utils.toWei(voteAmount))
+          )
         ).sendAndWaitForReceipt({ from: address });
       });
       toast.success('Vote cast');
 
       setVoteAmount('');
       setVotingAddress('');
+      setVotingName('');
     } catch (e) {
       toast.error(`Unable to vote ${e.message}`);
     } finally {
@@ -459,9 +472,21 @@ export function Earn() {
                             setVotingAddress(address);
                           }}
                         >
+                          <option value="" disabled selected hidden>
+                            Please choose a validator group...
+                          </option>
+
                           {groups.map((g) => (
-                            <option data-address={g.address}>
-                              {`${g.name} (${truncateAddress(g.address)})`}
+                            <option
+                              data-address={g.address}
+                              value={`${truncate(
+                                g.name,
+                                20
+                              )} (${truncateAddress(g.address)})`}
+                            >
+                              {`${truncate(g.name, 20)} (${truncateAddress(
+                                g.address
+                              )})`}
                             </option>
                           ))}
                         </select>
@@ -481,10 +506,7 @@ export function Earn() {
                           <Loader type="TailSpin" height={20} width={20} />
                         </span>
                       ) : (
-                        <button
-                          className="secondary-button"
-                          onClick={async () => vote(votingAddress, voteAmount)}
-                        >
+                        <button className="secondary-button" onClick={vote}>
                           Vote
                         </button>
                       )}
