@@ -24,7 +24,7 @@ enum States {
 const buildCacheKey = (from: Token, to: Token) => `${from.ticker}-${to.ticker}`;
 
 export function Swap() {
-  const { network, kit, performActions } = useContractKit();
+  const { network, kit, performActions, address } = useContractKit();
   const { fetchBalances, balances, track } = Base.useContainer();
   const [state, setState] = useState(States.None);
   const [fromToken, setFromToken] = useState(Celo);
@@ -44,6 +44,7 @@ export function Swap() {
         setState(States.Swapping);
         await swap(
           k as any,
+          address,
           fromToken.networks[network.name],
           toToken.networks[network.name],
           amount

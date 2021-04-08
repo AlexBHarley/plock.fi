@@ -23,11 +23,15 @@ export async function quote(
 
 export async function swap(
   kit: ContractKit,
-  from: Address,
-  to: Address,
+  address: Address,
+  fromTokenAddress: Address,
+  toTokenAddress: Address,
   amount: string
 ) {
-  const fromToken = new kit.web3.eth.Contract(ERC20Abi as any, from);
+  const fromToken = new kit.web3.eth.Contract(
+    ERC20Abi as any,
+    fromTokenAddress
+  );
   await fromToken.methods
     .increaseAllowance(ubeswap.routerAddress, amount)
     .send({ from: kit.defaultAccount });
@@ -40,8 +44,8 @@ export async function swap(
     .swapExactTokensForTokens(
       amount,
       1,
-      [from, to],
-      kit.defaultAccount,
+      [fromTokenAddress, toTokenAddress],
+      address,
       Date.now() + 10000000
     )
     .send({
