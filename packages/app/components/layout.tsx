@@ -29,7 +29,7 @@ export function Sidebar({ items }: { items: SidebarOption[] }) {
   return (
     <aside className="sm:px-6 md:pb-4 lg:px-0 lg:col-span-3">
       <nav className="hidden md:block space-y-1">
-        {items.map((item, i) => (
+        {items.map((item) => (
           <Link to={item.disabled ? location.pathname : item.link}>
             <span
               className={`${
@@ -318,7 +318,7 @@ export function WithAppLayout({ children }) {
         </div>
       )}
 
-      <header className="">
+      <header>
         {menu && (
           <div
             style={{ zIndex: 100 }}
