@@ -25,7 +25,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <script
               dangerouslySetInnerHTML={{
                 __html:
-                  '<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>',
+                  'window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }',
               }}
             ></script>
           </>
