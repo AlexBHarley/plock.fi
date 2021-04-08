@@ -49,6 +49,6 @@ export async function swap(
       Date.now() + 10000000
     )
     .send({
-      from: kit.defaultAccount,
+      from: address,
     });
 }
