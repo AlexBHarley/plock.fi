@@ -48,6 +48,7 @@ export function Swap() {
           toToken.networks[network.name],
           amount
         );
+        setAmounts({ from: '', to: '' });
         fetchBalances();
         toast.success('Swap successful');
       } catch (e) {

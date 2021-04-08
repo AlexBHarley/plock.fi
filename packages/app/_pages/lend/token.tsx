@@ -121,7 +121,7 @@ export function LendToken() {
         await client.withdraw(token.networks[network.name], wei);
       });
       fetchAccountSummary();
-      toast.success(`${token.name} deposited`);
+      toast.success(`${token.name} withdrawn`);
     } catch (e) {
       toast.error(e.message);
     } finally {
@@ -167,7 +167,7 @@ export function LendToken() {
         await client.borrow(token.networks[network.name], wei, interestRate);
       });
       fetchAccountSummary();
-      toast.success(`${token.name} deposited`);
+      toast.success(`${token.name} borrowed`);
     } catch (e) {
       toast.error(e.message);
     } finally {
@@ -190,7 +190,7 @@ export function LendToken() {
         await client.repay(token.networks[network.name], wei);
       });
       fetchAccountSummary();
-      toast.success(`${token.name} deposited`);
+      toast.success(`${token.name} repaid`);
     } catch (e) {
       toast.error(e.message);
     } finally {
