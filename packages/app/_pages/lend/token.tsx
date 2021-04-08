@@ -1,31 +1,27 @@
 import { useContractKit } from '@celo-tools/use-contractkit';
-import {
-  Balances,
-  TokenInput,
-  Panel,
-  PanelDescription,
-  PanelGrid,
-  PanelHeader,
-  PanelWithButton,
-  Table,
-  toast,
-  Toggle,
-  TokenIcons,
-  WithLayout,
-} from '../../components';
-import { Celo, cUSD, tokens, TokenTicker } from '../../constants';
-import { useCallback, useEffect, useState } from 'react';
-import { Aave } from '../../utils/aave';
-import { formatAmount } from '../../utils';
 import BigNumber from 'bignumber.js';
-import Web3 from 'web3';
-import Loader from 'react-loader-spinner';
-import { Base } from '../../state';
+import { useCallback, useEffect, useState } from 'react';
 import {
   buildStyles,
   CircularProgressbarWithChildren,
 } from 'react-circular-progressbar';
+import Loader from 'react-loader-spinner';
 import { Link, useParams } from 'react-router-dom';
+import Web3 from 'web3';
+import {
+  Panel,
+  PanelDescription,
+  PanelGrid,
+  PanelHeader,
+  toast,
+  Toggle,
+  TokenIcons,
+  TokenInput,
+} from '../../components';
+import { tokens } from '../../constants';
+import { Base } from '../../state';
+import { formatAmount } from '../../utils';
+import { Aave } from '../../utils/aave';
 
 const defaultAccountSummary = {
   Deposited: new BigNumber(0),
@@ -217,7 +213,7 @@ export function LendToken() {
   return (
     <>
       <div>
-        <Link href="/lend">
+        <Link to="/lend">
           <div className="flex items-center space-x-1 cursor-pointer">
             <svg
               className="h-3"
