@@ -34,7 +34,7 @@ export async function swap(
   );
   await fromToken.methods
     .increaseAllowance(ubeswap.routerAddress, amount)
-    .send({ from: kit.defaultAccount });
+    .send({ from: address });
 
   const router = new kit.web3.eth.Contract(
     RouterAbi as any,
