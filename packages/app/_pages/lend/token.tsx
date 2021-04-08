@@ -124,6 +124,7 @@ export function LendToken() {
         const client = await Aave(k as any, network.name, address);
         await client.withdraw(token.networks[network.name], wei);
       });
+      fetchAccountSummary();
       toast.success(`${token.name} deposited`);
     } catch (e) {
       toast.error(e.message);
@@ -146,6 +147,7 @@ export function LendToken() {
         const client = await Aave(k as any, network.name, address);
         await client.deposit(token.networks[network.name], wei);
       });
+      fetchAccountSummary();
       toast.success(`${token.name} deposited`);
     } catch (e) {
       toast.error(e.message);
@@ -168,6 +170,7 @@ export function LendToken() {
         const client = await Aave(k as any, network.name, address);
         await client.borrow(token.networks[network.name], wei, interestRate);
       });
+      fetchAccountSummary();
       toast.success(`${token.name} deposited`);
     } catch (e) {
       toast.error(e.message);
@@ -190,6 +193,7 @@ export function LendToken() {
         const client = await Aave(k as any, network.name, address);
         await client.repay(token.networks[network.name], wei);
       });
+      fetchAccountSummary();
       toast.success(`${token.name} deposited`);
     } catch (e) {
       toast.error(e.message);
