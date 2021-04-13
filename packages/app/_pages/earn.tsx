@@ -11,6 +11,9 @@ import {
   CustomSelectSearch,
   LockCelo,
   Panel,
+  PanelDescription,
+  PanelGrid,
+  PanelHeader,
   Table,
   toast,
   TokenInput,
@@ -341,190 +344,184 @@ export function Earn() {
       <LockCelo />
 
       <Panel>
-        <div className="md:grid md:grid-cols-4 md:gap-6 py-2">
-          <div className="md:col-span-1">
-            <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
-              Vote
-            </h3>
+        <PanelGrid>
+          <div>
+            <PanelHeader>Vote</PanelHeader>
+            <PanelDescription></PanelDescription>
           </div>
-          <div className="mt-2 md:mt-0 md:col-span-3">
-            <div className="space-y-6">
-              <div className="text-gray-600 dark:text-gray-400 text-sm">
-                {truncateAddress(address || '0x')} currently has{' '}
-                <span className="font-medium text-gray-900 dark:text-gray-200">
-                  {formatAmount(lockedSummary.lockedGold.nonvoting)}
-                </span>{' '}
-                ({nonvotingPctStr}%) CELO locked and ready to vote with.
-              </div>
 
-              <div className="text-gray-600 dark:text-gray-400 text-sm">
-                After voting for any group there is a{' '}
-                <span className="text-gray-900 dark:text-gray-200 font-medium">
-                  24
-                </span>{' '}
-                hour waiting period you must observe before activating your
-                votes. Please ensure you check back here to activate any votes
-                and start earning rewards.
-              </div>
+          <>
+            <div className="text-gray-600 dark:text-gray-400 text-sm">
+              {truncateAddress(address || '0x')} currently has{' '}
+              <span className="font-medium text-gray-900 dark:text-gray-200">
+                {formatAmount(lockedSummary.lockedGold.nonvoting)}
+              </span>{' '}
+              ({nonvotingPctStr}%) CELO locked and ready to vote with.
+            </div>
 
-              {hasActivatablePendingVotes && (
+            <div className="text-gray-600 dark:text-gray-400 text-sm">
+              After voting for any group there is a{' '}
+              <span className="text-gray-900 dark:text-gray-200 font-medium">
+                24
+              </span>{' '}
+              hour waiting period you must observe before activating your votes.
+              Please ensure you check back here to activate any votes and start
+              earning rewards.
+            </div>
+
+            {hasActivatablePendingVotes && (
+              <div className="flex">
+                <button onClick={activate} className="ml-auto secondary-button">
+                  Activate All Pending Votes
+                </button>
+              </div>
+            )}
+
+            <div>
+              <ul className="list-decimal list-inside">
+                {groupVotes.map((gv) => {
+                  const group = groups.find((g) => g.address === gv.group);
+                  if (!group) {
+                    return null;
+                  }
+                  return (
+                    <li className="flex flex-col mb-3">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm">
+                          {truncate(group.name, 30)}
+                        </span>
+                        <span className="text-gray-600 dark:text-gray-400 text-sm inline-flex space-x-1">
+                          <span>({truncateAddress(group.address)})</span>
+                          <CopyText text={group.address} />
+                        </span>
+                      </div>
+
+                      <div className="relative flex flex-col mt-2">
+                        <span className="inline-flex items-center rounded-md text-xs font-medium text-indigo-600">
+                          {formatAmount(gv.active)} ACTIVE (
+                          {gv.active
+                            .dividedBy(lockedSummary.lockedGold.total)
+                            .times(100)
+                            .toFixed(0)}
+                          )%
+                        </span>
+                        <span className="inline-flex items-center rounded-md text-xs font-medium text-blue-600 mt-1">
+                          {formatAmount(gv.pending)} PENDING (
+                          {gv.pending
+                            .dividedBy(lockedSummary.lockedGold.total)
+                            .times(100)
+                            .toFixed(0)}
+                          )%
+                        </span>
+                        <div className="absolute right-0 top-0">
+                          {gv.active && (
+                            <>
+                              {state === States.Revoking ? (
+                                <Loader
+                                  type="TailSpin"
+                                  color="white"
+                                  height={'12px'}
+                                  width="12px"
+                                />
+                              ) : (
+                                <button
+                                  className=" text-sm hover:text-gray-600 dark:text-gray-400"
+                                  onClick={() =>
+                                    revoke(gv.group, gv.active.toString())
+                                  }
+                                >
+                                  Revoke
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              {adding ? (
+                <div className="mt-4">
+                  <div className="flex flex-col md:flex-row md:space-x-4 items-center">
+                    <div className="hidden sm:flex w-full">
+                      <CustomSelectSearch
+                        options={groups.map((vg) => ({
+                          value: vg.address,
+                          name: `${vg.name} (${truncateAddress(vg.address)})`,
+                        }))}
+                        placeholder="Choose a validator group"
+                        value={votingAddress}
+                        onChange={(a) => {
+                          setVotingAddress(a);
+                        }}
+                      />
+                    </div>
+                    <div className="flex sm:hidden w-full">
+                      <select
+                        className="py-2 dark:bg-gray-750 rounded-md border border-gray-300 dark:border-gray-500 w-full"
+                        value={votingName}
+                        onChange={(e) => {
+                          const address = e.target[
+                            e.target.selectedIndex
+                          ].getAttribute('data-address');
+                          setVotingName(e.target.value);
+                          setVotingAddress(address);
+                        }}
+                      >
+                        <option value="" disabled selected hidden>
+                          Please choose a validator group...
+                        </option>
+
+                        {groups.map((g) => (
+                          <option
+                            data-address={g.address}
+                            value={`${truncate(g.name, 20)} (${truncateAddress(
+                              g.address
+                            )})`}
+                          >
+                            {`${truncate(g.name, 20)} (${truncateAddress(
+                              g.address
+                            )})`}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="mt-4 md:mt-0 w-full">
+                      <TokenInput
+                        value={voteAmount}
+                        onChange={(e) => setVoteAmount(e)}
+                        max={formatAmount(lockedSummary.lockedGold.nonvoting)}
+                        token={Celo}
+                      />
+                    </div>
+
+                    {state === States.Voting ? (
+                      <span className="px-6 py-2">
+                        <Loader type="TailSpin" height={20} width={20} />
+                      </span>
+                    ) : (
+                      <button className="secondary-button" onClick={vote}>
+                        Vote
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ) : (
                 <div className="flex">
                   <button
-                    onClick={activate}
-                    className="ml-auto secondary-button"
+                    onClick={() => setAdding(true)}
+                    className="ml-auto rounded-md px-4 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-750 transition"
                   >
-                    Activate All Pending Votes
+                    New vote
                   </button>
                 </div>
               )}
-
-              <div>
-                <ul className="list-decimal list-inside">
-                  {groupVotes.map((gv) => {
-                    const group = groups.find((g) => g.address === gv.group);
-                    if (!group) {
-                      return null;
-                    }
-                    return (
-                      <li className="flex flex-col mb-3">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm">
-                            {truncate(group.name, 30)}
-                          </span>
-                          <span className="text-gray-600 dark:text-gray-400 text-sm inline-flex space-x-1">
-                            <span>({truncateAddress(group.address)})</span>
-                            <CopyText text={group.address} />
-                          </span>
-                        </div>
-
-                        <div className="relative flex flex-col mt-2">
-                          <span className="inline-flex items-center rounded-md text-xs font-medium text-indigo-600">
-                            {formatAmount(gv.active)} ACTIVE (
-                            {gv.active
-                              .dividedBy(lockedSummary.lockedGold.total)
-                              .times(100)
-                              .toFixed(0)}
-                            )%
-                          </span>
-                          <span className="inline-flex items-center rounded-md text-xs font-medium text-blue-600 mt-1">
-                            {formatAmount(gv.pending)} PENDING (
-                            {gv.pending
-                              .dividedBy(lockedSummary.lockedGold.total)
-                              .times(100)
-                              .toFixed(0)}
-                            )%
-                          </span>
-                          <div className="absolute right-0 top-0">
-                            {gv.active && (
-                              <>
-                                {state === States.Revoking ? (
-                                  <Loader
-                                    type="TailSpin"
-                                    color="white"
-                                    height={'12px'}
-                                    width="12px"
-                                  />
-                                ) : (
-                                  <button
-                                    className=" text-sm hover:text-gray-600 dark:text-gray-400"
-                                    onClick={() =>
-                                      revoke(gv.group, gv.active.toString())
-                                    }
-                                  >
-                                    Revoke
-                                  </button>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-
-                {adding ? (
-                  <div className="mt-4">
-                    <div className="flex flex-col md:flex-row md:space-x-4 items-center">
-                      <div className="hidden sm:flex w-full">
-                        <CustomSelectSearch
-                          options={groups.map((vg) => ({
-                            value: vg.address,
-                            name: `${vg.name} (${truncateAddress(vg.address)})`,
-                          }))}
-                          placeholder="Choose a validator group"
-                          value={votingAddress}
-                          onChange={(a) => {
-                            setVotingAddress(a);
-                          }}
-                        />
-                      </div>
-                      <div className="flex sm:hidden w-full">
-                        <select
-                          className="py-2 dark:bg-gray-750 rounded-md border border-gray-300 dark:border-gray-500 w-full"
-                          value={votingName}
-                          onChange={(e) => {
-                            const address = e.target[
-                              e.target.selectedIndex
-                            ].getAttribute('data-address');
-                            setVotingName(e.target.value);
-                            setVotingAddress(address);
-                          }}
-                        >
-                          <option value="" disabled selected hidden>
-                            Please choose a validator group...
-                          </option>
-
-                          {groups.map((g) => (
-                            <option
-                              data-address={g.address}
-                              value={`${truncate(
-                                g.name,
-                                20
-                              )} (${truncateAddress(g.address)})`}
-                            >
-                              {`${truncate(g.name, 20)} (${truncateAddress(
-                                g.address
-                              )})`}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div className="mt-4 md:mt-0 w-full">
-                        <TokenInput
-                          value={voteAmount}
-                          onChange={(e) => setVoteAmount(e)}
-                          max={formatAmount(lockedSummary.lockedGold.nonvoting)}
-                          token={Celo}
-                        />
-                      </div>
-
-                      {state === States.Voting ? (
-                        <span className="px-6 py-2">
-                          <Loader type="TailSpin" height={20} width={20} />
-                        </span>
-                      ) : (
-                        <button className="secondary-button" onClick={vote}>
-                          Vote
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex">
-                    <button
-                      onClick={() => setAdding(true)}
-                      className="ml-auto rounded-md px-4 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-750 transition"
-                    >
-                      New vote
-                    </button>
-                  </div>
-                )}
-              </div>
             </div>
-          </div>
-        </div>
+          </>
+        </PanelGrid>
       </Panel>
 
       <Panel>

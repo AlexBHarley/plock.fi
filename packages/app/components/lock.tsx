@@ -108,16 +108,14 @@ export function LockCelo() {
                   />
                 </div>
               ) : (
-                <>
-                  <div className="flex space-x-4 justify-center items-center">
-                    <button className="secondary-button" onClick={unlock}>
-                      Unlock
-                    </button>
-                    <button className="secondary-button" onClick={lock}>
-                      Lock
-                    </button>
-                  </div>
-                </>
+                <div className="flex space-x-4 justify-center items-center">
+                  <button className="secondary-button" onClick={unlock}>
+                    Unlock
+                  </button>
+                  <button className="secondary-button" onClick={lock}>
+                    Lock
+                  </button>
+                </div>
               )}
             </span>
           </div>
