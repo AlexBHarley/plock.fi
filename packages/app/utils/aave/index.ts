@@ -1,17 +1,13 @@
-import { NetworkNames } from '@celo-tools/use-contractkit';
 import { ContractKit } from '@celo/contractkit';
-import { Address } from 'node:cluster';
+import { eqAddress } from '@celo/utils/lib/address';
+import BigNumber from 'bignumber.js';
 import { AbiItem } from 'web3-utils';
-
-import LendingPoolAddressesProvider from '../abis/aave/LendingPoolAddressesProvider.json';
+import AToken from '../abis/aave/AToken.json';
 import LendingPool from '../abis/aave/LendingPool.json';
+import LendingPoolAddressesProvider from '../abis/aave/LendingPoolAddressesProvider.json';
 import LendingPoolCore from '../abis/aave/LendingPoolCore.json';
 import LendingPoolDataProvider from '../abis/aave/LendingPoolDataProvider.json';
-import AToken from '../abis/aave/AToken.json';
 import ERC20 from '../abis/ERC20.json';
-import BigNumber from 'bignumber.js';
-import { eqAddress } from '@celo/utils/lib/address';
-
 import { addresses } from './constants';
 
 const ray = '1000000000000000000000000000';

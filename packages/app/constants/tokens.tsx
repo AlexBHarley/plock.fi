@@ -4,7 +4,7 @@ export enum TokenTicker {
   CELO = 'CELO',
   cUSD = 'cUSD',
   cEUR = 'cEUR',
-  KeyKoin = 'KEY',
+  vMOJO = 'vMOJO',
   PesabaseDollar = 'pUSD',
   MutualCreditResourceSystem = 'MCRS',
   DexfairGovernanceToken = 'XGP',
@@ -44,13 +44,13 @@ export const cEUR: Token = {
   name: 'Celo Euro',
   networks: {
     [NetworkNames.Alfajores]: '',
-    [NetworkNames.Mainnet]: '',
+    [NetworkNames.Mainnet]: '0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73',
     [NetworkNames.Baklava]: '',
   },
 };
 export const Keykoin: Token = {
-  ticker: TokenTicker.KeyKoin,
-  name: 'Keykoin',
+  ticker: TokenTicker.vMOJO,
+  name: 'vMOJO',
   networks: {
     [NetworkNames.Alfajores]: '',
     [NetworkNames.Baklava]: '0xb6790ae0634f2439094e9bce08702f9261fe69c0',

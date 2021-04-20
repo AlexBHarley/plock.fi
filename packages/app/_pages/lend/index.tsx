@@ -66,7 +66,15 @@ export function LendOverview() {
             )
           ).filter(Boolean);
 
+          if (!token) {
+            return null;
+          }
+
           const data = await client.getReserveData(r);
+          if (!data) {
+            return null;
+          }
+
           return {
             ...token,
             ...data,
@@ -74,7 +82,7 @@ export function LendOverview() {
         })
       );
 
-      setMarkets(reserveData);
+      setMarkets(reserveData.filter(Boolean));
     } catch (e) {
       toast.error(e.message);
     } finally {
