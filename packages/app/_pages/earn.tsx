@@ -106,7 +106,6 @@ export function Earn() {
     setState(States.Activating);
     try {
       await performActions(async (k) => {
-        console.log(k);
         const election = await k.contracts.getElection();
         await Promise.all(
           (await election.activate(address)).map((tx) =>

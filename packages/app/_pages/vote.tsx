@@ -121,10 +121,7 @@ export function Vote() {
     try {
       await performActions(async (k) => {
         const governance = await k.contracts.getGovernance();
-        const voteRecord = await governance.getVoteRecord(
-          kit.defaultAccount,
-          id
-        );
+        const voteRecord = await governance.getVoteRecord(address, id);
 
         let safeValue = value;
         if (voteRecord.value === value) {
