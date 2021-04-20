@@ -1,6 +1,6 @@
 import { newKit } from '@celo/contractkit';
 import { add } from 'date-fns';
-import { deployReleaseCelo } from '../packages/app/utils/deploy-release-celo';
+import { deployReleaseCelo } from '../utils/deploy-release-celo';
 
 export async function main() {
   const kit = newKit('https://alfajores-forno.celo-testnet.org');

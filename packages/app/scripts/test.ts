@@ -1,5 +1,5 @@
 import { newKit } from '@celo/contractkit';
-import ERC20Abi from '../packages/app/utils/abis/ERC20.json';
+import ERC20Abi from '../utils/abis/ERC20.json';
 
 export async function main() {
   const kit = newKit('https://alfajores-forno.celo-testnet.org');

@@ -1,12 +1,12 @@
 import { NetworkNames } from '@celo-tools/use-contractkit';
 import { newKit } from '@celo/contractkit';
-import { Aave } from '../packages/app/utils/aave';
-import { ubeswap } from '../packages/app/constants';
-import FactoryAbi from '../packages/app/utils/abis/uniswap/Factory.json';
-import PairAbi from '../packages/app/utils/abis/uniswap/Pair.json';
-import { quote, swap } from '../packages/app/utils/uniswap';
+import { Aave } from '../utils/aave';
+import { ubeswap } from '../constants';
+import FactoryAbi from '../utils/abis/uniswap/Factory.json';
+import PairAbi from '../utils/abis/uniswap/Pair.json';
+import { quote, swap } from '../utils/uniswap';
 import Web3 from 'web3';
-import { formatAmount } from '../packages/app/utils';
+import { formatAmount } from '../utils';
 
 const ONE = Web3.utils.toWei('10');
 

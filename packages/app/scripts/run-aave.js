@@ -1,9 +1,9 @@
 const { newKit } = require('@celo/contractkit');
-const LendingPoolAddressesProvider = require('../packages/app/utils/abis/aave/LendingPoolAddressesProvider.json');
-const LendingPool = require('../packages/app/utils/abis/aave/LendingPool.json');
-const LendingPoolCore = require('../packages/app/utils/abis/aave/LendingPoolCore.json');
-const LendingPoolDataProvider = require('../packages/app/utils/abis/aave/LendingPoolDataProvider.json');
-const AToken = require('../packages/app/utils/abis/aave/AToken.json');
+const LendingPoolAddressesProvider = require('../utils/abis/aave/LendingPoolAddressesProvider.json');
+const LendingPool = require('../utils/abis/aave/LendingPool.json');
+const LendingPoolCore = require('../utils/abis/aave/LendingPoolCore.json');
+const LendingPoolDataProvider = require('../utils/abis/aave/LendingPoolDataProvider.json');
+const AToken = require('../utils/abis/aave/AToken.json');
 const BigNumber = require('bignumber.js');
 const Promise = require('bluebird');
 

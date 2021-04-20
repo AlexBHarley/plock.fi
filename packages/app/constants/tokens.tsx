@@ -11,6 +11,10 @@ export enum TokenTicker {
   Unifty = 'NIF',
   Ubeswap = 'ULP',
   cMC02 = 'cMC02',
+
+  mCELO = 'mCELO',
+  mcUSD = 'mcUSD',
+  mcEUR = 'mcEUR',
 }
 
 export interface Token {
@@ -43,9 +47,9 @@ export const cEUR: Token = {
   ticker: TokenTicker.cEUR,
   name: 'Celo Euro',
   networks: {
-    [NetworkNames.Alfajores]: '',
+    [NetworkNames.Alfajores]: '0x10c892a6ec43a53e45d0b916b4b7d383b1b78c0f',
     [NetworkNames.Mainnet]: '0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73',
-    [NetworkNames.Baklava]: '',
+    [NetworkNames.Baklava]: '0xf9ecE301247aD2CE21894941830A2470f4E774ca',
   },
 };
 export const Keykoin: Token = {
@@ -99,6 +103,30 @@ export const cMC02: Token = {
     [NetworkNames.Mainnet]: '0x32a9fe697a32135bfd313a6ac28792dae4d9979d',
   },
 };
+export const mCELO: Token = {
+  ticker: TokenTicker.mCELO,
+  name: 'mCELO AToken',
+  networks: {
+    [NetworkNames.Alfajores]: '0x86f61EB83e10e914fc6F321F5dD3c2dD4860a003',
+    [NetworkNames.Mainnet]: '0x7037F7296B2fc7908de7b57a89efaa8319f0C500',
+  },
+};
+export const mcUSD: Token = {
+  ticker: TokenTicker.mcUSD,
+  name: 'mcUSD AToken',
+  networks: {
+    [NetworkNames.Alfajores]: '0x71DB38719f9113A36e14F409bAD4F07B58b4730b',
+    [NetworkNames.Mainnet]: '0x64dEFa3544c695db8c535D289d843a189aa26b98',
+  },
+};
+export const mcEUR: Token = {
+  ticker: TokenTicker.mcEUR,
+  name: 'mcEUR AToken',
+  networks: {
+    [NetworkNames.Alfajores]: '0x32974C7335e649932b5766c5aE15595aFC269160',
+    [NetworkNames.Mainnet]: '0xa8d0E6799FF3Fd19c6459bf02689aE09c4d78Ba7',
+  },
+};
 
 export const tokens: Token[] = [
   Celo,
@@ -111,6 +139,9 @@ export const tokens: Token[] = [
   Unifty,
   Ubeswap,
   cMC02,
+  mCELO,
+  mcUSD,
+  mcEUR,
 ];
 
 export enum FiatCurrency {
