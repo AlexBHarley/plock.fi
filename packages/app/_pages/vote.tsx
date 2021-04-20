@@ -130,7 +130,7 @@ export function Vote() {
 
         await (
           await governance.vote(id, safeValue as any)
-        ).sendAndWaitForReceipt();
+        ).sendAndWaitForReceipt({ from: address });
       });
 
       toast.success('Vote cast');
