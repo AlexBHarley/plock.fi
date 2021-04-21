@@ -5,8 +5,10 @@ import { toast } from '../components';
 import { Celo } from '../constants';
 import { Base } from '../state';
 import { formatAmount, toWei, truncateAddress } from '../utils';
+import { ensureAccount } from '../utils/ensure-account';
 import { TokenInput } from './input';
-import { Panel, PanelGrid, PanelHeader } from './panel';
+import { Panel, PanelDescription, PanelGrid, PanelHeader } from './panel';
+import { Bold, Link } from './text';
 
 enum States {
   None,
@@ -14,6 +16,7 @@ enum States {
   Revoking,
   Locking,
   Unlocking,
+  Withdrawing,
 }
 
 export function LockCelo() {
@@ -28,10 +31,12 @@ export function LockCelo() {
   const [state, setState] = useState(States.None);
 
   const lock = async () => {
-    track('lock', { amount: toWei(lockAmount) });
+    track('lock/lock', { amount: toWei(lockAmount) });
     setState(States.Locking);
+
     try {
       await performActions(async (k) => {
+        await ensureAccount(k, address);
         const lockedCelo = await k.contracts.getLockedGold();
         return lockedCelo
           .lock()
@@ -47,11 +52,12 @@ export function LockCelo() {
   };
 
   const unlock = async () => {
-    track('unlock', { amount: toWei(lockAmount) });
+    track('lock/unlock', { amount: toWei(lockAmount) });
 
     setState(States.Unlocking);
     try {
       await performActions(async (k) => {
+        await ensureAccount(k, address);
         const lockedCelo = await k.contracts.getLockedGold();
         await lockedCelo
           .unlock(toWei(lockAmount))
@@ -66,28 +72,72 @@ export function LockCelo() {
     setState(States.None);
   };
 
-  const total = lockedSummary.lockedGold.total.plus(balances.CELO);
-  const lockedPct = lockedSummary.lockedGold.total
-    .dividedBy(total)
-    .times(100)
-    .toFixed(2);
+  const withdraw = async () => {
+    track('lock/withdraw', { amount: toWei(lockAmount) });
+
+    setState(States.Withdrawing);
+    try {
+      await performActions(async (k) => {
+        const locked = await k.contracts.getLockedGold();
+        const currentTime = Math.round(new Date().getTime() / 1000);
+        while (true) {
+          let madeWithdrawal = false;
+          const pendingWithdrawals = await locked.getPendingWithdrawals(
+            address
+          );
+          for (let i = 0; i < pendingWithdrawals.length; i++) {
+            const pendingWithdrawal = pendingWithdrawals[i];
+            if (pendingWithdrawal.time.isLessThan(currentTime)) {
+              await locked.withdraw(i).sendAndWaitForReceipt({ from: address });
+              madeWithdrawal = true;
+              break;
+            }
+          }
+          if (!madeWithdrawal) {
+            break;
+          }
+        }
+      });
+      fetchLockedSummary();
+      toast.success('CELO withdrawn');
+    } catch (e) {
+      toast.error(e.message);
+    }
+    setState(States.None);
+  };
+
+  const total = lockedSummary.total.plus(balances.CELO);
+  const lockedPct = lockedSummary.total.dividedBy(total).times(100).toFixed(2);
 
   return (
     <Panel>
       <PanelGrid>
         <PanelHeader>Lock CELO</PanelHeader>
+
         <div className="flex flex-col space-y-4">
-          <div className="text-gray-600 dark:text-gray-400 text-sm">
-            {truncateAddress(address || '0x')} currently has{' '}
-            <span className="font-medium text-gray-900 dark:text-gray-200">
-              {formatAmount(lockedSummary.lockedGold.total)}
-            </span>{' '}
-            out of{' '}
-            <span className="text-gray-900 dark:text-gray-200">
-              {formatAmount(total)}
-            </span>{' '}
-            ({parseFloat(lockedPct) || 0}%) CELO locked for voting.
-          </div>
+          <PanelDescription>
+            <p>
+              When locking CELO it's important to note that there are a few
+              states your CELO can be in, not locked, locked, unlocking and
+              withdrawable. For a deep dive into each of these states, checkout
+              the{' '}
+              <Link link="https://docs.celo.org/celo-codebase/protocol/proof-of-stake/locked-gold">
+                Locked Celo documentation
+              </Link>
+              .
+            </p>
+
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
+              {truncateAddress(address || '0x')} currently has{' '}
+              <Bold>{formatAmount(lockedSummary.total)}</Bold> out of{' '}
+              <Bold>{formatAmount(total)}</Bold> ({parseFloat(lockedPct) || 0}%)
+              CELO locked for voting.{' '}
+              <Bold>{formatAmount(lockedSummary.unlocking)}</Bold> CELO is
+              currently unlocking and{' '}
+              <Bold>{formatAmount(lockedSummary.withdrawable)}</Bold> CELO is
+              withdrawable.
+            </p>
+          </PanelDescription>
           <div>
             <span className="flex flex-col">
               <div className="w-full md:w-96 md:mx-auto">
@@ -95,7 +145,6 @@ export function LockCelo() {
                   value={lockAmount}
                   onChange={(e) => setLockAmount(e)}
                   token={Celo}
-                  max={balances[Celo.ticker].toString()}
                 />
               </div>
               {state === States.Locking || state === States.Unlocking ? (
@@ -114,6 +163,17 @@ export function LockCelo() {
                   </button>
                   <button className="secondary-button" onClick={lock}>
                     Lock
+                  </button>
+                </div>
+              )}
+
+              {lockedSummary.withdrawable.gt(0) && (
+                <div className="flex">
+                  <button
+                    className="secondary-button ml-auto"
+                    onClick={withdraw}
+                  >
+                    Withdraw Locked CELO
                   </button>
                 </div>
               )}

@@ -37,5 +37,9 @@ export function PanelHeader({ children }: any) {
 }
 
 export function PanelDescription({ children }: any) {
-  return <p className="text-sm text-gray-600 dark:text-gray-400">{children}</p>;
+  return (
+    <p className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+      {children}
+    </p>
+  );
 }

@@ -14,6 +14,7 @@ import {
 } from '../components';
 import { FiatCurrency, networks } from '../constants';
 import { Base } from '../state';
+import { ensureAccount } from '../utils/ensure-account';
 
 export function Settings() {
   const { address, updateNetwork, network, performActions } = useContractKit();
@@ -54,13 +55,9 @@ export function Settings() {
 
     try {
       await performActions(async (k) => {
-        const accounts = await k.contracts.getAccounts();
-        if (!(await accounts.isAccount(address))) {
-          await accounts
-            .createAccount()
-            .sendAndWaitForReceipt({ from: address });
-        }
+        await ensureAccount(k, address);
 
+        const accounts = await k.contracts.getAccounts();
         try {
           if (accountSummary.name !== state.name) {
             await accounts

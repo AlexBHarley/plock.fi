@@ -4,6 +4,7 @@ import { Address, eqAddress } from '@celo/base';
 import { PendingWithdrawal } from '@celo/contractkit/lib/wrappers/LockedGold';
 import { AddressUtils } from '@celo/utils';
 import BigNumber from 'bignumber.js';
+import { totalmem } from 'node:os';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { createContainer } from 'unstated-next';
@@ -30,14 +31,6 @@ interface AccountSummary {
   dataEncryptionKey: string;
 }
 
-interface LockedAccountSummary {
-  lockedGold: {
-    total: BigNumber;
-    nonvoting: BigNumber;
-    requirement: BigNumber;
-  };
-  pendingWithdrawals: PendingWithdrawal[];
-}
 const defaultAccountSummary = {
   address: AddressUtils.NULL_ADDRESS,
   name: '',
@@ -59,12 +52,10 @@ const defaultBalances = tokens.reduce(
   {}
 );
 const defaultLockedSummary = {
-  lockedGold: {
-    total: new BigNumber(0),
-    nonvoting: new BigNumber(0),
-    requirement: new BigNumber(0),
-  },
-  pendingWithdrawals: [],
+  total: new BigNumber(0),
+  nonVoting: new BigNumber(0),
+  withdrawable: new BigNumber(0),
+  unlocking: new BigNumber(0),
 };
 
 const defaultSettings = {
@@ -89,9 +80,12 @@ function State() {
   const [accountSummary, setAccountSummary] = useState<AccountSummary>(
     defaultAccountSummary
   );
-  const [lockedSummary, setLockedSummary] = useState<LockedAccountSummary>(
-    defaultLockedSummary
-  );
+  const [lockedSummary, setLockedSummary] = useState<{
+    withdrawable: BigNumber;
+    unlocking: BigNumber;
+    nonVoting: BigNumber;
+    total: BigNumber;
+  }>(defaultLockedSummary);
   const [balances, setBalances] = useState<{
     [x: string]: BigNumber;
   }>(defaultBalances);
@@ -170,8 +164,37 @@ function State() {
     }
 
     const locked = await kit.contracts.getLockedGold();
+
+    const { pendingWithdrawals, lockedGold } = await locked.getAccountSummary(
+      address
+    );
+
+    const withdrawals = pendingWithdrawals.reduce(
+      (totals, { time, value }) => {
+        const available = new Date(time.toNumber() * 1000);
+
+        if (available.getTime() < Date.now()) {
+          return {
+            ...totals,
+            withdrawable: totals.withdrawable.plus(value),
+          };
+        }
+
+        return {
+          ...totals,
+          unlocking: totals.unlocking.plus(value),
+        };
+      },
+      { withdrawable: new BigNumber(0), unlocking: new BigNumber(0) }
+    );
+
     try {
-      setLockedSummary(await locked.getAccountSummary(address));
+      setLockedSummary({
+        unlocking: withdrawals.unlocking,
+        withdrawable: withdrawals.withdrawable,
+        total: lockedGold.total,
+        nonVoting: lockedGold.nonvoting,
+      });
     } catch (_) {}
   }, [kit, address]);
 

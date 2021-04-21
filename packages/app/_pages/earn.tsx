@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Loader from 'react-loader-spinner';
 import Web3 from 'web3';
 import {
+  Bold,
   CopyText,
   CustomSelectSearch,
   LockCelo,
@@ -251,15 +252,13 @@ export function Earn() {
     fetchValidators();
   }, [fetchValidators]);
 
-  const voting = lockedSummary.lockedGold.total.minus(
-    lockedSummary.lockedGold.nonvoting
-  );
-  const total = lockedSummary.lockedGold.total.plus(balances.CELO);
+  const voting = lockedSummary.total.minus(lockedSummary.nonVoting);
+  const total = lockedSummary.total.plus(balances.CELO);
   const nonLocked = balances.CELO;
 
   const votingPct = voting.dividedBy(total).times(100);
-  const nonvotingPct = lockedSummary.lockedGold.nonvoting
-    .dividedBy(lockedSummary.lockedGold.total)
+  const nonvotingPct = lockedSummary.nonVoting
+    .dividedBy(lockedSummary.total)
     .times(100);
   const notLockedPct = nonLocked.dividedBy(total).times(100);
 
@@ -270,16 +269,13 @@ export function Earn() {
   return (
     <>
       <Panel>
-        <div>
-          <div className="text-gray-900 dark:text-gray-200 text-xl font-medium">
-            Earn with CELO
-          </div>
-          <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm mt-2">
-            Staking your CELO is a great way to earn passive rewards. To begin
-            staking you first need to lock your CELO, then you're free to vote
-            for validator groups of your choosing.
-          </p>
-        </div>
+        <PanelHeader>Earn with CELO</PanelHeader>
+        <PanelDescription>
+          Staking your CELO is a great way to earn passive rewards. To begin
+          staking you first need to lock your CELO, then you're free to vote for
+          validator groups of your choosing.
+        </PanelDescription>
+        <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm mt-2"></p>
 
         <div className="space-y-3">
           <div className="flex flex-col sm:flex-row space-y-1 md:space-y-0 md:space-x-3 items-end justify-end">
@@ -344,29 +340,23 @@ export function Earn() {
 
       <Panel>
         <PanelGrid>
-          <div>
-            <PanelHeader>Vote</PanelHeader>
-            <PanelDescription></PanelDescription>
-          </div>
+          <PanelHeader>Vote</PanelHeader>
 
           <>
-            <div className="text-gray-600 dark:text-gray-400 text-sm">
-              {truncateAddress(address || '0x')} currently has{' '}
-              <span className="font-medium text-gray-900 dark:text-gray-200">
-                {formatAmount(lockedSummary.lockedGold.nonvoting)}
-              </span>{' '}
-              ({nonvotingPctStr}%) CELO locked and ready to vote with.
-            </div>
+            <PanelDescription>
+              <div className="text-gray-600 dark:text-gray-400 text-sm">
+                {truncateAddress(address || '0x')} currently has{' '}
+                <Bold>{formatAmount(lockedSummary.nonVoting)}</Bold> (
+                {nonvotingPctStr}%) CELO locked and ready to vote with.
+              </div>
 
-            <div className="text-gray-600 dark:text-gray-400 text-sm">
-              After voting for any group there is a{' '}
-              <span className="text-gray-900 dark:text-gray-200 font-medium">
-                24
-              </span>{' '}
-              hour waiting period you must observe before activating your votes.
-              Please ensure you check back here to activate any votes and start
-              earning rewards.
-            </div>
+              <div className="text-gray-600 dark:text-gray-400 text-sm">
+                After voting for any group there is a <Bold>24</Bold> hour
+                waiting period you must observe before activating your votes.
+                Please ensure you check back here to activate any votes and
+                start earning rewards.
+              </div>
+            </PanelDescription>
 
             {hasActivatablePendingVotes && (
               <div className="flex">
@@ -398,18 +388,12 @@ export function Earn() {
                       <div className="relative flex flex-col mt-2">
                         <span className="inline-flex items-center rounded-md text-xs font-medium text-indigo-600">
                           {formatAmount(gv.active)} ACTIVE (
-                          {gv.active
-                            .dividedBy(lockedSummary.lockedGold.total)
-                            .times(100)
-                            .toFixed(0)}
+                          {gv.active.dividedBy(voting).times(100).toFixed(0)}
                           )%
                         </span>
                         <span className="inline-flex items-center rounded-md text-xs font-medium text-blue-600 mt-1">
                           {formatAmount(gv.pending)} PENDING (
-                          {gv.pending
-                            .dividedBy(lockedSummary.lockedGold.total)
-                            .times(100)
-                            .toFixed(0)}
+                          {gv.pending.dividedBy(voting).times(100).toFixed(0)}
                           )%
                         </span>
                         <div className="absolute right-0 top-0">
@@ -487,25 +471,21 @@ export function Earn() {
                         ))}
                       </select>
                     </div>
-
                     <div className="mt-4 md:mt-0 w-full">
                       <TokenInput
                         value={voteAmount}
                         onChange={(e) => setVoteAmount(e)}
-                        max={formatAmount(lockedSummary.lockedGold.nonvoting)}
+                        max={lockedSummary.nonVoting.toString()}
                         token={Celo}
                       />
                     </div>
-
-                    {state === States.Voting ? (
-                      <span className="px-6 py-2">
+                    <button className="primary-button" onClick={vote}>
+                      {state === States.Voting ? (
                         <Loader type="TailSpin" height={20} width={20} />
-                      </span>
-                    ) : (
-                      <button className="secondary-button" onClick={vote}>
-                        Vote
-                      </button>
-                    )}
+                      ) : (
+                        'Vote'
+                      )}
+                    </button>
                   </div>
                 </div>
               ) : (

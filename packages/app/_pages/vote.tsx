@@ -1,5 +1,15 @@
 import { useContractKit } from '@celo-tools/use-contractkit';
-import { LockCelo, Panel, Table, toast, WithLayout } from '../components';
+import {
+  Link,
+  LockCelo,
+  Panel,
+  PanelDescription,
+  PanelGrid,
+  PanelHeader,
+  Table,
+  toast,
+  WithLayout,
+} from '../components';
 import { useCallback, useEffect, useState } from 'react';
 import { ImArrowDown, ImArrowUp } from 'react-icons/im';
 import { FiExternalLink } from 'react-icons/fi';
@@ -144,33 +154,25 @@ export function Vote() {
     <>
       <Panel>
         <div>
-          <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-200">
-            Governance
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">
-            Celo uses a formal on-chain governance mechanism to manage and
-            upgrade the protocol. You can have your say in this by{' '}
-            <a
-              className="text-blue-500"
-              target="_blank"
-              href="https://docs.celo.org/celo-owner-guide/voting-governance"
-            ></a>
-            voting on proposals and being active in the community. More
-            information around this can be found in the{' '}
-            <a
-              className="text-blue-500"
-              target="_blank"
-              href="https://docs.celo.org/celo-codebase/protocol/governance"
-            >
-              Governance documentation
-            </a>
-            .
-          </p>
-
-          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">
-            As with voting for validator groups (or staking), you need to lock
-            Celo before voting on active proposals.
-          </p>
+          <PanelHeader>Governance</PanelHeader>
+          <PanelDescription>
+            <p>
+              Celo uses a formal on-chain governance mechanism to manage and
+              upgrade the protocol, you can have your say in these changes by{' '}
+              <Link link="https://docs.celo.org/celo-owner-guide/voting-governance">
+                voting on proposals
+              </Link>
+              . More information around voting can be found in the{' '}
+              <Link link="https://docs.celo.org/celo-codebase/protocol/governance">
+                Celo Governance documentation
+              </Link>
+              .
+            </p>
+            <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">
+              As with voting for validator groups (or staking), you need to lock
+              Celo before voting on active proposals.
+            </p>
+          </PanelDescription>
         </div>
       </Panel>
 

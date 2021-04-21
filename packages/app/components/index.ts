@@ -12,3 +12,4 @@ export * from './table';
 export * from './panel';
 export * from './pulsating-dot';
 export * from './select';
+export * from './text';
