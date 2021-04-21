@@ -71,6 +71,7 @@ export function Transfer() {
         await erc20.methods.transfer(toAddress, wei).send({ from: address });
       });
       toast.success(`${amount} ${currency.ticker} sent`);
+      setAmount('');
       fetchBalances();
     } catch (e) {
       toast.error(e.message);
