@@ -103,9 +103,7 @@ export const TokenIcons = {
       </svg>
     </>
   ),
-  [TokenTicker.KeyKoin]: (props: any) => (
-    <Image src="/keykoin.jpg" {...props} />
-  ),
+  [TokenTicker.vMOJO]: (props: any) => <Image src="/keykoin.jpg" {...props} />,
   [TokenTicker.PesabaseDollar]: (props: any) => (
     <Image src="/pesabase.jpg" {...props} />
   ),
