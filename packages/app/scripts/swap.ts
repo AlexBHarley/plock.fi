@@ -57,7 +57,7 @@ export async function main() {
     stableToken.address
   );
   console.log('Quoted', quoteAmount);
-  await swap(kit, goldToken.address, stableToken.address, amount);
+  await swap(kit, account, goldToken.address, stableToken.address, amount);
 
   console.log(
     'goldToken balance',
