@@ -17,7 +17,7 @@ import {
   TokenInput,
 } from '../components';
 import { Toggle } from '../components/toggle';
-import { Celo } from '../constants';
+import { Celo, Token } from '../constants';
 import { Base } from '../state';
 import { formatAmount, truncateAddress } from '../utils';
 import ERC20 from '../utils/abis/ERC20.json';
@@ -52,7 +52,7 @@ export function Transfer() {
     }
   );
   const [amount, setAmount] = useState('');
-  const [currency, setCurrency] = useState(Celo);
+  const [currency, setCurrency] = useState<Token>(Celo);
   const [toAddress, setToAddress] = useState('');
 
   const transfer = async () => {
@@ -70,7 +70,7 @@ export function Transfer() {
         const erc20 = new k.web3.eth.Contract(ERC20 as any, contractAddress);
         await erc20.methods.transfer(toAddress, wei).send({ from: address });
       });
-      toast.success(`${amount} ${currency} sent`);
+      toast.success(`${amount} ${currency.ticker} sent`);
       fetchBalances();
     } catch (e) {
       toast.error(e.message);
