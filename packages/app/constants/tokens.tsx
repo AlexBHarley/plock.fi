@@ -8,13 +8,17 @@ export enum TokenTicker {
   PesabaseDollar = 'pUSD',
   MutualCreditResourceSystem = 'MCRS',
   DexfairGovernanceToken = 'XGP',
-  Unifty = 'NIF',
-  Ubeswap = 'ULP',
+  NIF = 'NIF',
+  UBE = 'UBE',
   cMC02 = 'cMC02',
 
   mCELO = 'mCELO',
   mcUSD = 'mcUSD',
   mcEUR = 'mcEUR',
+
+  cXOF = 'cXOF',
+
+  sCELO = 'Savings Celo',
 }
 
 export interface Token {
@@ -54,9 +58,8 @@ export const cEUR: Token = {
 };
 export const Keykoin: Token = {
   ticker: TokenTicker.vMOJO,
-  name: 'vMOJO',
+  name: 'Voting MOJO',
   networks: {
-    [NetworkNames.Alfajores]: '',
     [NetworkNames.Baklava]: '0xb6790ae0634f2439094e9bce08702f9261fe69c0',
     [NetworkNames.Mainnet]: '0x39d6477522eb543d750af82537325fb2930c1aa6',
   },
@@ -82,15 +85,15 @@ export const DexfairGovernanceToken: Token = {
     [NetworkNames.Mainnet]: '0xf06768797ba4e86abfa5adfbfd223742f2657960',
   },
 };
-export const Unifty: Token = {
-  ticker: TokenTicker.Unifty,
-  name: 'Unifty',
+export const NIF: Token = {
+  ticker: TokenTicker.NIF,
+  name: 'NIF',
   networks: {
     [NetworkNames.Mainnet]: '0x3df39266f1246128c39086e1b542db0148a30d8c',
   },
 };
 export const Ubeswap: Token = {
-  ticker: TokenTicker.Ubeswap,
+  ticker: TokenTicker.UBE,
   name: 'Ubeswap LP Token',
   networks: {
     [NetworkNames.Mainnet]: '0x1e593f1fe7b61c53874b54ec0c59fd0d5eb8621e',
@@ -98,14 +101,14 @@ export const Ubeswap: Token = {
 };
 export const cMC02: Token = {
   ticker: TokenTicker.cMC02,
-  name: 'MCO2 Token',
+  name: 'Celo Moss Carbon Credit',
   networks: {
     [NetworkNames.Mainnet]: '0x32a9fe697a32135bfd313a6ac28792dae4d9979d',
   },
 };
 export const mCELO: Token = {
   ticker: TokenTicker.mCELO,
-  name: 'mCELO AToken',
+  name: 'Moola CELO',
   networks: {
     [NetworkNames.Alfajores]: '0x86f61EB83e10e914fc6F321F5dD3c2dD4860a003',
     [NetworkNames.Mainnet]: '0x7037F7296B2fc7908de7b57a89efaa8319f0C500',
@@ -113,7 +116,7 @@ export const mCELO: Token = {
 };
 export const mcUSD: Token = {
   ticker: TokenTicker.mcUSD,
-  name: 'mcUSD AToken',
+  name: 'Moola cUSD',
   networks: {
     [NetworkNames.Alfajores]: '0x71DB38719f9113A36e14F409bAD4F07B58b4730b',
     [NetworkNames.Mainnet]: '0x64dEFa3544c695db8c535D289d843a189aa26b98',
@@ -121,10 +124,17 @@ export const mcUSD: Token = {
 };
 export const mcEUR: Token = {
   ticker: TokenTicker.mcEUR,
-  name: 'mcEUR AToken',
+  name: 'Moola cEUR',
   networks: {
     [NetworkNames.Alfajores]: '0x32974C7335e649932b5766c5aE15595aFC269160',
     [NetworkNames.Mainnet]: '0xa8d0E6799FF3Fd19c6459bf02689aE09c4d78Ba7',
+  },
+};
+export const cXOF: Token = {
+  ticker: TokenTicker.cXOF,
+  name: 'Duniapay West African CFA franc',
+  networks: {
+    [NetworkNames.Mainnet]: '0x832F03bCeE999a577cb592948983E35C048B5Aa4',
   },
 };
 
@@ -136,7 +146,7 @@ export const tokens: Token[] = [
   PesabaseDollar,
   MutualCreditResourceSystem,
   DexfairGovernanceToken,
-  Unifty,
+  NIF,
   Ubeswap,
   cMC02,
   mCELO,

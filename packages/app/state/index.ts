@@ -132,7 +132,7 @@ function State() {
       const balances = erc20s.reduce((accum, t) => {
         return {
           ...accum,
-          [t.ticker]: t.balance,
+          [t.ticker]: new BigNumber(t.balance),
         };
       }, {});
 

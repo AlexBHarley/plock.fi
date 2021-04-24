@@ -19,11 +19,11 @@ import {
   PanelHeader,
   PanelWithButton,
   toast,
-  TokenIcons,
 } from '../components';
 import { Base } from '../state';
 import { formatAmount } from '../utils';
 import { deployReleaseCelo } from '../utils/deploy-release-celo';
+import Image from 'next/image';
 
 class GradientSVG extends React.Component {
   render() {
@@ -399,7 +399,11 @@ export function Stream() {
                       >
                         <div className="flex flex-col items-center justify-center">
                           <span className="mb-4">
-                            <TokenIcons.CELO height="40px" width="40px" />
+                            <Image
+                              height="40px"
+                              width="40px"
+                              src="/tokens/CELO.png"
+                            />
                           </span>
 
                           <div className="text-2xl md:text-4xl font-medium text-gray-900 dark:text-gray-200 mb-2">

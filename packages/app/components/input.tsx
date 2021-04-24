@@ -9,8 +9,8 @@ import Web3 from 'web3';
 import { toast } from '.';
 import { Token, tokens } from '../constants';
 import { CopyText } from './copy-text';
-import { TokenIcons } from './icon';
 import { Modal } from './modals';
+import Image from 'next/image';
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   const { className } = props;
@@ -135,13 +135,20 @@ export function TokenInput(
   }
 ) {
   const { network } = useContractKit();
-  const Icon = TokenIcons[props.token.ticker];
 
   return (
     <div className="group flex items-center rounded-md shadow-sm w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-600 focus-within:outline-none focus-within:ring-indigo-500 focus-within:border-indigo-500">
-      <div className="ml-2">
-        <Icon height="25px" width="25px" />
-      </div>
+      <span
+        className="inline-flex items-center ml-2"
+        style={{ minWidth: '25px' }}
+      >
+        <Image
+          height={25}
+          width={25}
+          src={`/tokens/${props.token.ticker}.png`}
+          className="rounded-full"
+        />
+      </span>
       <input
         type="text"
         name="price"

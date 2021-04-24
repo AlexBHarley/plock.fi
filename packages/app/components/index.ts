@@ -2,7 +2,6 @@ export * from './balances';
 export * from './circular-progress-bar';
 export * from './copy-text';
 export * from './dropdown';
-export * from './icon';
 export * from './input';
 export * from './layout';
 export * from './lock';

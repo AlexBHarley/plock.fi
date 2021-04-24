@@ -2,11 +2,12 @@ import { useContractKit } from '@celo-tools/use-contractkit';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Panel, PanelHeader, Table, toast, TokenIcons } from '../../components';
+import { Panel, PanelHeader, Table, toast } from '../../components';
 import { tokens, TokenTicker } from '../../constants';
 import { Base } from '../../state';
 import { formatAmount } from '../../utils';
 import { Aave } from '../../utils/aave';
+import Image from 'next/image';
 
 const defaultAccountSummary = {
   TotalLiquidity: '0',
@@ -95,7 +96,6 @@ export function LendOverview() {
   }, [fetchMarkets]);
 
   const isSafe = accountSummary.healthFactor.gt(100);
-
   return (
     <>
       <Panel>
@@ -222,7 +222,6 @@ export function LendOverview() {
             loading={state === States.Loading}
             noDataMessage={'No reserve data found'}
             rows={markets.map((r) => {
-              const Icon = TokenIcons[r.ticker];
               return [
                 <Link to={`/lend/${r.ticker}`}>
                   <span className="px-4 py-2 bg-gray-800 hover:bg-gray-900 dark:bg-gray-50 dark:hover:bg-gray-300 text-white dark:text-gray-800 transition  rounded">
@@ -230,7 +229,14 @@ export function LendOverview() {
                   </span>
                 </Link>,
                 <div className="flex items-center space-x-2">
-                  <Icon className="h-4 w-4" />
+                  <span style={{ minWidth: '20px' }}>
+                    <Image
+                      src={`/tokens/${r.ticker}.png`}
+                      height={20}
+                      width={20}
+                      className="rounded-full"
+                    />
+                  </span>
                   <div>{r.ticker}</div>
                 </div>,
                 <div className="font-semibold">

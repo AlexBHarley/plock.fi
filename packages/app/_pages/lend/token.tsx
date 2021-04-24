@@ -15,13 +15,13 @@ import {
   PanelHeader,
   toast,
   Toggle,
-  TokenIcons,
   TokenInput,
 } from '../../components';
 import { tokens } from '../../constants';
 import { Base } from '../../state';
 import { formatAmount } from '../../utils';
 import { Aave } from '../../utils/aave';
+import Image from 'next/image';
 
 const defaultAccountSummary = {
   Deposited: new BigNumber(0),
@@ -208,7 +208,6 @@ export function LendToken() {
   const liquidityPercentage = reserve.AvailableLiquidity.dividedBy(marketSize)
     .times(100)
     .toNumber();
-  const Icon = TokenIcons[tokenTicker as string];
 
   return (
     <>
@@ -271,7 +270,11 @@ export function LendToken() {
             >
               <div className="flex flex-col items-center justify-center">
                 <span className="mb-4">
-                  <Icon height="40px" width="40px" />
+                  <Image
+                    src={`/tokens/${token.ticker}.png`}
+                    height="40px"
+                    width="40px"
+                  />
                 </span>
               </div>
             </CircularProgressbarWithChildren>

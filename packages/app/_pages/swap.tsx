@@ -31,6 +31,7 @@ export function Swap() {
   const [amounts, setAmounts] = useState({ from: '', to: '' });
   const [toToken, setToToken] = useState(cUSD);
   const [exchangeRateCache, setExchangeRateCache] = useState({});
+  const [quoteError, setQuoteError] = useState('');
 
   const handleSwap = async () => {
     const amount = Web3.utils.toWei(amounts.from);
@@ -75,18 +76,29 @@ export function Swap() {
     }
 
     async function f() {
-      if (!exchangeRateCache[key]) {
-        const rate = await quote(
-          kit as any,
-          fromToken.networks[network.name],
-          Web3.utils.toWei('1', 'ether'), // just to get some more decimal places
-          toToken.networks[network.name]
-        );
+      if (exchangeRateCache[key]) {
+        setQuoteError('');
+        return;
+      }
 
-        setExchangeRateCache((c) => ({
-          ...c,
-          [key]: Web3.utils.fromWei(rate),
-        }));
+      if (!exchangeRateCache[key]) {
+        try {
+          const rate = await quote(
+            kit as any,
+            fromToken.networks[network.name],
+            Web3.utils.toWei('1', 'ether'), // just to get some more decimal places
+            toToken.networks[network.name]
+          );
+          setExchangeRateCache((c) => ({
+            ...c,
+            [key]: Web3.utils.fromWei(rate),
+          }));
+          setQuoteError('');
+        } catch (e) {
+          setQuoteError(
+            'Insufficient liquidity to swap between these two tokens'
+          );
+        }
       }
     }
     f();
@@ -163,6 +175,8 @@ export function Swap() {
               onTokenChange={(t) => setToToken(t)}
             />
           </div>
+
+          <div className="text-red-500 mt-2 text-sm">{quoteError}</div>
         </div>
 
         <button
