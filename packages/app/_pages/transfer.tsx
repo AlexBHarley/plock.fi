@@ -68,7 +68,9 @@ export function Transfer() {
     try {
       await performActions(async (k) => {
         const erc20 = new k.web3.eth.Contract(ERC20 as any, contractAddress);
-        await erc20.methods.transfer(toAddress, wei).send({ from: address });
+        await erc20.methods
+          .transfer(toAddress, wei)
+          .send({ from: k.defaultAccount });
       });
       toast.success(`${amount} ${currency.ticker} sent`);
       setAmount('');

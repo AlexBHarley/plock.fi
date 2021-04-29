@@ -115,8 +115,10 @@ export function Vote() {
     try {
       await performActions(async (k) => {
         const governance = await k.contracts.getGovernance();
-        await (await governance.upvote(id, address)).sendAndWaitForReceipt({
-          from: address,
+        await (
+          await governance.upvote(id, k.defaultAccount)
+        ).sendAndWaitForReceipt({
+          from: k.defaultAccount,
         });
       });
       toast.success('Approved');
@@ -140,7 +142,7 @@ export function Vote() {
 
         await (
           await governance.vote(id, safeValue as any)
-        ).sendAndWaitForReceipt({ from: address });
+        ).sendAndWaitForReceipt({ from: k.defaultAccount });
       });
 
       toast.success('Vote cast');

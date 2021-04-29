@@ -155,7 +155,7 @@ export function Stream() {
       await performActions(async (k) => {
         const rgAddress = await deployReleaseCelo(
           {
-            from: address,
+            from: k.defaultAccount,
             to: config.beneficiary,
             amount: config.amount,
             start: config.start,
@@ -187,7 +187,7 @@ export function Stream() {
         );
         await rgw
           .withdraw(stream.released.minus(stream.withdrawn))
-          .sendAndWaitForReceipt({ from: address });
+          .sendAndWaitForReceipt({ from: k.defaultAccount });
       });
       connect(stream.address);
       toast.success('Withdrawn');

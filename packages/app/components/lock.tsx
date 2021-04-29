@@ -38,9 +38,10 @@ export function LockCelo() {
       await performActions(async (k) => {
         await ensureAccount(k, k.defaultAccount);
         const lockedCelo = await k.contracts.getLockedGold();
-        return lockedCelo
-          .lock()
-          .sendAndWaitForReceipt({ value: toWei(lockAmount), from: address });
+        return lockedCelo.lock().sendAndWaitForReceipt({
+          value: toWei(lockAmount),
+          from: k.defaultAccount,
+        });
       });
       fetchLockedSummary();
       toast.success('CELO locked');
@@ -60,7 +61,7 @@ export function LockCelo() {
         const lockedCelo = await k.contracts.getLockedGold();
         await lockedCelo
           .unlock(toWei(lockAmount))
-          .sendAndWaitForReceipt({ from: address });
+          .sendAndWaitForReceipt({ from: k.defaultAccount });
       });
       fetchLockedSummary();
       toast.success('CELO unlocked');
@@ -87,7 +88,9 @@ export function LockCelo() {
           for (let i = 0; i < pendingWithdrawals.length; i++) {
             const pendingWithdrawal = pendingWithdrawals[i];
             if (pendingWithdrawal.time.isLessThan(currentTime)) {
-              await locked.withdraw(i).sendAndWaitForReceipt({ from: address });
+              await locked
+                .withdraw(i)
+                .sendAndWaitForReceipt({ from: k.defaultAccount });
               madeWithdrawal = true;
               break;
             }

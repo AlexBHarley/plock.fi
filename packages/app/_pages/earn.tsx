@@ -110,7 +110,7 @@ export function Earn() {
         const election = await k.contracts.getElection();
         await Promise.all(
           (await election.activate(address)).map((tx) =>
-            tx.sendAndWaitForReceipt({ from: address })
+            tx.sendAndWaitForReceipt({ from: k.defaultAccount })
           )
         );
       });
@@ -144,7 +144,7 @@ export function Earn() {
             votingAddress,
             new BigNumber(Web3.utils.toWei(voteAmount))
           )
-        ).sendAndWaitForReceipt({ from: address });
+        ).sendAndWaitForReceipt({ from: k.defaultAccount });
       });
       toast.success('Vote cast');
 
@@ -169,7 +169,7 @@ export function Earn() {
         await Promise.all(
           (
             await election.revoke(address, groupAddress, new BigNumber(value))
-          ).map((tx) => tx.sendAndWaitForReceipt({ from: address }))
+          ).map((tx) => tx.sendAndWaitForReceipt({ from: k.defaultAccount }))
         );
       });
       toast.success('Vote cast');

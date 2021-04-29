@@ -62,12 +62,12 @@ export function Settings() {
           if (accountSummary.name !== state.name) {
             await accounts
               .setName(state.name)
-              .sendAndWaitForReceipt({ from: address });
+              .sendAndWaitForReceipt({ from: k.defaultAccount });
           }
           if (accountSummary.metadataURL !== state.metadataURL) {
             await accounts
               .setMetadataURL(state.metadataURL)
-              .sendAndWaitForReceipt({ from: address });
+              .sendAndWaitForReceipt({ from: k.defaultAccount });
           }
 
           toast.success('Account data updated');
