@@ -36,7 +36,7 @@ export function LockCelo() {
 
     try {
       await performActions(async (k) => {
-        await ensureAccount(k, address);
+        await ensureAccount(k, k.defaultAccount);
         const lockedCelo = await k.contracts.getLockedGold();
         return lockedCelo
           .lock()
@@ -57,7 +57,6 @@ export function LockCelo() {
     setState(States.Unlocking);
     try {
       await performActions(async (k) => {
-        await ensureAccount(k, address);
         const lockedCelo = await k.contracts.getLockedGold();
         await lockedCelo
           .unlock(toWei(lockAmount))

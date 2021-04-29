@@ -55,7 +55,7 @@ export function Settings() {
 
     try {
       await performActions(async (k) => {
-        await ensureAccount(k, address);
+        await ensureAccount(k, k.defaultAccount);
 
         const accounts = await k.contracts.getAccounts();
         try {
