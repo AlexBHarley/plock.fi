@@ -544,6 +544,8 @@ function WithSidebar({ children }: any) {
 export const WithLayout = ({ children }: any) => (
   <ContractKitProvider
     dappName="Plock"
+    dappDescription="The DeFi dashboard for Celo"
+    dappUrl="https://plock.fi"
     networks={[Mainnet, Alfajores, Baklava]}
   >
     <Base.Provider>
