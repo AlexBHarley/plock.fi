@@ -8,7 +8,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <title>Plock - DeFi Dashboard</title>
-        <link rel="icon" href="/logo.png" />
+        <link rel="icon" href="/favicon.ico" />
         <meta name="keywords" content="celo, cryptocurrency, defi" />
         <meta name="description" content="The Defi dashboard for Celo" />
 
