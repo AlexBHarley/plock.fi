@@ -65,10 +65,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo-tools/use-contractkit@1.0.0-beta.7":
-  version "1.0.0-beta.7"
-  resolved "https://registry.yarnpkg.com/@celo-tools/use-contractkit/-/use-contractkit-1.0.0-beta.7.tgz#00d72ded4c18186d473effb9af4dca5d5fd337f2"
-  integrity sha512-mxMFmQyPTt4+6+1TiXqs0KWk5FcxtBK20wmfQZGKcrLWGvB9qg2HAfTdnSl0HQNQKTuXsVYTX+ZpLc3W4qkG4A==
+"@celo-tools/use-contractkit@1.0.0-beta.10":
+  version "1.0.0-beta.10"
+  resolved "https://registry.yarnpkg.com/@celo-tools/use-contractkit/-/use-contractkit-1.0.0-beta.10.tgz#49b7f0955660d126afa650a84f8e0982202c3348"
+  integrity sha512-Fw4exfah6+FWKfOjKBR/E8mStDly3AvGbYSPnTdC+ikFTMSbG94Vy2yu1qCn3L59brZgCjh/qiY48aakGyoZsg==
   dependencies:
     "@celo/contractkit" "^1.2.0"
     "@celo/utils" "^1.2.0"
