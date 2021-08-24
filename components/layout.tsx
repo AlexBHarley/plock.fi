@@ -66,7 +66,7 @@ export function Sidebar({ items }: { items: SidebarOption[] }) {
 
 const tabs: SidebarOption[] = [
   {
-    name: 'Dashboard',
+    name: 'Home',
     icon: (
       <svg
         className="h-4"
@@ -107,7 +107,7 @@ const tabs: SidebarOption[] = [
     link: '/transfer',
   },
   {
-    name: 'Swap',
+    name: 'Exchange',
     icon: (
       <svg
         className="h-4"
@@ -148,7 +148,7 @@ const tabs: SidebarOption[] = [
     badge: 'BETA',
   },
   {
-    name: 'Earn',
+    name: 'Staking',
     icon: (
       <svg
         className="h-4"
@@ -168,7 +168,7 @@ const tabs: SidebarOption[] = [
     link: '/earn',
   },
   {
-    name: 'Vote',
+    name: 'Governance',
     icon: (
       <svg
         className="h-4"
