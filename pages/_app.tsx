@@ -7,10 +7,13 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Plock - DeFi Dashboard</title>
+        <title>Plock</title>
         <link rel="icon" href="/favicon.ico" />
         <meta name="keywords" content="celo, cryptocurrency, defi" />
-        <meta name="description" content="The Defi dashboard for Celo" />
+        <meta
+          name="description"
+          content="Access to the decentralised world of Celo"
+        />
 
         <script async src="/dark-mode.js" />
 
