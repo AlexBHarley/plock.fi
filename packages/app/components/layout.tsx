@@ -240,13 +240,8 @@ const tabs: SidebarOption[] = [
 export function WithAppLayout({ children }) {
   const menuRef = useRef(null);
   const { settings } = Base.useContainer();
-  const {
-    network,
-    address,
-    destroy,
-    connect,
-    connectionCallback,
-  } = useContractKit();
+  const { network, address, destroy, connect, connectionCallback } =
+    useContractKit();
   const [healthy, setHealthy] = useState(true);
   const [menu, setMenu] = useState(false);
 
@@ -481,7 +476,7 @@ export function WithAppLayout({ children }) {
           </div>
           <div className="flex items-center space-x-6">
             <a
-              href="https://github.com/alexbharley/celo-manager"
+              href="https://github.com/alexbharley/plock.fi"
               target="_blank"
               className="text-gray-600 dark:text-gray-400 hover:text-gray-500"
             >
@@ -500,7 +495,7 @@ export function WithAppLayout({ children }) {
               </svg>
             </a>
             <a
-              href="https://twitter.com/"
+              href="https://twitter.com/alex_b_h_"
               target="_blank"
               className="text-gray-600 dark:text-gray-400 hover:text-gray-500"
             >

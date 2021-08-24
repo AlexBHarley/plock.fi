@@ -370,7 +370,7 @@ export const WithMarketingLayout = (Component: any) => () => {
                   </svg>
                 </a> */}
                 <a
-                  href="https://github.com/alexbharley"
+                  href="https://github.com/alexbharley/plock.fi"
                   className="text-gray-600 dark:text-gray-400 hover:text-gray-500"
                   target="_blank"
                 >
